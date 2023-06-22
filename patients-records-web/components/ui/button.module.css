@@ -1,0 +1,49 @@
+/** @format */
+
+.primary {
+  padding: 10px 20px;
+  gap: 10px;
+
+  background: var(--primary-light);
+  box-shadow: 5px 5px 2px rgba(0, 0, 0, 0.25);
+  border-radius: 10px;
+
+  font-family: "Montserrat";
+  font-style: normal;
+  font-weight: 800;
+  font-size: 18px;
+  line-height: 150%;
+
+  color: var(--neutral);
+
+  border: 0;
+}
+
+.primary:hover {
+  background: var(--neutral);
+  color: var(--primary-light);
+}
+
+.secondary {
+  padding: 10px 20px;
+  gap: 10px;
+
+  background: var(--neutral);
+  box-shadow: 5px 5px 2px rgba(0, 0, 0, 0.25);
+  border-radius: 10px;
+
+  font-family: "Montserrat";
+  font-style: normal;
+  font-weight: 800;
+  font-size: 18px;
+  line-height: 150%;
+
+  color: var(--primary-light);
+
+  border: 0;
+}
+
+.secondary:hover {
+  background: var(--primary-light);
+  color: var(--neutral);
+}

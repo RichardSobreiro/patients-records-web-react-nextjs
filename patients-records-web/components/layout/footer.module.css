@@ -121,6 +121,8 @@
   line-height: 150%;
 
   color: var(--neutral);
+
+  border: 0;
 }
 
 .feed_input_button:hover {

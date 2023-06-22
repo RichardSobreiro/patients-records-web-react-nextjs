@@ -4,6 +4,7 @@ import Head from "next/head";
 import Image from "next/image";
 import { Inter } from "next/font/google";
 import classes from "@/styles/Home.module.css";
+import Button, { ButtonType } from "@/components/ui/button";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -39,7 +40,37 @@ export default function Home() {
         <div className={classes.bottom_body}>
           <p>PLANOS PARA TODOS OS GOSTOS</p>
           <div className={classes.plan_area}>
-            <div className={classes.free_plan}></div>
+            <div className={classes.normal_plan}>
+              <div>
+                <div className={classes.plan_header}>
+                  <p>Grátis</p>
+                  <p>
+                    0 R$<span style={{ fontSize: "15px" }}> / Mês</span>
+                  </p>
+                </div>
+                <div className={classes.plan_body}>
+                  <ul>
+                    <li>Agenda Online</li>
+                    <hr className={classes.solid} />
+                    <li>Gestão de Clientes</li>
+                    <hr className={classes.solid} />
+                    <li>Gestão Financeira</li>
+                    <hr className={classes.solid} />
+                    <li>Portal Web</li>
+                    <hr className={classes.solid} />
+                    <li>App Android</li>
+                    <hr className={classes.solid} />
+                    <li>App iOS</li>
+                  </ul>
+                </div>
+              </div>
+              <div className={classes.actions}>
+                <Button type={ButtonType.PRIMARY} onClickHandler={() => {}}>
+                  Contratar
+                </Button>
+              </div>
+            </div>
+
             <div className={classes.monthly_plan}>
               <div className={classes.monthly_plan_header}>
                 <p>Plano Anual</p>
@@ -50,26 +81,87 @@ export default function Home() {
                   * Melhor Custo Benefício
                 </p>
                 <p className={classes.monthly_plan_header_benefits}>
-                  * Cancelamento a qualquer hora
+                  * Cancele a Qualquer Momento
                 </p>
+              </div>
+              <div className={classes.plan_body}>
+                <ul>
+                  <li>Agenda Online</li>
+                  <hr className={classes.solid} />
+                  <li>Gestão de Clientes</li>
+                  <hr className={classes.solid} />
+                  <li>Gestão Financeira</li>
+                  <hr className={classes.solid} />
+                  <li>Notificações </li>
+                  <hr className={classes.solid} />
+                  <li>Whatsapp</li>
+                  <hr className={classes.solid} />
+                  <li>SMSs</li>
+                  <hr className={classes.solid} />
+                  <li>Gestão Cobranças</li>
+                  <hr className={classes.solid} />
+                  <li>
+                    Armazenamento em Nuvem
+                    <br />
+                    das Fotos de Clientes
+                  </li>
+                  <hr className={classes.solid} />
+                  <li>Portal Web</li>
+                  <hr className={classes.solid} />
+                  <li>App Android</li>
+                  <hr className={classes.solid} />
+                  <li>App iOS</li>
+                </ul>
+              </div>
+              <Button type={ButtonType.SECONDARY} onClickHandler={() => {}}>
+                Contratar
+              </Button>
+            </div>
+
+            <div className={classes.normal_plan}>
+              <div>
+                <div className={classes.plan_header}>
+                  <p>Mensal</p>
+                  <p>
+                    40 R$<span style={{ fontSize: "15px" }}> / Mês</span>
+                  </p>
+                </div>
                 <div className={classes.plan_body}>
                   <ul>
                     <li>Agenda Online</li>
+                    <hr className={classes.solid} />
                     <li>Gestão de Clientes</li>
+                    <hr className={classes.solid} />
                     <li>Gestão Financeira</li>
-                    <li>Notificações</li>
+                    <hr className={classes.solid} />
+                    <li>Notificações </li>
+                    <hr className={classes.solid} />
                     <li>Whatsapp</li>
+                    <hr className={classes.solid} />
                     <li>SMSs</li>
+                    <hr className={classes.solid} />
                     <li>Gestão Cobranças</li>
-                    <li>Armazenamento em Nuvem Fotos de Clientes</li>
+                    <hr className={classes.solid} />
+                    <li>
+                      Armazenamento em Nuvem
+                      <br />
+                      das Fotos de Clientes
+                    </li>
+                    <hr className={classes.solid} />
                     <li>Portal Web</li>
+                    <hr className={classes.solid} />
                     <li>App Android</li>
+                    <hr className={classes.solid} />
                     <li>App iOS</li>
                   </ul>
                 </div>
               </div>
+              <div className={classes.actions}>
+                <Button type={ButtonType.PRIMARY} onClickHandler={() => {}}>
+                  Contratar
+                </Button>
+              </div>
             </div>
-            <div className={classes.anual_plan}></div>
           </div>
         </div>
       </main>
