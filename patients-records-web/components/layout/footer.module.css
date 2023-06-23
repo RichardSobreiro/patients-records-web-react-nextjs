@@ -1,7 +1,7 @@
 /** @format */
 
 .footer {
-  position: absolute;
+  position: relative;
   width: 100vw;
   height: 400px;
   left: 0px;
@@ -123,6 +123,7 @@
   color: var(--neutral);
 
   border: 0;
+  cursor: pointer;
 }
 
 .feed_input_button:hover {

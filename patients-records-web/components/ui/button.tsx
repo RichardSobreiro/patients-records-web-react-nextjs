@@ -5,8 +5,9 @@ import classes from "./button.module.css";
 
 export enum ButtonType {
   PRIMARY,
-  SECONDARY,
   PRIMARY_BODERED,
+  PRIMARY_SMALL,
+  SECONDARY,
   SECONDARY_BORDERED,
   NEUTRAL,
 }
@@ -19,15 +20,20 @@ type Props = {
 
 const Button = ({ children, type, onClickHandler }: Props) => {
   let buttonTypeClass = "";
+  let buttonSizeClass = "";
   switch (type) {
     case ButtonType.PRIMARY:
       buttonTypeClass = "primary";
       break;
-    case ButtonType.SECONDARY:
-      buttonTypeClass = "secondary";
-      break;
     case ButtonType.PRIMARY_BODERED:
       buttonTypeClass = "primary_bordered";
+      break;
+    case ButtonType.PRIMARY_SMALL:
+      buttonTypeClass = "primary";
+      buttonSizeClass = "small";
+      break;
+    case ButtonType.SECONDARY:
+      buttonTypeClass = "secondary";
       break;
     case ButtonType.SECONDARY_BORDERED:
       buttonTypeClass = "secondary_bordered";
@@ -37,7 +43,14 @@ const Button = ({ children, type, onClickHandler }: Props) => {
       break;
   }
   return (
-    <button className={classes[buttonTypeClass]} onClick={onClickHandler}>
+    <button
+      className={
+        buttonSizeClass === ""
+          ? classes[buttonTypeClass]
+          : `${classes[buttonTypeClass]} ${classes[buttonSizeClass]}`
+      }
+      onClick={onClickHandler}
+    >
       {children}
     </button>
   );

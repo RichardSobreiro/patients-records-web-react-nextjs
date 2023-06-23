@@ -104,8 +104,8 @@ const Footer = () => {
               className={classes.footer_main_area_text}
               style={{ width: "320px" }}
             >
-              Cadestre-se em nossa rede e receba notícias sobre empreendedorismo
-              na área de beleza:
+              Cadastre-se em nossa rede e receba notícias sobre casos de sucesso
+              e dicas de especialistas sobre empreendedorismo na área de beleza:
             </p>
             <input
               className={classes.feed_input_email}

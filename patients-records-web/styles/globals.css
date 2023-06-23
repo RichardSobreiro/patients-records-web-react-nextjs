@@ -15,6 +15,10 @@
 
   --border-radius: 20px;
 
+  --font-family-title: Montserrat;
+  --font-family-text: font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
+  "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
+
   --font-mono: ui-monospace, Menlo, Monaco, "Cascadia Mono", "Segoe UI Mono",
     "Roboto Mono", "Oxygen Mono", "Ubuntu Monospace", "Source Code Pro",
     "Fira Mono", "Droid Sans Mono", "Courier New", monospace;
@@ -29,7 +33,7 @@
 html,
 body {
   max-width: var(--default-width);
-  min-height: calc(var(--min-height) + 400px);
+  /* min-height: calc(var(--min-height) + 400px); */
   overflow-x: hidden;
   background-color: var(--primary-light);
   position: relative;
@@ -42,4 +46,22 @@ a {
 
 ul {
   list-style-type: none;
+}
+
+table,
+caption,
+tbody,
+tfoot,
+thead,
+tr,
+th,
+td {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  font-size: 100%;
+  vertical-align: baseline;
+  background: transparent;
+  border-spacing: 0;
 }
