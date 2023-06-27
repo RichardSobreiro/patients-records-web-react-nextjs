@@ -1,0 +1,238 @@
+/** @format */
+
+.content {
+  display: grid;
+  grid-template-columns: 45% 45%;
+  gap: 5rem;
+
+  padding-left: calc((100vw - 1200px) / 2);
+  padding-right: calc((100vw - 1200px) / 2);
+}
+
+.content_left {
+  padding: 1rem;
+}
+
+.plan_choice_area {
+  display: flex;
+  flex-direction: column;
+}
+
+.title {
+  color: var(--neutral);
+  font-size: 1.875rem;
+  font-family: var(--font-family-title);
+  font-weight: 600;
+  line-height: 150%;
+}
+
+.plans {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+}
+
+.plan_square {
+  display: flex;
+  flex-direction: column;
+  gap: 0.05rem;
+  padding: 0.625rem;
+
+  border-radius: 20px;
+  background: var(--tertiary-light-light, #d2d2d2);
+
+  cursor: pointer;
+  box-shadow: 5px 5px 2px rgba(0, 0, 0, 0.25);
+  min-width: 8.375rem;
+}
+
+.chosen_plan {
+  background: var(--success);
+}
+
+.plan_title {
+  color: var(--neutral);
+  font-size: 1.5625rem;
+  font-family: var(--font-family-title);
+  font-weight: 600;
+  line-height: 150%;
+}
+
+.plan_price {
+  color: var(--neutral);
+  font-size: 1.5625rem;
+  font-family: var(--font-family-title);
+  font-weight: 600;
+  line-height: 150%;
+}
+
+.per_month {
+  font-size: 0.9rem;
+}
+
+.plan_details {
+  color: var(--neutral);
+  font-size: 0.9rem;
+  font-family: var(--font-family-title);
+  font-weight: 600;
+  line-height: 150%;
+}
+
+.detail_area {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.about_your_business {
+  margin-top: 1rem;
+}
+
+.action_multiple_same_row {
+  margin-top: 0.5rem;
+  display: grid;
+  grid-template-columns: 50% 50%;
+  max-width: 19.7rem;
+  gap: 0.3rem;
+}
+
+.about_you {
+  margin-top: 1rem;
+}
+
+.input_half_size {
+  margin-top: 0.5rem;
+  max-width: 10rem;
+}
+
+.content_right {
+  padding: 1rem;
+}
+
+.payment_square {
+  display: flex;
+  /* width: 37.375rem;
+  height: 33rem; */
+  padding: 0.625rem;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.625rem;
+  flex-shrink: 0;
+
+  border-radius: 10px;
+  background: var(--neutral);
+}
+
+.credit_card {
+  display: flex;
+  padding: 0.625rem;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.625rem;
+  border-radius: 10px;
+  border: 1px solid var(--tertiary);
+  background: var(--tertiary-light);
+  width: 100%;
+}
+
+.credit_card_line_one {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.radio_button {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 1rem;
+}
+
+.payment_method_label {
+  color: var(--tertiary);
+
+  font-size: 1rem;
+  font-family: var(--font-family-title);
+  font-weight: 600;
+  line-height: 1.25rem;
+}
+
+.credit_card_brands {
+  display: flex;
+  gap: 1rem;
+}
+
+.credit_card_line_two {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.credit_card_cvv_container {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: flex-end;
+  gap: 0.5rem;
+}
+
+.cvv_explaination {
+  color: var(--primary);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.bank_slip {
+  display: flex;
+  padding: 0.625rem;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.625rem;
+  border-radius: 10px;
+  /* border: 1px solid var(--primary, #06279b);
+  background: var(--secondary, #cfe2f0); */
+  border: 1px solid var(--tertiary);
+  background: var(--tertiary-light);
+  width: 100%;
+}
+
+.pix {
+  display: flex;
+  padding: 0.625rem;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.625rem;
+  border-radius: 10px;
+  border: 1px solid var(--tertiary);
+  background: var(--tertiary-light);
+  width: 100%;
+}
+
+.selected_payment_method {
+  border: 1px solid var(--primary, #06279b);
+  background: var(--secondary, #cfe2f0);
+}
+
+.actions {
+  padding-top: 1rem;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.security_area {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 0.4rem;
+
+  color: var(--dark-dark-2, #828282);
+
+  font-size: 0.75rem;
+  font-family: Open Sans;
+  line-height: 1.25rem;
+}

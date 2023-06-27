@@ -43,13 +43,25 @@ const Footer = () => {
               className={classes.footer_main_area_text}
               style={{ width: "320px" }}
             >
-              Envie-nos uma mensagem sobresobre qualquer assunto usando o email{" "}
+              Envie-nos uma mensagem sobre qualquer assunto usando o e-mail{" "}
               <span
                 className={classes.footer_main_area_container_body_contact_text}
               >
                 contato@meunegocio.com
               </span>{" "}
-              ou vá direto para nossa página Fale Conosco.
+              ou vá direto para nossa página{" "}
+              {/* <span
+                className={classes.footer_main_area_container_body_contact_text}
+              >
+                Fale Conosco
+              </span> */}
+              <Link
+                className={classes.footer_main_area_container_body_contact_text}
+                href="/fale-conosco"
+              >
+                Fale Conosco
+              </Link>
+              .
             </p>
             <div className={classes.social_icons_container}>
               <SocialIcon

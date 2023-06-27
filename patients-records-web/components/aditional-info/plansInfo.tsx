@@ -1,12 +1,13 @@
 /** @format */
 
-import Button, { ButtonStyle } from "@/components/ui/button";
-import classes from "@/styles/Planos.module.css";
+import Button, { ButtonStyle } from "../ui/button";
+import classes from "./plansInfo.module.css";
 
-import { useRouter } from "next/navigation";
+import { useRouter } from "next/router";
 
-const Planos = () => {
+const PlansInfo = () => {
   const router = useRouter();
+
   return (
     <div className={classes.content}>
       <table className={classes.table}>
@@ -19,39 +20,6 @@ const Planos = () => {
           </tr>
         </thead>
         <tbody className={classes.table_body}>
-          <tr>
-            <td className={classes.table_skill_cell}>Contrate Agora</td>
-            <td>
-              <Button
-                style={ButtonStyle.PRIMARY_SMALL}
-                onClickHandler={() => {
-                  router.push("/criar-conta");
-                }}
-              >
-                Contratar
-              </Button>
-            </td>
-            <td className={classes.table_anual_cell}>
-              <Button
-                style={ButtonStyle.SECONDARY}
-                onClickHandler={() => {
-                  router.push("/criar-conta");
-                }}
-              >
-                Contratar
-              </Button>
-            </td>
-            <td>
-              <Button
-                style={ButtonStyle.PRIMARY_SMALL}
-                onClickHandler={() => {
-                  router.push("/criar-conta");
-                }}
-              >
-                Contratar
-              </Button>
-            </td>
-          </tr>
           <tr>
             <td className={classes.table_skill_cell}>Valor Mensal</td>
             <td>0 R$</td>
@@ -132,4 +100,4 @@ const Planos = () => {
   );
 };
 
-export default Planos;
+export default PlansInfo;

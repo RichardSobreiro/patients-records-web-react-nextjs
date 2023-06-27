@@ -4,11 +4,14 @@ import Head from "next/head";
 import Image from "next/image";
 import { Inter } from "next/font/google";
 import classes from "@/styles/Home.module.css";
-import Button, { ButtonType } from "@/components/ui/button";
+import Button, { ButtonStyle } from "@/components/ui/button";
+
+import { useRouter } from "next/navigation";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
+  const router = useRouter();
   return (
     <>
       <Head>
@@ -65,7 +68,12 @@ export default function Home() {
                 </div>
               </div>
               <div className={classes.actions}>
-                <Button type={ButtonType.PRIMARY} onClickHandler={() => {}}>
+                <Button
+                  style={ButtonStyle.PRIMARY}
+                  onClickHandler={() => {
+                    router.push("/criar-conta");
+                  }}
+                >
                   Contratar
                 </Button>
               </div>
@@ -78,10 +86,10 @@ export default function Home() {
                   20 R$<span style={{ fontSize: "15px" }}> / Mês</span>
                 </p>
                 <p className={classes.monthly_plan_header_benefits}>
-                  * Melhor Custo Benefício
+                  * Melhor custo benefício
                 </p>
                 <p className={classes.monthly_plan_header_benefits}>
-                  * Cancele a Qualquer Momento
+                  * Cancele a qualquer momento e tenha seu dinheiro de volta
                 </p>
               </div>
               <div className={classes.plan_body}>
@@ -113,7 +121,12 @@ export default function Home() {
                   <li>App iOS</li>
                 </ul>
               </div>
-              <Button type={ButtonType.SECONDARY} onClickHandler={() => {}}>
+              <Button
+                style={ButtonStyle.SECONDARY}
+                onClickHandler={() => {
+                  router.push("/criar-conta");
+                }}
+              >
                 Contratar
               </Button>
             </div>
@@ -157,7 +170,12 @@ export default function Home() {
                 </div>
               </div>
               <div className={classes.actions}>
-                <Button type={ButtonType.PRIMARY} onClickHandler={() => {}}>
+                <Button
+                  style={ButtonStyle.PRIMARY}
+                  onClickHandler={() => {
+                    router.push("/criar-conta");
+                  }}
+                >
                   Contratar
                 </Button>
               </div>

@@ -3,51 +3,57 @@
 import { MouseEventHandler } from "react";
 import classes from "./button.module.css";
 
-export enum ButtonType {
+export enum ButtonStyle {
   PRIMARY,
   PRIMARY_BODERED,
   PRIMARY_SMALL,
   SECONDARY,
   SECONDARY_BORDERED,
   NEUTRAL,
+  SUCCESS,
 }
 
 type Props = {
   children: string | JSX.Element | JSX.Element[];
-  type: ButtonType;
-  onClickHandler: MouseEventHandler<HTMLButtonElement>;
+  style: ButtonStyle;
+  onClickHandler?: MouseEventHandler<HTMLButtonElement>;
+  type?: "button" | "submit" | "reset";
 };
 
-const Button = ({ children, type, onClickHandler }: Props) => {
-  let buttonTypeClass = "";
+const Button = ({ children, style, onClickHandler, type }: Props) => {
+  let ButtonStyleClass = "";
   let buttonSizeClass = "";
-  switch (type) {
-    case ButtonType.PRIMARY:
-      buttonTypeClass = "primary";
+  switch (style) {
+    case ButtonStyle.PRIMARY:
+      ButtonStyleClass = "primary";
       break;
-    case ButtonType.PRIMARY_BODERED:
-      buttonTypeClass = "primary_bordered";
+    case ButtonStyle.PRIMARY_BODERED:
+      ButtonStyleClass = "primary_bordered";
       break;
-    case ButtonType.PRIMARY_SMALL:
-      buttonTypeClass = "primary";
+    case ButtonStyle.PRIMARY_SMALL:
+      ButtonStyleClass = "primary";
       buttonSizeClass = "small";
       break;
-    case ButtonType.SECONDARY:
-      buttonTypeClass = "secondary";
+    case ButtonStyle.SECONDARY:
+      ButtonStyleClass = "secondary";
       break;
-    case ButtonType.SECONDARY_BORDERED:
-      buttonTypeClass = "secondary_bordered";
+    case ButtonStyle.SECONDARY_BORDERED:
+      ButtonStyleClass = "secondary_bordered";
+      break;
+    case ButtonStyle.SUCCESS:
+      ButtonStyleClass = "success";
       break;
     default:
-      buttonTypeClass = "neutral";
+      ButtonStyleClass = "neutral";
       break;
   }
   return (
     <button
+      type={type ? type : "button"}
       className={
         buttonSizeClass === ""
-          ? classes[buttonTypeClass]
-          : `${classes[buttonTypeClass]} ${classes[buttonSizeClass]}`
+          ? classes[ButtonStyleClass]
+          : `${classes[ButtonStyleClass]} ${classes[buttonSizeClass]}`
       }
       onClick={onClickHandler}
     >

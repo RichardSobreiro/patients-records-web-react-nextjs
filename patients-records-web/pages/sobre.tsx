@@ -1,6 +1,6 @@
 /** @format */
 
-import Button, { ButtonType } from "@/components/ui/button";
+import Button, { ButtonStyle } from "@/components/ui/button";
 import classes from "@/styles/Sobre.module.css";
 
 import Image from "next/image";
@@ -29,7 +29,7 @@ const Sobre = () => {
           </p>
 
           <Button
-            type={ButtonType.PRIMARY_BODERED}
+            style={ButtonStyle.PRIMARY_BODERED}
             onClickHandler={() => {
               router.push("/criar-conta");
             }}
@@ -116,7 +116,7 @@ const Sobre = () => {
       </section>
       <section className={classes.go_to_purchase_area}>
         <Button
-          type={ButtonType.PRIMARY_BODERED}
+          style={ButtonStyle.PRIMARY_BODERED}
           onClickHandler={() => {
             router.push("/criar-conta");
           }}
