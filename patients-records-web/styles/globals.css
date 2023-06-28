@@ -9,6 +9,8 @@
   --tertiary: #171717;
   --tertiary-light: #d2d2d2;
   --success-light: #e7ffec;
+  --error-100: #f1acc9;
+  --error-500: #a10c4a;
 
   --default-width: 1920px;
   --min-height: 1080px;

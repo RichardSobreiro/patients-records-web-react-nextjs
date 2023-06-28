@@ -8,9 +8,19 @@ type Props = {
   rows: number;
   required: boolean;
   placeholder?: string;
+  value?: any;
+  onChangeHandler?: any;
 };
 
-const TextArea = ({ label, id, rows, required, placeholder }: Props) => {
+const TextArea = ({
+  label,
+  id,
+  rows,
+  required,
+  placeholder,
+  value,
+  onChangeHandler,
+}: Props) => {
   return (
     <>
       <label htmlFor={id} className={classes.label}>
@@ -22,6 +32,8 @@ const TextArea = ({ label, id, rows, required, placeholder }: Props) => {
         rows={rows}
         required={required}
         placeholder={placeholder}
+        value={value}
+        onChange={(event) => onChangeHandler(event.target.value)}
       ></textarea>
     </>
   );

@@ -10,6 +10,7 @@ export default function Document() {
         <Main />
         <div id="portal" />
         <NextScript />
+        <div id="notifications"></div>
       </body>
     </Html>
   );

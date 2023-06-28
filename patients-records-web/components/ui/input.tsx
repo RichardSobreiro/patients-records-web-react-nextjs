@@ -16,6 +16,8 @@ type Props = {
   placeholder?: string;
   labelStyle?: CSSProperties;
   inputStyle?: CSSProperties;
+  value?: any;
+  onChangeHandler?: any;
 };
 
 const Input = ({
@@ -26,6 +28,8 @@ const Input = ({
   placeholder,
   labelStyle,
   inputStyle,
+  value,
+  onChangeHandler,
 }: Props) => {
   let typeString = "text";
   switch (type) {
@@ -48,6 +52,8 @@ const Input = ({
         id={id}
         required={required}
         placeholder={placeholder}
+        value={value}
+        onChange={(event) => onChangeHandler(event.target.value)}
       />
     </>
   );

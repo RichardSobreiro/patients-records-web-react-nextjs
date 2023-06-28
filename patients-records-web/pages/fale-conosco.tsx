@@ -19,6 +19,7 @@ const sendContactData = async (
     body: JSON.stringify({ name, email, message }),
     headers: {
       "Content-Type": "application/json",
+      Accept: "application/json, text/plain, */*",
     },
   });
 
@@ -41,7 +42,7 @@ const FaleConosco = () => {
       const timer = setTimeout(() => {
         setRequestStatus(null);
         setRequestError(null);
-      }, 3000);
+      }, 5000);
 
       return () => clearTimeout(timer);
     }
@@ -69,23 +70,23 @@ const FaleConosco = () => {
   if (requestStatus === "pending") {
     notification = {
       status: "pending",
-      title: "Sending message...",
-      message: "Your message is on its way!",
+      title: "Enviando...",
+      message: "Sua mensagem está sendo enviada!",
     };
   }
 
   if (requestStatus === "success") {
     notification = {
       status: "success",
-      title: "Success!",
-      message: "Message sent successfully!",
+      title: "Sucesso!",
+      message: "Iremos enviar uma resposta a sua mensagem em até 24 horas!",
     };
   }
 
   if (requestStatus === "error") {
     notification = {
       status: "error",
-      title: "Error!",
+      title: "Erro!",
       message: requestError,
     };
   }
@@ -107,6 +108,8 @@ const FaleConosco = () => {
                 label={"Nome:"}
                 required={true}
                 placeholder={"Ex.: Ana Maria"}
+                value={enteredName}
+                onChangeHandler={setEnteredName}
               />
             </div>
 
@@ -117,6 +120,8 @@ const FaleConosco = () => {
                 label={"E-mail:"}
                 required={true}
                 placeholder={"Ex.: anamaria@email.com"}
+                value={enteredEmail}
+                onChangeHandler={setEnteredEmail}
               />
             </div>
 
@@ -127,11 +132,15 @@ const FaleConosco = () => {
                 rows={5}
                 required={true}
                 placeholder={"Digite sua mensagem aqui..."}
+                value={enteredMessage}
+                onChangeHandler={setEnteredMessage}
               />
             </div>
 
             <div className={classes.actions}>
-              <Button style={ButtonStyle.PRIMARY_BODERED}>Enviar</Button>
+              <Button type="submit" style={ButtonStyle.PRIMARY_BODERED}>
+                Enviar
+              </Button>
             </div>
           </form>
         </div>
