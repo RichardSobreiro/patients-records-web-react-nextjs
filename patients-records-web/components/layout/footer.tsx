@@ -4,9 +4,87 @@ import classes from "./footer.module.css";
 
 import Image from "next/image";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { SocialIcon } from "react-social-icons";
+import NotificationBottom from "../ui/notification";
+
+const sendContactData = async (email: string) => {
+  const response = await fetch("/api/newsletter", {
+    method: "POST",
+    body: JSON.stringify({ email }),
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json, text/plain, */*",
+    },
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(
+      data.message || "Ocorreu um erro. Tente novamente, por favor!"
+    );
+  }
+};
 
 const Footer = () => {
+  const [enteredEmail, setEnteredEmail] = useState<string>("");
+  const [requestStatus, setRequestStatus] = useState<string | null>(); // 'pending', 'success', 'error'
+  const [requestError, setRequestError] = useState<string | null>();
+
+  useEffect(() => {
+    if (requestStatus === "success" || requestStatus === "error") {
+      const timer = setTimeout(() => {
+        setRequestStatus(null);
+        setRequestError(null);
+      }, 5000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [requestStatus]);
+
+  const sendMessageHandler = async (event: any) => {
+    event.preventDefault();
+
+    setRequestStatus("pending");
+
+    try {
+      await sendContactData(enteredEmail!);
+      setRequestStatus("success");
+      setEnteredEmail("");
+    } catch (error: any) {
+      setRequestError(error.message);
+      setRequestStatus("error");
+    }
+  };
+
+  let notification;
+
+  if (requestStatus === "pending") {
+    notification = {
+      status: "pending",
+      title: "Enviando...",
+      message: "Sua subscrição está sendo realizada!",
+    };
+  }
+
+  if (requestStatus === "success") {
+    notification = {
+      status: "success",
+      title: "Sucesso!",
+      message:
+        "Você faz parte da maior rede de empreendedores na área de beleza do Brasil!",
+    };
+  }
+
+  if (requestStatus === "error") {
+    notification = {
+      status: "error",
+      title: "Erro!",
+      message: requestError,
+    };
+  }
+
   return (
     <footer className={classes.footer}>
       <div className={classes.footer_main_area}>
@@ -111,7 +189,11 @@ const Footer = () => {
         </div>
         <div className={classes.footer_main_area_container}>
           <p className={classes.footer_main_area_title}>FEED DE NOTÍCIAS</p>
-          <div className={classes.footer_main_area_container_body}>
+          <form
+            id="newsletter-form"
+            onSubmit={sendMessageHandler}
+            className={classes.footer_main_area_container_body}
+          >
             <p
               className={classes.footer_main_area_text}
               style={{ width: "320px" }}
@@ -123,9 +205,13 @@ const Footer = () => {
               className={classes.feed_input_email}
               type="email"
               placeholder="Digite seu e-mail aqui..."
+              value={enteredEmail}
+              onChange={(event) => setEnteredEmail(event.target.value)}
             />
-            <button className={classes.feed_input_button}>Cadastrar</button>
-          </div>
+            <button type="submit" className={classes.feed_input_button}>
+              Cadastrar
+            </button>
+          </form>
         </div>
       </div>
       <div className={classes.footer_copyright}>
@@ -154,6 +240,13 @@ const Footer = () => {
           </div>
         </div> */}
       </div>
+      {notification && (
+        <NotificationBottom
+          status={notification.status}
+          title={notification.title}
+          message={notification.message}
+        />
+      )}
     </footer>
   );
 };

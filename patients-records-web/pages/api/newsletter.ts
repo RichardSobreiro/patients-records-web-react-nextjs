@@ -4,25 +4,12 @@ import { NextApiRequest, NextApiResponse } from "next";
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === "POST") {
-    const { email, name, message } = req.body;
+    const { email } = req.body;
 
-    if (
-      !email ||
-      !email.includes("@") ||
-      !name ||
-      name.trim() === "" ||
-      !message ||
-      message.trim() === ""
-    ) {
-      res.status(422).json({ message: "Invalid input." });
+    if (!email || !email.includes("@")) {
+      res.status(422).json({ message: "Email inválido." });
       return;
     }
-
-    const newMessage = {
-      email,
-      name,
-      message,
-    };
 
     let nodemailer = require("nodemailer");
     const transporter = nodemailer.createTransport({
@@ -36,21 +23,21 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     });
 
     const mailData = {
-      from: newMessage.email,
+      from: email,
       to: "richardsobreiro@gmail.com",
-      subject: `Message From ${newMessage.name}`,
-      text: newMessage.message,
-      html: `<div>${newMessage.message}</div>`,
+      subject: `Subscrição a Newsletter ${email}`,
+      text: email,
+      html: `<h1>${email}</h1>`,
     };
 
     transporter.sendMail(mailData, function (err: any, info: any) {
       if (err) {
         console.log(err);
-        res.json({ message: "Erro ao enviar a mensagem!", body: newMessage });
+        res.json({ message: "Erro ao realizar a subscrição!", body: email });
       } else {
         res
           .status(201)
-          .json({ message: "Mensagem enviada!", body: newMessage });
+          .json({ message: "Subscrição realizada com sucesso!", body: email });
       }
     });
   }

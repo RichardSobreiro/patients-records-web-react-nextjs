@@ -95,7 +95,7 @@ const FaleConosco = () => {
     <>
       <section className={classes.content}>
         <div className={classes.content_left}>
-          <form onSubmit={sendMessageHandler}>
+          <form id="newsletter-form" onSubmit={sendMessageHandler}>
             <p className={classes.title}>
               Envie-nos uma mensagem sobre qualquer assunto através do
               formulário abaixo:
