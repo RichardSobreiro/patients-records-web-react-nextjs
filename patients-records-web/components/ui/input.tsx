@@ -12,24 +12,30 @@ type Props = {
   type: InputType;
   label: string;
   id: string;
-  required: boolean;
+  hasError: boolean;
+  errorMessage: string;
   placeholder?: string;
   labelStyle?: CSSProperties;
   inputStyle?: CSSProperties;
   value?: any;
   onChangeHandler?: any;
+  onBlurHandler?: any;
+  required?: boolean;
 };
 
 const Input = ({
   type,
   label,
   id,
-  required,
+  hasError,
+  errorMessage,
   placeholder,
   labelStyle,
   inputStyle,
   value,
   onChangeHandler,
+  onBlurHandler,
+  required,
 }: Props) => {
   let typeString = "text";
   switch (type) {
@@ -46,15 +52,16 @@ const Input = ({
         {label}
       </label>
       <input
-        className={classes.input}
+        className={`${classes.input} ${hasError && classes.invalid}`}
         style={inputStyle}
         type={typeString}
         id={id}
-        required={required}
         placeholder={placeholder}
         value={value}
-        onChange={(event) => onChangeHandler(event.target.value)}
+        onChange={onChangeHandler}
+        onBlur={onBlurHandler}
       />
+      {hasError && <p className={classes.error_text}>{errorMessage}</p>}
     </>
   );
 };

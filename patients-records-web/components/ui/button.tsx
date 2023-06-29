@@ -18,14 +18,15 @@ type Props = {
   style: ButtonStyle;
   onClickHandler?: MouseEventHandler<HTMLButtonElement>;
   type?: "button" | "submit" | "reset";
+  disabled?: boolean;
 };
 
-const Button = ({ children, style, onClickHandler, type }: Props) => {
+const Button = ({ children, style, onClickHandler, type, disabled }: Props) => {
   let ButtonStyleClass = "";
   let buttonSizeClass = "";
   switch (style) {
     case ButtonStyle.PRIMARY:
-      ButtonStyleClass = "primary";
+      ButtonStyleClass = `primary`;
       break;
     case ButtonStyle.PRIMARY_BODERED:
       ButtonStyleClass = "primary_bordered";
@@ -47,15 +48,17 @@ const Button = ({ children, style, onClickHandler, type }: Props) => {
       ButtonStyleClass = "neutral";
       break;
   }
+
   return (
     <button
       type={type ? type : "button"}
       className={
         buttonSizeClass === ""
-          ? classes[ButtonStyleClass]
+          ? `${classes[ButtonStyleClass]}`
           : `${classes[ButtonStyleClass]} ${classes[buttonSizeClass]}`
       }
       onClick={onClickHandler}
+      disabled={disabled !== undefined && disabled !== null ? disabled : false}
     >
       {children}
     </button>

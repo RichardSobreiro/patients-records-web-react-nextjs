@@ -9,8 +9,9 @@
   --tertiary: #171717;
   --tertiary-light: #d2d2d2;
   --success-light: #e7ffec;
+  --error-50: #fddddd;
   --error-100: #f1acc9;
-  --error-500: #a10c4a;
+  --error-500: #ff4e4e;
 
   --default-width: 1920px;
   --min-height: 1080px;
@@ -66,6 +67,29 @@ td {
   vertical-align: baseline;
   background: transparent;
   border-spacing: 0;
+}
+
+button:disabled,
+button:disabled:hover,
+button:disabled:active {
+  background-color: var(--tertiary-light);
+  color: var(--tertiary);
+  border-color: var(--tertiary-light);
+  cursor: not-allowed;
+
+  padding: 10px 20px;
+  gap: 10px;
+
+  box-shadow: 5px 5px 2px rgba(0, 0, 0, 0.25);
+  border-radius: 20px;
+
+  font-family: "Montserrat";
+  font-style: normal;
+  font-weight: 800;
+  font-size: 18px;
+  line-height: 150%;
+
+
 }
 
 .modal-wrapper {

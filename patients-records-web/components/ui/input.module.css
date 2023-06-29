@@ -31,4 +31,16 @@
 .input:focus {
   outline: 0;
   box-shadow: 1px 1px 4px var(--neutral);
+  outline: none;
+  border-color: var(--primary);
+  background-color: var(--secondary);
+}
+
+.invalid {
+  border: 1px solid var(--error-500);
+  background-color: var(--error-50);
+}
+
+.error_text {
+  color: var(--error-500);
 }
