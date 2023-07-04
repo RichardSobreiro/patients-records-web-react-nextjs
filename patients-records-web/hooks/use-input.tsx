@@ -4,28 +4,41 @@ import { useState } from "react";
 
 type Props = {
   validateValue: (
-    input: any,
+    input?: any | string,
     setErrorMessage?: any,
     mustMatchWith?: any
   ) => boolean | string;
   mustMatchWith?: string;
+  initialValue?: string;
+  maskFunction?: (value: string) => string;
 };
 
-const useInput = ({ validateValue, mustMatchWith }: Props) => {
-  const [enteredValue, setEnteredValue] = useState<string>("");
+const useInput = ({
+  validateValue,
+  mustMatchWith,
+  initialValue,
+  maskFunction,
+}: Props) => {
+  const [enteredValue, setEnteredValue] = useState<string>(initialValue ?? "");
   const [isTouched, setIsTouched] = useState(false);
   let errorMessage = "";
 
-  const valueIsValid = validateValue(enteredValue, mustMatchWith);
+  let valueIsValid = validateValue(enteredValue, mustMatchWith);
   const hasError =
     (!valueIsValid || typeof valueIsValid === "string") && isTouched;
 
   if (hasError) {
     errorMessage = valueIsValid as string;
+    valueIsValid = false;
   }
 
   const valueChangeHandler = (event: any) => {
-    setEnteredValue(event.target.value);
+    if (maskFunction) {
+      const maskedValue = maskFunction(event.target.value);
+      setEnteredValue(maskedValue);
+    } else {
+      setEnteredValue(event.target.value);
+    }
   };
 
   const inputBlurHandler = (event: any) => {
@@ -45,6 +58,7 @@ const useInput = ({ validateValue, mustMatchWith }: Props) => {
     inputBlurHandler,
     reset,
     errorMessage,
+    setEnteredValue,
   };
 };
 

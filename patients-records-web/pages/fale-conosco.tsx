@@ -4,10 +4,13 @@ import Button, { ButtonStyle } from "@/components/ui/button";
 import Input, { InputType } from "@/components/ui/input";
 import NotificationBottom from "@/components/ui/notification";
 import TextArea from "@/components/ui/textarea";
+import useInput from "@/hooks/use-input";
+import { NotificationContext } from "@/store/notification-context";
 import classes from "@/styles/FaleConosco.module.css";
+import { isEmail, isNotEmpty } from "@/util/field-validations";
 
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 
 const sendContactData = async (
   name: string,
@@ -31,65 +34,80 @@ const sendContactData = async (
 };
 
 const FaleConosco = () => {
-  const [enteredName, setEnteredName] = useState<string>();
-  const [enteredEmail, setEnteredEmail] = useState<string>();
-  const [enteredMessage, setEnteredMessage] = useState<string>();
-  const [requestStatus, setRequestStatus] = useState<string | null>(); // 'pending', 'success', 'error'
-  const [requestError, setRequestError] = useState<string | null>();
+  const notificationCtx = useContext(NotificationContext);
 
-  useEffect(() => {
-    if (requestStatus === "success" || requestStatus === "error") {
-      const timer = setTimeout(() => {
-        setRequestStatus(null);
-        setRequestError(null);
-      }, 5000);
+  const [isSendingMessage, setIsSendingMessage] = useState<boolean>(false);
 
-      return () => clearTimeout(timer);
-    }
-  }, [requestStatus]);
+  const {
+    value: enteredName,
+    isValid: enteredNameIsValid,
+    hasError: enteredNameInputHasError,
+    valueChangeHandler: enteredNameChangedHandler,
+    inputBlurHandler: enteredNameBlurHandler,
+    reset: resetEnteredNameInput,
+  } = useInput({ validateValue: isNotEmpty });
+
+  const {
+    value: enteredEmail,
+    isValid: enteredEmailIsValid,
+    hasError: emailInputHasError,
+    valueChangeHandler: emailChangedHandler,
+    inputBlurHandler: emailBlurHandler,
+    reset: resetEmailInput,
+  } = useInput({ validateValue: isEmail });
+
+  const {
+    value: enteredMessage,
+    isValid: enteredMessageIsValid,
+    hasError: enteredMessageInputHasError,
+    valueChangeHandler: enteredMessageChangedHandler,
+    inputBlurHandler: enteredMessageBlurHandler,
+    reset: resetEnteredMessageInput,
+  } = useInput({ validateValue: isNotEmpty });
 
   const sendMessageHandler = async (event: any) => {
     event.preventDefault();
 
-    setRequestStatus("pending");
+    if (
+      !enteredMessageIsValid ||
+      !enteredEmailIsValid ||
+      !enteredMessageIsValid
+    )
+      return;
 
-    try {
-      await sendContactData(enteredName!, enteredEmail!, enteredMessage!);
-      setRequestStatus("success");
-      setEnteredMessage("");
-      setEnteredEmail("");
-      setEnteredName("");
-    } catch (error: any) {
-      setRequestError(error.message);
-      setRequestStatus("error");
-    }
-  };
-
-  let notification;
-
-  if (requestStatus === "pending") {
-    notification = {
+    //setRequestStatus("pending");
+    setIsSendingMessage(true);
+    notificationCtx.showNotification({
       status: "pending",
       title: "Enviando...",
       message: "Sua mensagem está sendo enviada!",
-    };
-  }
+    });
 
-  if (requestStatus === "success") {
-    notification = {
-      status: "success",
-      title: "Sucesso!",
-      message: "Iremos enviar uma resposta a sua mensagem em até 24 horas!",
-    };
-  }
+    try {
+      await sendContactData(enteredName!, enteredEmail!, enteredMessage!);
+      //setRequestStatus("success");
+      notificationCtx.showNotification({
+        status: "success",
+        title: "Sucesso!",
+        message: "Iremos enviar uma resposta a sua mensagem em até 24 horas!",
+      });
+      resetEnteredMessageInput();
+      resetEmailInput();
+      resetEnteredNameInput();
+    } catch (error: any) {
+      //setRequestStatus("error");
+      notificationCtx.showNotification({
+        status: "error",
+        title: "Erro!",
+        message: "Ocorreu um erro ao enviar sua mensagem. Tente novamente!",
+      });
+    } finally {
+      setIsSendingMessage(false);
+    }
+  };
 
-  if (requestStatus === "error") {
-    notification = {
-      status: "error",
-      title: "Erro!",
-      message: requestError,
-    };
-  }
+  const formIsValid =
+    enteredNameIsValid && enteredEmailIsValid && enteredMessageIsValid;
 
   return (
     <>
@@ -106,10 +124,12 @@ const FaleConosco = () => {
                 type={InputType.TEXT}
                 id={"name"}
                 label={"Nome:"}
-                required={true}
+                hasError={enteredNameInputHasError}
+                errorMessage="O deve ser preenchido"
                 placeholder={"Ex.: Ana Maria"}
                 value={enteredName}
-                onChangeHandler={setEnteredName}
+                onChangeHandler={enteredNameChangedHandler}
+                onBlurHandler={enteredNameBlurHandler}
               />
             </div>
 
@@ -118,10 +138,12 @@ const FaleConosco = () => {
                 type={InputType.TEXT}
                 id={"email"}
                 label={"E-mail:"}
-                required={true}
+                hasError={emailInputHasError}
+                errorMessage="O e-mail é inválido"
                 placeholder={"Ex.: anamaria@email.com"}
                 value={enteredEmail}
-                onChangeHandler={setEnteredEmail}
+                onChangeHandler={emailChangedHandler}
+                onBlurHandler={emailBlurHandler}
               />
             </div>
 
@@ -129,16 +151,23 @@ const FaleConosco = () => {
               <TextArea
                 label={"Mensagem"}
                 id={"message"}
+                hasError={enteredMessageInputHasError}
+                errorMessage="A mensagem é obrigatóra."
                 rows={5}
                 required={true}
                 placeholder={"Digite sua mensagem aqui..."}
                 value={enteredMessage}
-                onChangeHandler={setEnteredMessage}
+                onChangeHandler={enteredMessageChangedHandler}
+                onBlurHandler={enteredMessageBlurHandler}
               />
             </div>
 
             <div className={classes.actions}>
-              <Button type="submit" style={ButtonStyle.PRIMARY_BODERED}>
+              <Button
+                type="submit"
+                style={ButtonStyle.PRIMARY_BODERED}
+                disabled={!formIsValid || isSendingMessage}
+              >
                 Enviar
               </Button>
             </div>
@@ -154,13 +183,6 @@ const FaleConosco = () => {
           />
         </div>
       </section>
-      {notification && (
-        <NotificationBottom
-          status={notification.status}
-          title={notification.title}
-          message={notification.message}
-        />
-      )}
     </>
   );
 };

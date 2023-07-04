@@ -1,12 +1,20 @@
 /** @format */
 
+import classes from "./main-header.module.css";
+import Button, { ButtonStyle } from "../ui/button";
+
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import classes from "./main-header.module.css";
+import { useSession, signOut } from "next-auth/react";
 
 const MainHeader = () => {
   const currentRoute = usePathname();
+  const { data: session, status } = useSession();
+
+  const handleSignOut = () => {
+    signOut();
+  };
 
   return (
     <header className={classes.header}>
@@ -76,12 +84,24 @@ const MainHeader = () => {
         </nav>
       </div>
       <div className={classes.header_right_container}>
-        <Link className={classes.signin_button} href="/entrar">
-          Entrar
-        </Link>
-        <Link className={classes.signup_button} href="/criar-conta">
-          Criar Conta
-        </Link>
+        {status === "authenticated" ? (
+          <Button
+            type="button"
+            onClickHandler={handleSignOut}
+            style={ButtonStyle.PRIMARY_BODERED}
+          >
+            Sair
+          </Button>
+        ) : (
+          <>
+            <Link className={classes.signin_button} href="/entrar">
+              Entrar
+            </Link>
+            <Link className={classes.signup_button} href="/criar-conta">
+              Criar Conta
+            </Link>
+          </>
+        )}
       </div>
     </header>
   );

@@ -9,18 +9,19 @@ type Props = {
   title: string | JSX.Element | JSX.Element[];
   children: string | JSX.Element | JSX.Element[];
   header?: JSX.Element | JSX.Element[];
+  chevronRef?: any;
 };
 
-const Collapsable = ({ open, title, children, header }: Props) => {
+const Collapsable = ({ open, title, children, header, chevronRef }: Props) => {
   const [isOpen, setIsOpen] = useState<boolean>(open);
   const [height, setHeight] = useState<number | undefined>(0);
 
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (isOpen) setHeight(ref.current?.getBoundingClientRect().height);
+    if (isOpen || open) setHeight(ref.current?.getBoundingClientRect().height);
     else setHeight(0);
-  }, [isOpen]);
+  }, [isOpen, open]);
 
   return (
     <div className={classes.card}>
@@ -37,6 +38,7 @@ const Collapsable = ({ open, title, children, header }: Props) => {
                 return !prevIsOpen;
               });
             }}
+            ref={chevronRef}
           >
             {isOpen ? (
               <Image

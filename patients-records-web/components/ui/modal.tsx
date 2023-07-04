@@ -20,11 +20,11 @@ const Modal = ({ onClose, children, title }: Props) => {
       <div className="modal-wrapper">
         <div className="modal">
           <div className="modal-header">
-            <a href="#" onClick={handleCloseClick}>
+            {title && <h1 className="modal-title">{title}</h1>}
+            <a href="#" onClick={handleCloseClick} className="modal-close">
               x
             </a>
           </div>
-          {title && <h1>{title}</h1>}
           <div className="modal-body">{children}</div>
         </div>
       </div>

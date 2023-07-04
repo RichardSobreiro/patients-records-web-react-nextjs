@@ -38,9 +38,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     const mailData = {
       from: newMessage.email,
       to: "richardsobreiro@gmail.com",
-      subject: `Message From ${newMessage.name}`,
+      subject: `Message From: Name = ${newMessage.name} | Email = ${newMessage.email}`,
       text: newMessage.message,
-      html: `<div>${newMessage.message}</div>`,
+      html: `<div><h1>Email: ${newMessage.email}</h1></div><div><h3>Name: ${newMessage.name}</h3></div><div>Message: ${newMessage.message}</div>`,
     };
 
     transporter.sendMail(mailData, function (err: any, info: any) {
