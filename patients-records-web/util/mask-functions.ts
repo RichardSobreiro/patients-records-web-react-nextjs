@@ -45,6 +45,20 @@ export const maskCPF = (inputCard: string): string => {
   return inputCard;
 };
 
+export const maskMobilePhoneNumber = (inputPhoneNumber: string): string => {
+  const values = inputPhoneNumber
+    .replace(/\D/g, "")
+    .match(/(\d{0,2})(\d{0,1})(\d{0,4})(\d{0,4})/);
+  if (values) {
+    inputPhoneNumber = !values[2]
+      ? values[1]
+      : `(${values[1]}) ${values[2]}${`${
+          values[3] ? ` ${values[3]}` : ""
+        }`}${`${values[4] ? `-${values[4]}` : ""}`}`;
+  }
+  return inputPhoneNumber;
+};
+
 export const maskCEP = (inputCard: string): string => {
   const cardValue = inputCard.replace(/\D/g, "").match(/(\d{0,5})(\d{0,3})/);
   if (cardValue) {
@@ -55,16 +69,12 @@ export const maskCEP = (inputCard: string): string => {
   return inputCard;
 };
 
-export const maskDate = (inputCard: string): string => {
-  const cardValue = inputCard
-    .replace(/\D/g, "")
-    .match(/(\d{0,2})(\d{0,2})(\d{0,4})/);
+export const maskCreditCardExpireDate = (inputCard: string): string => {
+  const cardValue = inputCard.replace(/\D/g, "").match(/(\d{0,2})(\d{0,4})/);
   if (cardValue) {
     inputCard = !cardValue[2]
       ? cardValue[1]
-      : `${cardValue[1]}/${cardValue[2]}${`${
-          cardValue[3] ? `/${cardValue[3]}` : ""
-        }`}`;
+      : `${cardValue[1]}/${cardValue[2]}`;
   }
   return inputCard;
 };

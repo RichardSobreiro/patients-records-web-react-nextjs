@@ -3,15 +3,6 @@
 import Modal from "@/components/ui/modal";
 import Collapsable from "@/components/ui/collapsable";
 import classes from "@/styles/InformacoesAdicionais.module.css";
-
-import Image from "next/image";
-import {
-  useContext,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from "react";
 import PlansInfo from "@/components/aditional-info/plansInfo";
 import Input, { InputType } from "@/components/ui/input";
 import Button, { ButtonStyle } from "@/components/ui/button";
@@ -23,21 +14,44 @@ import {
   validateCPF,
   validateCEP,
   validateIfExistsCNPJ,
+  validateMobilePhoneNumber,
 } from "@/util/field-validations";
 import {
   maskCEP,
   maskCNPJ,
   maskCPF,
+  maskCreditCardExpireDate,
   maskCreditCardNumber,
-  maskDate,
+  maskMobilePhoneNumber,
 } from "@/util/mask-functions";
 import { getCepInfo } from "@/api/postalService";
 import { PostalServiceResponse } from "@/models/postal-service/PostalServiceResponse";
 import { NotificationContext } from "@/store/notification-context";
-import { AditionalInfoRequest } from "@/models/users/AditionalInfoRequest";
+import {
+  AditionalInfoRequest,
+  BankSlipPaymentInfo,
+  CreditCardPaymentInfo,
+  PaymentInfoRequest,
+} from "@/models/users/AditionalInfoRequest";
 import { updateUserAditionalInfo } from "@/api/userSettingsApi";
 import { AditionalInfoResponse } from "@/models/users/AditionalInfoResponse";
 import LoadingSpinner from "@/components/ui/loading-spinner";
+
+import Image from "next/image";
+import {
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
+import Script from "next/script";
+
+import getConfig from "next/config";
+import Head from "next/head";
+const { publicRuntimeConfig } = getConfig();
+
+declare var PagSeguro: any;
 
 enum PAYMENT_METHOD {
   CREDIT_CARD,
@@ -58,7 +72,7 @@ const InformacoesAdicionais = () => {
   }
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  console.log(userCustom?.userPlanId);
+
   const [planId, setPlanId] = useState<string>(userCustom?.userPlanId ?? "2");
   const [plansInfoModalIsOpen, setPlansInfoModalIsOpen] =
     useState<boolean>(false);
@@ -137,6 +151,18 @@ const InformacoesAdicionais = () => {
   } = useInput({
     validateValue: validateCPF,
     maskFunction: maskCPF,
+  });
+
+  const {
+    value: enteredPhoneNumber,
+    isValid: enteredPhoneNumberIsValid,
+    hasError: enteredPhoneNumberInputHasError,
+    valueChangeHandler: enteredPhoneNumberChangeHandler,
+    inputBlurHandler: enteredPhoneNumberBlurHandler,
+    reset: resetPhoneNumberInput,
+  } = useInput({
+    validateValue: validateMobilePhoneNumber,
+    maskFunction: maskMobilePhoneNumber,
   });
 
   const {
@@ -222,6 +248,17 @@ const InformacoesAdicionais = () => {
   });
 
   const {
+    value: enteredCreditCardHolderName,
+    isValid: enteredCreditCardHolderNameIsValid,
+    hasError: enteredCreditCardHolderNameInputHasError,
+    valueChangeHandler: enteredCreditCardHolderNameChangeHandler,
+    inputBlurHandler: enteredCreditCardHolderNameBlurHandler,
+    reset: resetCreditCardHolderNameInput,
+  } = useInput({
+    validateValue: isNotEmpty,
+  });
+
+  const {
     value: enteredCreditCardNumber,
     isValid: enteredCreditCardNumberIsValid,
     hasError: enteredCreditCardNumberInputHasError,
@@ -242,7 +279,7 @@ const InformacoesAdicionais = () => {
     reset: resetCreditCardExpireDateInput,
   } = useInput({
     validateValue: () => true,
-    maskFunction: maskDate,
+    maskFunction: maskCreditCardExpireDate,
   });
 
   const {
@@ -259,7 +296,8 @@ const InformacoesAdicionais = () => {
   useLayoutEffect(() => {
     setCompanyName((session?.user as any)?.companyName);
     (session?.user as any)?.userPlanId &&
-      setPlanId((session?.user as any).userPlanId);
+      // setPlanId((session?.user as any).userPlanId);
+      setPlanId("2");
   }, [session?.user]);
 
   useEffect(() => {
@@ -324,21 +362,36 @@ const InformacoesAdicionais = () => {
     setPaymentMethod(event.target.value * 1);
   };
 
+  let paymentIsValid: string | boolean = false;
+  if (planId === "1") {
+    paymentIsValid = true;
+  } else if (paymentMethod == PAYMENT_METHOD.CREDIT_CARD) {
+    paymentIsValid =
+      enteredCreditCardHolderNameIsValid &&
+      enteredCreditCardNumberIsValid &&
+      enteredCreditCardExpireDateIsValid &&
+      enteredCreditCardCVVIsValid;
+  } else if (paymentMethod == PAYMENT_METHOD.PIX) {
+    paymentIsValid = true;
+  } else if (paymentMethod == PAYMENT_METHOD.BANK_SLIP) {
+    paymentIsValid = true;
+  }
+
   const formIsValid =
     isNotEmpty(planId) &&
-    planId === "1" &&
     enteredCompanyNameIsValid &&
     enteredCNPJIsValid &&
     enteredNumberOfEmployeesIsValid &&
     enteredNameIsValid &&
     enteredCPFIsValid &&
+    enteredPhoneNumberIsValid &&
     enteredCEPIsValid &&
     enteredStreetIsValid &&
     enteredAddressNumberIsValid &&
     enteredDistrictIsValid &&
     enteredCityIsValid &&
-    enteredAddressComplement &&
-    enteredStateIsValid;
+    enteredStateIsValid &&
+    paymentIsValid;
 
   const onSubmitHandler = async (e: any) => {
     e.preventDefault();
@@ -347,12 +400,17 @@ const InformacoesAdicionais = () => {
 
     setIsLoading(true);
 
+    const phoneNumberJustDigits = enteredPhoneNumber.replace(/\D/g, "");
+
     const request = new AditionalInfoRequest(
       planId,
       enteredName,
       enteredCPF,
+      phoneNumberJustDigits.substring(0, 2),
+      phoneNumberJustDigits.substring(2),
       enteredCEP,
       enteredStreet,
+      enteredAddressNumber,
       enteredDistrict,
       enteredCity,
       enteredAddressComplement,
@@ -362,27 +420,68 @@ const InformacoesAdicionais = () => {
       enteredNumberOfEmployees
     );
 
+    if (paymentMethod == PAYMENT_METHOD.CREDIT_CARD) {
+      const card = PagSeguro.encryptCard({
+        publicKey: publicRuntimeConfig.PAG_BANK_PUBLIC_KEY,
+        holder: enteredCreditCardHolderName,
+        number: enteredCreditCardNumber.replace(/\D/g, ""),
+        expMonth: enteredCreditCardExpireDate.substring(0, 2),
+        expYear: enteredCreditCardExpireDate.substring(3),
+        securityCode: enteredCreditCardCVV,
+      });
+
+      const encrypted = card.encryptedCard;
+
+      if (encrypted.hasErrors) {
+        let msg = "Verifique as informações do seu cartão de crédito";
+        const notification = {
+          status: "error",
+          title: "Opss...",
+          message: msg,
+        };
+        notificationCtx.showNotification(notification);
+        return;
+      } else {
+        request.paymentInfo = new PaymentInfoRequest(
+          paymentMethod,
+          new CreditCardPaymentInfo(
+            encrypted,
+            enteredCreditCardCVV,
+            enteredCreditCardHolderName
+          )
+        );
+      }
+    } else if (paymentMethod == PAYMENT_METHOD.BANK_SLIP) {
+      request.paymentInfo = new PaymentInfoRequest(
+        paymentMethod,
+        undefined,
+        new BankSlipPaymentInfo(enteredCreditCardHolderName)
+      );
+    }
+
     const response = await updateUserAditionalInfo(
       userCustom.accessToken,
       request
     );
 
     if (response.ok) {
+      resetNameInput();
+      resetCPFInput();
+      resetCEPInput();
+      resetStreetInput();
+      resetDistrictInput();
+      resetDistrictInput();
+      resetCityInput();
+      resetAddressComplementInput();
+      resetStateInput();
+      resetCompanyNameInput();
+      resetCNPJInput();
+      resetNumberOfEmployeesInput();
+
       const aditionalInfoResponse = response.body as AditionalInfoResponse;
+
       if (aditionalInfoResponse.userCreationCompleted) {
         await update({ userCreationCompleted: true });
-        resetNameInput();
-        resetCPFInput();
-        resetCEPInput();
-        resetStreetInput();
-        resetDistrictInput();
-        resetDistrictInput();
-        resetCityInput();
-        resetAddressComplementInput();
-        resetStateInput();
-        resetCompanyNameInput();
-        resetCNPJInput();
-        resetNumberOfEmployeesInput();
         const notification = {
           status: "success",
           title: "Sucesso",
@@ -390,7 +489,11 @@ const InformacoesAdicionais = () => {
             "Você já pode acessar a maior plataforma de apoio ao empreendedor na área de beleza do Brasil!",
         };
         notificationCtx.showNotification(notification);
-        route.replace("/agenda");
+        route.replace("/clientes");
+      } else if (
+        !aditionalInfoResponse.userCreationCompleted &&
+        paymentMethod == PAYMENT_METHOD.BANK_SLIP
+      ) {
       }
     } else {
       const notification = {
@@ -407,6 +510,15 @@ const InformacoesAdicionais = () => {
 
   return (
     <>
+      <Head>
+        <title>Informações Adicionais</title>
+        <meta
+          name="description"
+          content="Portal para gerenciamento de empreendimentos na área de beleza."
+        />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
       {isLoading && <LoadingSpinner />}
       {plansInfoModalIsOpen && (
         <Modal onClose={() => setPlansInfoModalIsOpen(false)} title="Planos">
@@ -467,7 +579,7 @@ const InformacoesAdicionais = () => {
                 >
                   <p className={classes.plan_title}>Anual</p>
                   <p className={classes.plan_price}>
-                    20 R$ <span className={classes.per_month}>/ Mês</span>
+                    19,90 R$ <span className={classes.per_month}>/ Mês</span>
                   </p>
                   <div className={classes.detail_area}>
                     <div>
@@ -498,7 +610,7 @@ const InformacoesAdicionais = () => {
                 >
                   <p className={classes.plan_title}>Mensal</p>
                   <p className={classes.plan_price}>
-                    40 R$ <span className={classes.per_month}>/ Mês</span>
+                    39,90 R$ <span className={classes.per_month}>/ Mês</span>
                   </p>
                   <div className={classes.detail_area}>
                     <div>
@@ -523,7 +635,7 @@ const InformacoesAdicionais = () => {
           </section>
           <section className={classes.actions}>
             <Button
-              type="submit"
+              type="button"
               style={ButtonStyle.SUCCESS}
               onClickHandler={() => {
                 handleChangeStep(2);
@@ -585,7 +697,7 @@ const InformacoesAdicionais = () => {
           </section>
           <section className={classes.actions}>
             <Button
-              type="submit"
+              type="button"
               style={ButtonStyle.SUCCESS}
               onClickHandler={() => {
                 handleChangeStep(3);
@@ -613,18 +725,36 @@ const InformacoesAdicionais = () => {
                   onBlurHandler={enteredNameBlurHandler}
                 />
               </div>
-              <div style={{ marginTop: "0.5rem" }}>
-                <Input
-                  type={InputType.TEXT}
-                  label={"CPF:"}
-                  placeholder="Ex.: 123.456.789-00"
-                  id={"cpf"}
-                  errorMessage="O CPF fornecido é inválido"
-                  hasError={enteredCPFInputHasError}
-                  value={enteredCPF}
-                  onChangeHandler={enteredCPFChangeHandler}
-                  onBlurHandler={enteredCPFBlurHandler}
-                />
+              <div
+                style={{ marginTop: "0.5rem" }}
+                className={classes.action_multiple_same_row}
+              >
+                <div>
+                  <Input
+                    type={InputType.TEXT}
+                    label={"CPF:"}
+                    placeholder=""
+                    id={"cpf"}
+                    errorMessage="O CPF fornecido é inválido"
+                    hasError={enteredCPFInputHasError}
+                    value={enteredCPF}
+                    onChangeHandler={enteredCPFChangeHandler}
+                    onBlurHandler={enteredCPFBlurHandler}
+                  />
+                </div>
+                <div>
+                  <Input
+                    type={InputType.TEXT}
+                    label={"Celular:"}
+                    placeholder=""
+                    id={"mobile"}
+                    errorMessage="O número de celular é inválido"
+                    hasError={enteredPhoneNumberInputHasError}
+                    value={enteredPhoneNumber}
+                    onChangeHandler={enteredPhoneNumberChangeHandler}
+                    onBlurHandler={enteredPhoneNumberBlurHandler}
+                  />
+                </div>
               </div>
               <div className={classes.input_half_size}>
                 <Input
@@ -792,7 +922,7 @@ const InformacoesAdicionais = () => {
                             Pague com Cartão de Crédito
                           </p>
                         </div>
-                        <div className={classes.credit_card_brands}>
+                        <div className={classes.payment_icons}>
                           <Image
                             src={`/images/credit_card_mastercard.svg`}
                             alt="Details Caret"
@@ -807,71 +937,113 @@ const InformacoesAdicionais = () => {
                           />
                         </div>
                       </div>
-                      <div className={classes.credit_card_line_two}>
-                        <div>
-                          <Input
-                            type={InputType.TEXT}
-                            label={"Número do Cartão"}
-                            labelStyle={{ color: "#171717" }}
-                            placeholder="Ex.: 1234.5678.9012.3456"
-                            id={"credit-card-number"}
-                            hasError={enteredCreditCardNumberInputHasError}
-                            errorMessage="O número do cartão de crédito fornecido é inválido"
-                            value={enteredCreditCardNumber}
-                            onChangeHandler={
-                              enteredCreditCardNumberChangeHandler
-                            }
-                            onBlurHandler={enteredCreditCardNumberBlurHandler}
-                          />
-                        </div>
-                        <div>
-                          <Input
-                            type={InputType.TEXT}
-                            label={"Data de Expiração"}
-                            labelStyle={{ color: "#171717" }}
-                            placeholder="Ex.: 01/01/2029"
-                            id={"credit-card-expire-date"}
-                            hasError={enteredCreditCardExpireDateInputHasError}
-                            errorMessage="A data de expiração do cartão de crédito é inválida"
-                            value={enteredCreditCardExpireDate}
-                            onChangeHandler={
-                              enteredCreditCardExpireDateChangeHandler
-                            }
-                            onBlurHandler={
-                              enteredCreditCardExpireDateBlurHandler
-                            }
-                          />
-                        </div>
-                      </div>
-                      <div className={classes.credit_card_line_three}>
-                        <div className={classes.credit_card_cvv_container}>
-                          <div>
+                      {paymentMethod === PAYMENT_METHOD.CREDIT_CARD && (
+                        <>
+                          <div className={classes.credit_card_one_input_row}>
+                            <p className={classes.observation_text}>
+                              Não se preocupe! Todo mês o valor de R${" "}
+                              {planId === "2" ? "19.90" : "39.90"} será lançado
+                              na sua fatura. Dessa forma, não ocupamos o limite
+                              do seu cartão de crédito!
+                            </p>
+                          </div>
+                          <div className={classes.credit_card_one_input_row}>
                             <Input
                               type={InputType.TEXT}
-                              label={"Código de Segurança"}
+                              label={"Nome do portador do cartão"}
                               labelStyle={{ color: "#171717" }}
-                              inputStyle={{ maxWidth: "5rem" }}
-                              placeholder="Ex.: 123"
-                              id={"credit-card-cvv"}
-                              hasError={enteredCreditCardCVVInputHasError}
-                              errorMessage="O código de segurança do cartão de crédito é inválido"
-                              value={enteredCreditCardCVV}
-                              onChangeHandler={
-                                enteredCreditCardCVVChangeHandler
+                              placeholder="Ex.: Ana Maria de Souza"
+                              id={"credit-card-holder-name"}
+                              hasError={
+                                enteredCreditCardHolderNameInputHasError
                               }
-                              onBlurHandler={enteredCreditCardCVVBlurHandler}
+                              errorMessage="O nome do portador do cartão de crédito é obrigatório"
+                              value={enteredCreditCardHolderName}
+                              onChangeHandler={
+                                enteredCreditCardHolderNameChangeHandler
+                              }
+                              onBlurHandler={
+                                enteredCreditCardHolderNameBlurHandler
+                              }
+                              isPaymentSection={true}
                             />
                           </div>
-                          <p
-                            onClick={() => {
-                              alert("CVV explicação");
-                            }}
-                            className={classes.cvv_explaination}
-                          >
-                            O que é isso?
-                          </p>
-                        </div>
-                      </div>
+                          <div className={classes.credit_card_line_two}>
+                            <div>
+                              <Input
+                                type={InputType.TEXT}
+                                label={"Número do Cartão"}
+                                labelStyle={{ color: "#171717" }}
+                                placeholder="Ex.: 1234.5678.9012.3456"
+                                id={"credit-card-number"}
+                                hasError={enteredCreditCardNumberInputHasError}
+                                errorMessage="O número do cartão de crédito fornecido é inválido"
+                                value={enteredCreditCardNumber}
+                                onChangeHandler={
+                                  enteredCreditCardNumberChangeHandler
+                                }
+                                onBlurHandler={
+                                  enteredCreditCardNumberBlurHandler
+                                }
+                                isPaymentSection={true}
+                              />
+                            </div>
+                            <div>
+                              <Input
+                                type={InputType.TEXT}
+                                label={"Data de Expiração"}
+                                labelStyle={{ color: "#171717" }}
+                                placeholder="Ex.: 12/2029"
+                                id={"credit-card-expire-date"}
+                                hasError={
+                                  enteredCreditCardExpireDateInputHasError
+                                }
+                                errorMessage="A data de expiração do cartão de crédito é inválida"
+                                value={enteredCreditCardExpireDate}
+                                onChangeHandler={
+                                  enteredCreditCardExpireDateChangeHandler
+                                }
+                                onBlurHandler={
+                                  enteredCreditCardExpireDateBlurHandler
+                                }
+                                isPaymentSection={true}
+                              />
+                            </div>
+                          </div>
+                          <div className={classes.credit_card_line_three}>
+                            <div className={classes.credit_card_cvv_container}>
+                              <div>
+                                <Input
+                                  type={InputType.TEXT}
+                                  label={"Código de Segurança (CVV)"}
+                                  labelStyle={{ color: "#171717" }}
+                                  inputStyle={{ maxWidth: "5rem" }}
+                                  placeholder="Ex.: 123"
+                                  id={"credit-card-cvv"}
+                                  hasError={enteredCreditCardCVVInputHasError}
+                                  errorMessage="O código de segurança do cartão de crédito é inválido"
+                                  value={enteredCreditCardCVV}
+                                  onChangeHandler={
+                                    enteredCreditCardCVVChangeHandler
+                                  }
+                                  onBlurHandler={
+                                    enteredCreditCardCVVBlurHandler
+                                  }
+                                  isPaymentSection={true}
+                                />
+                              </div>
+                              <p
+                                onClick={() => {
+                                  alert("CVV explicação");
+                                }}
+                                className={classes.cvv_explaination}
+                              >
+                                O que é isso?
+                              </p>
+                            </div>
+                          </div>
+                        </>
+                      )}
                     </div>
                     <div
                       className={`${classes.bank_slip} ${
@@ -893,7 +1065,7 @@ const InformacoesAdicionais = () => {
                             Pague com Boleto
                           </p>
                         </div>
-                        <div className={classes.credit_card_brands}>
+                        <div className={classes.payment_icons}>
                           <Image
                             src={`/images/barcode.svg`}
                             alt="Details Caret"
@@ -902,6 +1074,31 @@ const InformacoesAdicionais = () => {
                           />
                         </div>
                       </div>
+                      {paymentMethod === PAYMENT_METHOD.BANK_SLIP && (
+                        <>
+                          <div className={classes.credit_card_one_input_row}>
+                            <Input
+                              type={InputType.TEXT}
+                              label={"Nome no boleto"}
+                              labelStyle={{ color: "#171717" }}
+                              placeholder="Ex.: Ana Maria de Souza"
+                              id={"credit-card-holder-name"}
+                              hasError={
+                                enteredCreditCardHolderNameInputHasError
+                              }
+                              errorMessage="O nome ao qual o boleto será emitido é inválido"
+                              value={enteredCreditCardHolderName}
+                              onChangeHandler={
+                                enteredCreditCardHolderNameChangeHandler
+                              }
+                              onBlurHandler={
+                                enteredCreditCardHolderNameBlurHandler
+                              }
+                              isPaymentSection={true}
+                            />
+                          </div>
+                        </>
+                      )}
                     </div>
                     <div
                       className={`${classes.pix} ${
@@ -923,7 +1120,7 @@ const InformacoesAdicionais = () => {
                             Pague com PIX
                           </p>
                         </div>
-                        <div className={classes.credit_card_brands}>
+                        <div className={classes.payment_icons}>
                           <Image
                             src={`/images/pix.svg`}
                             alt="Details Caret"
@@ -961,6 +1158,7 @@ const InformacoesAdicionais = () => {
           </section>
         </div>
       </form>
+      <Script src="https://assets.pagseguro.com.br/checkout-sdk-js/rc/dist/browser/pagseguro.min.js" />
     </>
   );
 };

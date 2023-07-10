@@ -1,11 +1,13 @@
 /** @format */
 
-import { CSSProperties } from "react";
 import classes from "./input.module.css";
+
+import { CSSProperties } from "react";
 
 export enum InputType {
   TEXT,
   EMAIL,
+  DATE,
 }
 
 type Props = {
@@ -21,6 +23,7 @@ type Props = {
   onChangeHandler?: any;
   onBlurHandler?: any;
   required?: boolean;
+  isPaymentSection?: boolean;
 };
 
 const Input = ({
@@ -36,6 +39,7 @@ const Input = ({
   onChangeHandler,
   onBlurHandler,
   required,
+  isPaymentSection,
 }: Props) => {
   let typeString = "text";
   switch (type) {
@@ -45,6 +49,9 @@ const Input = ({
     case InputType.EMAIL:
       typeString = "email";
       break;
+    case InputType.DATE:
+      typeString = "date";
+      break;
   }
   return (
     <>
@@ -52,7 +59,9 @@ const Input = ({
         {label}
       </label>
       <input
-        className={`${classes.input} ${hasError && classes.invalid}`}
+        className={`${
+          isPaymentSection ? classes.input_payment : classes.input
+        } ${hasError && classes.invalid}`}
         style={inputStyle}
         type={typeString}
         id={id}

@@ -4,6 +4,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 1rem;
   color: var(--tertiary);
   background-color: var(--success-light);
   padding: 0 2rem;
@@ -33,6 +34,7 @@
 
 .error {
   background-color: var(--error-500);
+  color: var(--neutral);
 }
 
 @media (min-width: 768px) {

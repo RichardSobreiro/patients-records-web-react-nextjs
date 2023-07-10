@@ -5,6 +5,10 @@ import { ErrorDetails } from "@/models/Api/ErrorDetails";
 import { LoginRequest } from "@/models/login/login-request";
 import { CreateUserRequest } from "@/models/users/CreateUserRequest";
 
+import getConfig from "next/config";
+
+const { publicRuntimeConfig } = getConfig();
+
 export const createAccount = async (
   request: CreateUserRequest
 ): Promise<ApiResponse> => {
@@ -38,14 +42,17 @@ export const createAccount = async (
       );
     const formBodyString = formBody.join("&");
 
-    const response = await fetch("http://localhost:3005/users", {
-      method: "post",
-      body: formBodyString,
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-        Accept: "application/json",
-      },
-    });
+    const response = await fetch(
+      `${publicRuntimeConfig.AUTHNZ_SERVER_URL}/users`,
+      {
+        method: "post",
+        body: formBodyString,
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          Accept: "application/json",
+        },
+      }
+    );
 
     if (response.ok) {
       const createUserResponse = await response.json();
@@ -82,16 +89,19 @@ export const createAccount = async (
 
 export const login = async (request: LoginRequest): Promise<ApiResponse> => {
   try {
-    const response = await fetch("http://localhost:3005/token", {
-      method: "post",
-      body: JSON.stringify({
-        request,
-      }),
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-    });
+    const response = await fetch(
+      `${publicRuntimeConfig.AUTHNZ_SERVER_URL}/token`,
+      {
+        method: "post",
+        body: JSON.stringify({
+          request,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+      }
+    );
 
     if (response.ok) {
       const createUserResponse = await response.json();

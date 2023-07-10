@@ -31,6 +31,32 @@
   color: var(--primary-light);
 }
 
+.primary_small {
+  font-size: 12px;
+  padding: 5px 10px;
+
+  gap: 10px;
+
+  background: var(--primary);
+  box-shadow: 5px 5px 2px rgba(0, 0, 0, 0.25);
+  border-radius: 20px;
+  border: 1px solid var(--neutral);
+
+  font-family: "Montserrat";
+  font-style: normal;
+  font-weight: 800;
+  line-height: 150%;
+
+  color: var(--neutral);
+
+  cursor: pointer;
+}
+
+.primary_small:hover {
+  background: var(--neutral);
+  color: var(--primary-light);
+}
+
 .primary_bordered {
   padding: 10px 20px;
   gap: 10px;
@@ -53,6 +79,33 @@
 }
 
 .primary_bordered:hover {
+  color: var(--neutral);
+  background: var(--primary-light);
+}
+
+.primary_bordered_small {
+  font-size: 12px;
+  padding: 5px 10px;
+
+  gap: 10px;
+
+  background: var(--neutral);
+
+  border-radius: 20px;
+  border: 1px solid var(--primary-light);
+  box-shadow: 2px 2px 4px 0px var(--neutral);
+
+  font-family: "Montserrat";
+  font-style: normal;
+  font-weight: 800;
+  line-height: 150%;
+
+  color: var(--primary-light);
+
+  cursor: pointer;
+}
+
+.primary_bordered_small:hover {
   color: var(--neutral);
   background: var(--primary-light);
 }
@@ -82,6 +135,31 @@
   color: var(--neutral);
 }
 
+.secondary_bordered {
+  padding: 10px 20px;
+  gap: 10px;
+
+  background: transparent;
+  box-shadow: 5px 5px 2px rgba(0, 0, 0, 0.25);
+  border-radius: 20px;
+
+  font-family: "Montserrat";
+  font-style: normal;
+  font-weight: 800;
+  font-size: 18px;
+  line-height: 150%;
+
+  color: var(--neutral);
+
+  border: 1px solid var(--neutral);
+  cursor: pointer;
+}
+
+.secondary_bordered:hover {
+  color: var(--primary-light);
+  background: var(--neutral);
+}
+
 .success {
   padding: 10px 20px;
   gap: 10px;
@@ -105,4 +183,134 @@
 .success:hover {
   background: var(--neutral);
   color: var(--success);
+}
+
+.success_small {
+  font-size: 12px;
+  padding: 5px 10px;
+
+  gap: 10px;
+
+  background: var(--success);
+  box-shadow: 5px 5px 2px rgba(0, 0, 0, 0.25);
+  border-radius: 20px;
+
+  font-family: "Montserrat";
+  font-style: normal;
+  font-weight: 800;
+  line-height: 150%;
+
+  color: var(--neutral);
+
+  border: 0;
+  cursor: pointer;
+}
+
+.success_small:hover {
+  background: var(--neutral);
+  color: var(--success);
+}
+
+.success_bordered {
+  padding: 10px 20px;
+  gap: 10px;
+
+  background: var(--neutral);
+
+  border-radius: 20px;
+  border: 1px solid var(--success);
+  box-shadow: 2px 2px 4px 0px var(--neutral);
+
+  font-family: "Montserrat";
+  font-style: normal;
+  font-weight: 800;
+  font-size: 18px;
+  line-height: 150%;
+
+  color: var(--success);
+
+  cursor: pointer;
+}
+
+.success_bordered:hover {
+  color: var(--neutral);
+  background: var(--success);
+}
+
+.success_bordered_small {
+  font-size: 12px;
+  padding: 5px 10px;
+
+  gap: 10px;
+
+  background: var(--neutral);
+
+  border-radius: 20px;
+  border: 1px solid var(--success);
+  box-shadow: 2px 2px 4px 0px var(--neutral);
+
+  font-family: "Montserrat";
+  font-style: normal;
+  font-weight: 800;
+  line-height: 150%;
+
+  color: var(--success);
+
+  cursor: pointer;
+}
+
+.success_bordered_small:hover {
+  color: var(--neutral);
+  background: var(--success);
+}
+
+.neutral {
+  padding: 10px 20px;
+  gap: 10px;
+
+  background: var(--neutral);
+  box-shadow: 5px 5px 2px rgba(0, 0, 0, 0.25);
+  border-radius: 20px;
+
+  font-family: "Montserrat";
+  font-style: normal;
+  font-weight: 800;
+  font-size: 18px;
+  line-height: 150%;
+
+  color: var(--tertiary);
+
+  border: 0;
+  cursor: pointer;
+}
+
+.neutral:hover {
+  background: var(--tertiary);
+  color: var(--neutral);
+}
+
+.neutral_small {
+  font-size: 12px;
+  padding: 5px 10px;
+
+  gap: 10px;
+
+  background: var(--neutral);
+  box-shadow: 5px 5px 2px rgba(0, 0, 0, 0.25);
+  border: 1px solid var(--tertiary);
+  border-radius: 20px;
+
+  font-family: "Montserrat";
+  font-style: normal;
+  font-weight: 800;
+  line-height: 150%;
+
+  color: var(--tertiary);
+
+  cursor: pointer;
+}
+
+.neutral_small:hover {
+  background: var(--tertiary);
+  color: var(--neutral);
 }

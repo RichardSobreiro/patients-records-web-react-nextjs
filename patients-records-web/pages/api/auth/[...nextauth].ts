@@ -5,6 +5,10 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import FacebookProvider from "next-auth/providers/facebook";
 import GoogleProvider from "next-auth/providers/google";
 
+import getConfig from "next/config";
+
+const { serverRuntimeConfig, publicRuntimeConfig } = getConfig();
+
 const socialLoginFlow = async (
   provider: string,
   access_token: string,
@@ -46,14 +50,17 @@ const socialLoginFlow = async (
       encodeURIComponent("pictureUrl") + "=" + encodeURIComponent(pictureUrl)
     );
     const formBodyString = formBody.join("&");
-    const response = await fetch("http://localhost:3005/token", {
-      method: "post",
-      body: formBodyString,
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-        Accept: "application/json",
-      },
-    });
+    const response = await fetch(
+      `${publicRuntimeConfig.AUTHNZ_SERVER_URL}/token`,
+      {
+        method: "post",
+        body: formBodyString,
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          Accept: "application/json",
+        },
+      }
+    );
 
     if (response.ok) {
       const data = await response.json();
@@ -104,20 +111,22 @@ export default NextAuth({
           formBody.push(
             encodeURIComponent("client_id") +
               "=" +
-              encodeURIComponent("web_professionals")
+              encodeURIComponent(serverRuntimeConfig.WEB_CLIENT_ID)
           );
           formBody.push(
             encodeURIComponent("client_secret") +
               "=" +
-              encodeURIComponent("web_professionals")
+              encodeURIComponent(serverRuntimeConfig.WEB_CLIENT_SECRET)
           );
           formBody.push(
             encodeURIComponent("grant_type") +
               "=" +
-              encodeURIComponent("password")
+              encodeURIComponent(serverRuntimeConfig.WEB_CLIENT_GRANT_TYPE)
           );
           formBody.push(
-            encodeURIComponent("scope") + "=" + encodeURIComponent("openid")
+            encodeURIComponent("scope") +
+              "=" +
+              encodeURIComponent(serverRuntimeConfig.WEB_CLIENT_SCOPE)
           );
           formBody.push(
             encodeURIComponent("usernameEmail") +
@@ -132,17 +141,20 @@ export default NextAuth({
           formBody.push(
             encodeURIComponent("resource") +
               "=" +
-              encodeURIComponent("http://localhost:3006")
+              encodeURIComponent(serverRuntimeConfig.WEB_CLIENT_RESOURCE)
           );
           const formBodyString = formBody.join("&");
-          const response = await fetch("http://localhost:3005/token", {
-            method: "post",
-            body: formBodyString,
-            headers: {
-              "Content-Type": "application/x-www-form-urlencoded",
-              Accept: "application/json",
-            },
-          });
+          const response = await fetch(
+            `${publicRuntimeConfig.AUTHNZ_SERVER_URL}/token`,
+            {
+              method: "post",
+              body: formBodyString,
+              headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+                Accept: "application/json",
+              },
+            }
+          );
 
           if (response.ok) {
             const data = await response.json();
@@ -169,13 +181,12 @@ export default NextAuth({
       },
     }),
     FacebookProvider({
-      clientId: `592502122839259`,
-      clientSecret: `d59fa3a4fe5100112930c4a974054359`,
+      clientId: serverRuntimeConfig.FACEBOOK_CLIENT_ID,
+      clientSecret: serverRuntimeConfig.FACEBOOK_CLIENT_SECRET,
     }),
     GoogleProvider({
-      clientId:
-        "898654580939-d3v52ladfrhb6mh3jfi6b41qql5red29.apps.googleusercontent.com",
-      clientSecret: "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",
+      clientId: serverRuntimeConfig.GOOGLE_CLIENT_ID,
+      clientSecret: serverRuntimeConfig.GOOGLE_CLIENT_SECRET,
     }),
   ],
   callbacks: {

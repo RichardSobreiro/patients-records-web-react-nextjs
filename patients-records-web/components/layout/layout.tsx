@@ -2,10 +2,10 @@
 
 import { useRouter } from "next/router";
 import Footer from "./footer";
-import MainHeader from "./main-header";
 
 import { useSession } from "next-auth/react";
-import LoadingSpinner from "../ui/loading-spinner";
+import AuthMainHeader from "./auth-main-header";
+import NoAuthMainHeader from "./no-auth-main-header";
 
 type Props = {
   children: string | JSX.Element | JSX.Element[];
@@ -26,12 +26,16 @@ const Layout = ({ children }: Props) => {
       if (!newSession?.user?.userCreationCompleted)
         route.replace("/informacoes-adicionais");
     });
-  } else if (status === "loading") {
   }
 
   return (
     <>
-      <MainHeader />
+      {status === "authenticated" && userInfo?.userCreationCompleted ? (
+        <AuthMainHeader />
+      ) : (
+        <NoAuthMainHeader />
+      )}
+
       <main>{children}</main>
       <Footer />
     </>

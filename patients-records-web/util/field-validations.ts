@@ -13,6 +13,14 @@ export const isEmail = (value: any) => {
   }
 };
 
+export const ifEnteredMustBeEmail = (value?: any) => {
+  if (value) {
+    return isEmail(value);
+  } else {
+    return true;
+  }
+};
+
 export const isPassword = (value: any) => {
   if (/^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{6,16}$/.test(value)) {
     return true;
@@ -118,6 +126,13 @@ export const validateCPF = (strCPF: string) => {
   if (Resto == 10 || Resto == 11) Resto = 0;
   if (Resto != parseInt(strCPF.substring(10, 11))) return false;
   return true;
+};
+
+export const validateMobilePhoneNumber = (strMobilePhoneNumber: string) => {
+  strMobilePhoneNumber = strMobilePhoneNumber.replace(/[^\d]+/g, "");
+  return /^([14689][0-9]|2[12478]|3([1-5]|[7-8])|5([13-5])|7[193-7])9[0-9]{8}$/.test(
+    strMobilePhoneNumber
+  );
 };
 
 export const validateIfExistsCPF = (strCPF?: string) => {

@@ -88,50 +88,9 @@ button:disabled:active {
   font-weight: 800;
   font-size: 18px;
   line-height: 150%;
-
-
 }
 
-.modal-wrapper {
-  /* width: 500px;
-  height: 600px; */
-  background-color: var(--neutral);
-  border-radius: 15px;
+main{
+  min-height: 35rem;
 }
 
-.modal {
-  height:100%;
-  width:100%;
-}
-
-.modal-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: rgba(0, 0, 0, 0.5);
-}
-
-.modal-body {
-  padding-top: 0.8rem;
-  overflow-y: scroll;
-  max-height: 20rem;
-}
-
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  font-size: 25px;
-}
-
-.modal-title{
-  padding: 1rem;
-}
-
-.modal-close{
-  padding: 1rem;
-}

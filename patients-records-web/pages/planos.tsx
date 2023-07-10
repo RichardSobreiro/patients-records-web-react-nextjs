@@ -55,7 +55,7 @@ const Planos = () => {
           <tr>
             <td className={classes.table_skill_cell}>Valor Mensal</td>
             <td>0 R$</td>
-            <td className={classes.table_anual_cell}>20 R$</td>
+            <td className={classes.table_anual_cell}>19.90 R$</td>
             <td>40 R$</td>
           </tr>
           <tr>

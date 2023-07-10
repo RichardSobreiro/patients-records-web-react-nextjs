@@ -1,6 +1,9 @@
 /** @format */
 
 import { NextApiRequest, NextApiResponse } from "next";
+import getConfig from "next/config";
+
+const { serverRuntimeConfig } = getConfig();
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === "POST") {
@@ -26,18 +29,18 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
     let nodemailer = require("nodemailer");
     const transporter = nodemailer.createTransport({
-      port: 465,
-      host: "smtp.gmail.com",
+      port: serverRuntimeConfig.CONTACT_FORM_EMAIL_HOST_PORT,
+      host: serverRuntimeConfig.CONTACT_FORM_EMAIL_HOST,
       auth: {
-        user: "richardsobreiro@gmail.com",
-        pass: "ttqdtdkbvxyhndmi",
+        user: serverRuntimeConfig.CONTACT_FORM_EMAIL_RECIPIENT,
+        pass: serverRuntimeConfig.CONTACT_FORM_EMAIL_PASSKEY,
       },
       secure: true,
     });
 
     const mailData = {
       from: newMessage.email,
-      to: "richardsobreiro@gmail.com",
+      to: serverRuntimeConfig.CONTACT_FORM_EMAIL_RECIPIENT,
       subject: `Message From: Name = ${newMessage.name} | Email = ${newMessage.email}`,
       text: newMessage.message,
       html: `<div><h1>Email: ${newMessage.email}</h1></div><div><h3>Name: ${newMessage.name}</h3></div><div>Message: ${newMessage.message}</div>`,

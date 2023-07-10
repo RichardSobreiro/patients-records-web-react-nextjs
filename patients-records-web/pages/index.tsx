@@ -83,7 +83,7 @@ export default function Home() {
               <div className={classes.monthly_plan_header}>
                 <p>Plano Anual</p>
                 <p>
-                  20 R$<span style={{ fontSize: "15px" }}> / Mês</span>
+                  19.90 R$<span style={{ fontSize: "15px" }}> / Mês</span>
                 </p>
                 <p className={classes.monthly_plan_header_benefits}>
                   * Melhor custo benefício

@@ -53,8 +53,7 @@ const Entrar = () => {
     let callbackUrl =
       router.query.callbackUrl && !Array.isArray(router.query.callbackUrl)
         ? router.query.callbackUrl
-        : "/agenda";
-    // const response = await login(request);
+        : "/clientes";
     const response = await signIn("credentials", {
       redirect: false,
       email: enteredUsernameEmail,

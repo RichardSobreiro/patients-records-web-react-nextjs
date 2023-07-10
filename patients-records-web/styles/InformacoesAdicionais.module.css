@@ -160,9 +160,13 @@
   line-height: 1.25rem;
 }
 
-.credit_card_brands {
+.payment_icons {
   display: flex;
   gap: 1rem;
+}
+
+.credit_card_one_input_row {
+  width: 100%;
 }
 
 .credit_card_line_two {
@@ -235,4 +239,10 @@
   font-size: 0.75rem;
   font-family: Open Sans;
   line-height: 1.25rem;
+}
+
+.observation_text {
+  font-size: 0.8rem;
+  line-height: 150%;
+  opacity: 0.9;
 }

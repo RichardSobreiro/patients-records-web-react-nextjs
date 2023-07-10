@@ -5,11 +5,15 @@ import { ErrorDetails } from "@/models/Api/ErrorDetails";
 import { AditionalInfoRequest } from "@/models/users/AditionalInfoRequest";
 import { AditionalInfoResponse } from "@/models/users/AditionalInfoResponse";
 
+import getConfig from "next/config";
+
+const { publicRuntimeConfig } = getConfig();
+
 export const updateUserAditionalInfo = async (
   accessToken: string,
   request: AditionalInfoRequest
 ): Promise<ApiResponse> => {
-  const URL = `http://localhost:3005/users/settings`;
+  const URL = `${publicRuntimeConfig.AUTHNZ_SERVER_URL}/users/settings`;
 
   try {
     const response = await fetch(URL, {
@@ -48,7 +52,7 @@ export const updateUserAditionalInfo = async (
 export const getUserAditionalInfo = async (
   accessToken: string
 ): Promise<ApiResponse> => {
-  const URL = `http://localhost:3005/users/settings`;
+  const URL = `${publicRuntimeConfig.AUTHNZ_SERVER_URL}/users/settings`;
 
   try {
     const response = await fetch(URL, {

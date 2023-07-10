@@ -1,0 +1,45 @@
+/** @format */
+
+.modal_wrapper {
+  background-color: var(--neutral);
+  border-radius: 15px;
+  padding: 1rem;
+}
+
+.modal {
+  height: 100%;
+  width: 100%;
+}
+
+.modal_overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal_body {
+  padding-top: 0.8rem;
+  max-height: 20rem;
+}
+
+.modal_header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 25px;
+}
+
+.modal_title {
+  padding: 1rem;
+  font-family: var(--font-family-title);
+  font-size: 1rem;
+  line-height: 150%;
+}
+
+.modal_close {
+}

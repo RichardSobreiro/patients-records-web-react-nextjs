@@ -1,25 +1,27 @@
 /** @format */
 
-import classes from "./main-header.module.css";
+import classes from "./auth-main-header.module.css";
 import Button, { ButtonStyle } from "../ui/button";
+import { useRouter } from "next/router";
 
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 
-const MainHeader = () => {
+const AuthMainHeader = () => {
   const currentRoute = usePathname();
   const { data: session, status } = useSession();
+  const route = useRouter();
 
   const handleSignOut = () => {
-    signOut();
+    signOut({ callbackUrl: "/entrar" });
   };
 
   return (
     <header className={classes.header}>
       <div className={classes.header_left_container}>
-        <Link className={classes.logo} href="/">
+        <Link className={classes.logo} href="/clientes">
           <div className={classes.image}>
             <Image
               src={`/images/icon.png`}
@@ -35,37 +37,49 @@ const MainHeader = () => {
             <li className={classes.link_container}>
               <Link
                 className={
-                  currentRoute === "/"
+                  currentRoute === "/clientes"
                     ? classes.link_text_active
                     : classes.link_text
                 }
-                href="/"
+                href="/clientes"
               >
-                Início
+                Clientes
               </Link>
             </li>
             <li className={classes.link_container}>
               <Link
                 className={
-                  currentRoute === "/planos"
+                  currentRoute === "/agenda"
                     ? classes.link_text_active
                     : classes.link_text
                 }
-                href="/planos"
+                href="/agenda"
               >
-                Planos
+                Agenda
               </Link>
             </li>
             <li className={classes.link_container}>
               <Link
                 className={
-                  currentRoute === "/sobre"
+                  currentRoute === "/financeiro"
                     ? classes.link_text_active
                     : classes.link_text
                 }
-                href="/sobre"
+                href="/financeiro"
               >
-                Sobre
+                Financeiro
+              </Link>
+            </li>
+            <li className={classes.link_container}>
+              <Link
+                className={
+                  currentRoute === "/configuracoes"
+                    ? classes.link_text_active
+                    : classes.link_text
+                }
+                href="/configuracoes"
+              >
+                Configurações
               </Link>
             </li>
             <li className={classes.link_container}>
@@ -107,4 +121,4 @@ const MainHeader = () => {
   );
 };
 
-export default MainHeader;
+export default AuthMainHeader;
