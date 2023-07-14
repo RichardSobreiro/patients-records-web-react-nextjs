@@ -70,3 +70,8 @@
 .error_text {
   color: var(--error-500);
 }
+
+.readOnly_label {
+  font-weight: bold;
+  font-size: 1.1rem;
+}

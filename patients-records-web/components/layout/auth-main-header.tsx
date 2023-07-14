@@ -25,12 +25,12 @@ const AuthMainHeader = () => {
           <div className={classes.image}>
             <Image
               src={`/images/icon.png`}
-              alt="Meu Negócio Logo Image"
+              alt="Meu Negocyo Logo Image"
               width={48}
               height={48}
             />
           </div>
-          <div className={classes.logo_text}>Meu Negócio</div>
+          <div className={classes.logo_text}>Meu Negocyo</div>
         </Link>
         <nav>
           <ul className={classes.nav_list}>

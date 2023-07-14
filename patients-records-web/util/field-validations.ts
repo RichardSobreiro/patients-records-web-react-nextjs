@@ -1,5 +1,7 @@
 /** @format */
 
+import { Item } from "@/components/ui/dropdown";
+
 export const isNotEmpty = (value: any) => value.trim() !== "";
 
 export const ifExistsMustBeGreatherThanThree = (value?: any) =>
@@ -156,5 +158,13 @@ export const validateCEP = (strCEP: string): boolean => {
     }
   } else {
     return false;
+  }
+};
+
+export const atLeastOneSelected = (input?: Item) => {
+  if (!input) {
+    return false;
+  } else {
+    return true;
   }
 };

@@ -15,7 +15,7 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>Meu Negócio</title>
+        <title>Meu Negocyo</title>
         <meta
           name="description"
           content="Portal para gerenciamento de empreendimentos na área de beleza."
@@ -34,7 +34,7 @@ export default function Home() {
           <div className={classes.top_body_main_image}>
             <Image
               src={`/images/landing_page.png`}
-              alt="Meu Negócio Logo Image"
+              alt="Meu Negocyo Logo Image"
               width={611}
               height={408}
             />

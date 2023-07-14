@@ -1,0 +1,53 @@
+/** @format */
+
+.table {
+  display: flex;
+  /* grid-template-columns: repeat(1, 100%); */
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0.3rem;
+  flex: 1 1 0;
+
+  margin-top: 1rem;
+}
+
+.table_header {
+  display: grid;
+  grid-auto-columns: 40% 25% 25% 10%;
+  grid-auto-flow: column;
+
+  font-size: 1.3rem;
+  font-family: var(--font-family-title);
+  line-height: 150%;
+  font-weight: bold;
+
+  color: var(--neutral);
+
+  padding: 0.2rem;
+
+  min-width: 70%;
+}
+
+.table_customers_container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.no_customers {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: flex-start;
+  text-align: center;
+
+  margin-top: 5rem;
+
+  font-size: 2rem;
+  font-family: var(--font-family-title);
+  font-weight: bold;
+  line-height: 150%;
+
+  color: var(--neutral);
+}

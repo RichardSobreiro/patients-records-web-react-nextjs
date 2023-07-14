@@ -220,12 +220,12 @@ const Footer = () => {
             <div className={classes.image}>
               <Image
                 src={`/images/icon.png`}
-                alt="Meu Negócio Logo Image"
+                alt="Meu Negocyo Logo Image"
                 width={48}
                 height={48}
               />
             </div>
-            <div className={classes.copyright_text}>Meu Negócio</div>
+            <div className={classes.copyright_text}>Meu Negocyo</div>
           </Link>
           <div>
             <p className={classes.allrights}>

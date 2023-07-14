@@ -23,6 +23,7 @@ const nextConfig = {
   publicRuntimeConfig: {
     PAG_BANK_PUBLIC_KEY: process.env.PAG_BANK_PUBLIC_KEY,
     AUTHNZ_SERVER_URL: process.env.AUTHNZ_SERVER_URL,
+    API_URL: process.env.API_URL,
   },
 };
 

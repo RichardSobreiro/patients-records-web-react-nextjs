@@ -89,6 +89,7 @@ export default NextAuth({
   },
   session: {
     strategy: "jwt",
+    maxAge: 24 * 60 * 60,
   },
   secret: "secret",
   providers: [

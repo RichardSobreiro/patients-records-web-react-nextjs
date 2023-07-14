@@ -6,9 +6,6 @@
   padding-top: 1rem;
   margin-bottom: 1rem;
   min-width: 37rem;
-
-  padding-left: calc((100vw - 1200px) / 2);
-  padding-right: calc((100vw - 1200px) / 2);
 }
 
 .content_left_form {

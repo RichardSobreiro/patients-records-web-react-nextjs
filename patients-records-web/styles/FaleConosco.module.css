@@ -6,9 +6,6 @@
   grid-template-columns: 50% 50%;
   padding-top: 1rem;
   min-width: 37rem;
-
-  padding-left: calc((100vw - 1200px) / 2);
-  padding-right: calc((100vw - 1200px) / 2);
 }
 
 .content_left {

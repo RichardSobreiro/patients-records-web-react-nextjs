@@ -1,0 +1,24 @@
+/** @format */
+
+.row {
+  display: grid;
+  grid-auto-columns: 40% 25% 25% 10%;
+  grid-auto-flow: column;
+
+  font-size: 1rem;
+  font-family: var(--font-family-text);
+  line-height: 150%;
+
+  color: var(--neutral);
+
+  border: 1px solid var(--neutral);
+  border-radius: 1rem;
+  box-shadow: 5px 5px 2px rgba(0, 0, 0, 0.25);
+
+  padding: 0.2rem;
+
+  min-width: 70%;
+}
+
+.cell {
+}

@@ -24,6 +24,7 @@ type Props = {
   onBlurHandler?: any;
   required?: boolean;
   isPaymentSection?: boolean;
+  readOnly?: boolean;
 };
 
 const Input = ({
@@ -40,6 +41,7 @@ const Input = ({
   onBlurHandler,
   required,
   isPaymentSection,
+  readOnly,
 }: Props) => {
   let typeString = "text";
   switch (type) {
@@ -55,21 +57,32 @@ const Input = ({
   }
   return (
     <>
-      <label htmlFor={id} className={`${classes.label}`} style={labelStyle}>
-        {label}
-      </label>
-      <input
-        className={`${
-          isPaymentSection ? classes.input_payment : classes.input
-        } ${hasError && classes.invalid}`}
-        style={inputStyle}
-        type={typeString}
-        id={id}
-        placeholder={placeholder}
-        value={value}
-        onChange={onChangeHandler}
-        onBlur={onBlurHandler}
-      />
+      {readOnly ? (
+        <label htmlFor={id} className={`${classes.label}`} style={labelStyle}>
+          <span className={classes.readOnly_label}>{label}:</span>{" "}
+          {type === InputType.DATE
+            ? new Date(value.replace(/-/g, "/")).toLocaleDateString()
+            : value}
+        </label>
+      ) : (
+        <>
+          <label htmlFor={id} className={`${classes.label}`} style={labelStyle}>
+            {label}
+          </label>
+          <input
+            className={`${
+              isPaymentSection ? classes.input_payment : classes.input
+            } ${hasError && classes.invalid}`}
+            style={inputStyle}
+            type={typeString}
+            id={id}
+            placeholder={placeholder}
+            value={value}
+            onChange={onChangeHandler}
+            onBlur={onBlurHandler}
+          />
+        </>
+      )}
       {hasError && <p className={classes.error_text}>{errorMessage}</p>}
     </>
   );

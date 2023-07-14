@@ -1,8 +1,6 @@
 /** @format */
 
 .container {
-  padding-left: calc((100vw - 1200px) / 2);
-  padding-right: calc((100vw - 1200px) / 2);
 }
 
 .steps {
@@ -44,12 +42,12 @@
 }
 
 .steps_container {
-  margin-top: 2rem;
+  margin-top: 1rem;
 }
 
 .actions {
   display: flex;
   justify-content: center;
   gap: 5rem;
-  margin-top: 2rem;
+  margin-top: 1rem;
 }

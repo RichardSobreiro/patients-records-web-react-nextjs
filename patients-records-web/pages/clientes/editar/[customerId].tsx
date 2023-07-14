@@ -1,6 +1,6 @@
 /** @format */
 
-import Step1 from "@/components/customers/create/step1";
+import Step1 from "@/components/customers/edit/step1";
 import Button, { ButtonStyle } from "@/components/ui/button";
 import useInput from "@/hooks/use-input";
 import classes from "@/styles/customers/Criar.module.css";
@@ -12,21 +12,25 @@ import {
 import { maskMobilePhoneNumber } from "@/util/mask-functions";
 
 import { useRouter } from "next/router";
-import { useContext, useState } from "react";
-import Step2 from "@/components/customers/create/step2";
+import { useCallback, useContext, useEffect, useState } from "react";
+import Step2 from "@/components/customers/edit/step2";
 import useDropdown from "@/hooks/use-dropdown";
-import Step3 from "@/components/customers/create/step3";
+import Step3 from "@/components/customers/edit/step3";
 import Head from "next/head";
 import LoadingSpinner from "@/components/ui/loading-spinner";
 import { CreateCustomerRequest } from "@/models/customers/CreateCustomerRequest";
 import { CreateAnamneseRequest } from "@/models/customers/CreateAnamneseRequest";
-import { createCustomer } from "@/api/customers/customersApi";
+import { createCustomer, getCustomerById } from "@/api/customers/customersApi";
 import { useSession } from "next-auth/react";
 import { NotificationContext } from "@/store/notification-context";
+import { GetCustomerByIdResponse } from "@/models/customers/GetCustomerByIdResponse";
+import { genderList } from "@/util/constants/lists";
+import { Item } from "@/components/ui/dropdown";
 
-const CriarCliente = () => {
+const EditarCliente = () => {
   const router = useRouter();
   const { data: session, status, update } = useSession();
+  const [customer, setCustomer] = useState<GetCustomerByIdResponse>();
 
   if (status === "unauthenticated") {
     router && router.replace("/entrar");
@@ -54,7 +58,10 @@ const CriarCliente = () => {
     valueChangeHandler: customerNameChangedHandler,
     inputBlurHandler: customerNameBlurHandler,
     reset: resetCustomerNameInput,
-  } = useInput({ validateValue: isNotEmpty });
+    setEnteredValue: setCustomerName,
+  } = useInput({
+    validateValue: isNotEmpty,
+  });
 
   const {
     value: enteredPhoneNumber,
@@ -63,6 +70,7 @@ const CriarCliente = () => {
     valueChangeHandler: phoneNumberChangedHandler,
     inputBlurHandler: phoneNumberBlurHandler,
     reset: resetPhoneNumberInput,
+    setEnteredValue: setPhoneNumber,
   } = useInput({
     validateValue: validateMobilePhoneNumber,
     maskFunction: maskMobilePhoneNumber,
@@ -75,6 +83,7 @@ const CriarCliente = () => {
     valueChangeHandler: emailChangedHandler,
     inputBlurHandler: emailBlurHandler,
     reset: resetEmailInput,
+    setEnteredValue: setEmail,
   } = useInput({ validateValue: ifEnteredMustBeEmail });
 
   const {
@@ -84,6 +93,7 @@ const CriarCliente = () => {
     valueChangeHandler: birthdateChangedHandler,
     inputBlurHandler: birthdateBlurHandler,
     reset: resetBirthdateInput,
+    setEnteredValue: setBirthdate,
   } = useInput({ validateValue: isNotEmpty });
 
   const {
@@ -235,10 +245,67 @@ const CriarCliente = () => {
     setIsLoading(false);
   };
 
+  const getCustomerByIdAsync = useCallback(async () => {
+    if (userCustom?.accessToken) {
+      try {
+        const response = await getCustomerById(
+          userCustom.accessToken,
+          router!.query!.customerId! as string
+        );
+        if (response.ok) {
+          const customerResponse = response.body as GetCustomerByIdResponse;
+          setCustomer(customerResponse);
+          setCustomerName(customerResponse.customerName);
+          setPhoneNumber(customerResponse.phoneNumber);
+          customerResponse.email && setEmail(customerResponse.email);
+          if (
+            customerResponse.anamneses &&
+            customerResponse.anamneses.length === 1
+          ) {
+            setBirthdate(
+              new Date(customerResponse.anamneses![0].birthDate)
+                .toISOString()
+                .split("T")[0]
+            );
+            const gender = genderList.find(
+              (item) =>
+                item.description === customerResponse.anamneses![0].gender
+            );
+            const tempSelectedGender = {
+              id: gender?.id,
+              description: gender?.description,
+              selected: true,
+              value: gender,
+            };
+            selectedGenderSetItem(tempSelectedGender as unknown as Item);
+          }
+        }
+      } catch (error: any) {
+        const notification = {
+          status: "error",
+          title: "Opsss...",
+          message:
+            "Tivemos um problema passageiro. Aguarde alguns segundos e tente novamente!",
+        };
+        notificationCtx.showNotification(notification);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+  }, [userCustom?.accessToken, router.query.customerId]);
+
+  useEffect(() => {
+    setIsLoading(true);
+
+    if (userCustom?.accessToken && router?.query?.customerId) {
+      getCustomerByIdAsync();
+    }
+  }, [userCustom?.accessToken, router.query.customerId]);
+
   return (
     <>
       <Head>
-        <title>Novo Cliente</title>
+        <title>Editar Cliente</title>
         <meta
           name="description"
           content="Portal para gerenciamento de empreendimentos na área de beleza."
@@ -400,4 +467,4 @@ const CriarCliente = () => {
   );
 };
 
-export default CriarCliente;
+export default EditarCliente;

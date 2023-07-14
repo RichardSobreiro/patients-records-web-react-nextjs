@@ -4,9 +4,6 @@
   display: grid;
   grid-template-columns: 45% 45%;
   gap: 5rem;
-
-  padding-left: calc((100vw - 1200px) / 2);
-  padding-right: calc((100vw - 1200px) / 2);
 }
 
 .content_left {
