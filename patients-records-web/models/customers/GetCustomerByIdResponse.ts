@@ -1,6 +1,6 @@
 /** @format */
 
-import { GetAnamneseByIdResponse } from "./GetAnamneseByIdResponse";
+import { GetAnamneseByIdResponse } from "./GetAnamnesisByIdResponse";
 
 export class GetCustomerByIdResponse {
   constructor(

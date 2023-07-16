@@ -6,6 +6,12 @@
   padding: 1rem;
 }
 
+.modal_wrapper_sec {
+  background-color: var(--secondary);
+  border-radius: 15px;
+  padding: 1rem;
+}
+
 .modal {
   height: 100%;
   width: 100%;

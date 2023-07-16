@@ -1,0 +1,65 @@
+/** @format */
+
+.container {
+  display: flex;
+  flex-direction: column;
+}
+
+.lists_container {
+  display: flex;
+  flex-direction: column;
+}
+
+.lists_container_tabs {
+  display: grid;
+  grid-template-columns: 50% 50%;
+  /* justify-content: space-around; */
+
+  margin-top: 0.5rem;
+  background-color: var(--tertiary);
+
+  font-family: var(--font-family-title);
+  font-size: 1.2rem;
+  font-weight: bold;
+  line-height: 150%;
+  color: var(--neutral);
+
+  border: 1px solid var(--neutral);
+  border-radius: 10px 10px 0 0;
+}
+
+.lists_container_tabs_cell_anamneses {
+  display: inline-block;
+  text-align: center;
+}
+
+.lists_container_tabs_cell_anamneses:hover {
+  color: var(--tertiary);
+  background-color: var(--neutral);
+  border-radius: 10px 0px 0 0;
+  cursor: pointer;
+}
+
+.lists_container_tabs_cell_services {
+  display: inline-block;
+  text-align: center;
+}
+
+.lists_container_tabs_cell_services:hover {
+  color: var(--tertiary);
+  background-color: var(--neutral);
+  border-radius: 0px 10px 0 0;
+  cursor: pointer;
+}
+
+.is_tab_active_anmnesis {
+  color: var(--tertiary);
+  background-color: var(--neutral);
+  border-radius: 10px 0px 0 0;
+}
+
+.is_tab_active_services {
+  color: var(--tertiary);
+  background-color: var(--neutral);
+  border-radius: 0px 10px 0 0;
+}

@@ -6,9 +6,11 @@ import classes from "./filter.module.css";
 import Image from "next/image";
 import useInput from "@/hooks/use-input";
 import { useState } from "react";
-import Modal from "../ui/modal";
+import Modal, { ModalTheme } from "../ui/modal";
 import Button, { ButtonStyle } from "../ui/button";
 import { useRouter } from "next/router";
+import PersonalInfo from "./edit/personal-info";
+import CreateCustomerModalContent from "./create/create-customer-modal";
 
 const Filter = () => {
   const router = useRouter();
@@ -17,6 +19,9 @@ const Filter = () => {
     useState<boolean>(false);
 
   const [lastServiceTypeModalIsOpen, setLastServiceTypeModalIsOpen] =
+    useState<boolean>(false);
+
+  const [createCustomerModalIsOpen, setCreateCustomerModalIsOpen] =
     useState<boolean>(false);
 
   const {
@@ -116,7 +121,10 @@ const Filter = () => {
         <div className={classes.actions}>
           <Button
             style={ButtonStyle.PRIMARY_BODERED}
-            onClickHandler={() => router.push("/clientes/criar")}
+            onClickHandler={() => {
+              setCreateCustomerModalIsOpen(true);
+              //router.push("/clientes/criar")
+            }}
           >
             + Cliente
           </Button>
@@ -251,6 +259,16 @@ const Filter = () => {
               Ok
             </Button>
           </div>
+        </Modal>
+      )}
+
+      {createCustomerModalIsOpen && (
+        <Modal
+          onClose={() => setCreateCustomerModalIsOpen(false)}
+          title="Novo Cliente"
+          theme={ModalTheme.SECONDARY}
+        >
+          <CreateCustomerModalContent />
         </Modal>
       )}
     </>

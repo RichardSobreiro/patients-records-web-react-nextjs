@@ -2,20 +2,22 @@
 
 import { ApiResponse } from "@/models/Api/ApiResponse";
 import { ErrorDetails } from "@/models/Api/ErrorDetails";
-import { CreateCustomerRequest } from "@/models/customers/CreateCustomerRequest";
-import { CreateCustomerResponse } from "@/models/customers/CreateCustomerResponse";
-import { GetCustomersResponse } from "@/models/customers/GetCustomersResponse";
-import { UpdateCustomerRequest } from "@/models/customers/UpdateCustomerRequest";
-import { UpdateCustomerResponse } from "@/models/customers/UpdateCustomerResponse";
+import { CreateAnamnesisRequest } from "@/models/customers/CreateAnamnesisRequest";
+import { CreateAnamnesisResponse } from "@/models/customers/CreateAnamnesisResponse";
+import { GetAnamnesisByIdResponse } from "@/models/customers/GetAnamnesisByIdResponse";
+import { GetAnamnesisResponse } from "@/models/customers/GetAnamnesisResponse";
+import { UpdateAnamnesisRequest } from "@/models/customers/UpdateAnamnesisRequest";
+import { UpdateAnamnesisResponse } from "@/models/customers/UpdateAnamnesisResponse";
+
 import getConfig from "next/config";
 
 const { publicRuntimeConfig } = getConfig();
 
-export const createCustomer = async (
+export const createAnamnesis = async (
   accessToken: string,
-  request: CreateCustomerRequest
+  request: CreateAnamnesisRequest
 ): Promise<ApiResponse> => {
-  const URL = `${publicRuntimeConfig.API_URL}/customers`;
+  const URL = `${publicRuntimeConfig.API_URL}/customers/${request.customerId}/anamnesis`;
 
   try {
     const response = await fetch(URL, {
@@ -29,9 +31,8 @@ export const createCustomer = async (
     });
 
     if (response.ok) {
-      const createCustomerResponse: CreateCustomerResponse =
-        await response.json();
-      return new ApiResponse(true, response.status, createCustomerResponse);
+      const responseBody: CreateAnamnesisResponse = await response.json();
+      return new ApiResponse(true, response.status, responseBody);
     } else {
       return new ApiResponse(
         false,
@@ -50,11 +51,49 @@ export const createCustomer = async (
   }
 };
 
-export const updateCustomer = async (
+export const getAnamnesisById = async (
   accessToken: string,
-  request: UpdateCustomerRequest
+  customerId: string,
+  anamnesisId: string
 ): Promise<ApiResponse> => {
-  const URL = `${publicRuntimeConfig.API_URL}/customers/${request.customerId}`;
+  const URL = `${publicRuntimeConfig.API_URL}/customers/${customerId}/anamnesis/${anamnesisId}`;
+
+  try {
+    const response = await fetch(URL, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    });
+
+    if (response.ok) {
+      const responseBody: GetAnamnesisByIdResponse = await response.json();
+      return new ApiResponse(true, response.status, responseBody);
+    } else {
+      return new ApiResponse(
+        false,
+        response.status,
+        ``,
+        new ErrorDetails(``, response.status)
+      );
+    }
+  } catch (error: any) {
+    return new ApiResponse(
+      false,
+      400,
+      error.message,
+      new ErrorDetails(error.message, 400)
+    );
+  }
+};
+
+export const updateAnamnesis = async (
+  accessToken: string,
+  request: UpdateAnamnesisRequest
+): Promise<ApiResponse> => {
+  const URL = `${publicRuntimeConfig.API_URL}/customers/${request.customerId}/anamnesis/${request.anamneseId}`;
 
   try {
     const response = await fetch(URL, {
@@ -68,9 +107,8 @@ export const updateCustomer = async (
     });
 
     if (response.ok) {
-      const createCustomerResponse: UpdateCustomerResponse =
-        await response.json();
-      return new ApiResponse(true, response.status, createCustomerResponse);
+      const responseBody: UpdateAnamnesisResponse = await response.json();
+      return new ApiResponse(true, response.status, responseBody);
     } else {
       return new ApiResponse(
         false,
@@ -89,16 +127,16 @@ export const updateCustomer = async (
   }
 };
 
-export const getCustomers = async (
+export const getAnamnesis = async (
   accessToken: string,
   pageNumber: string,
   limit: string,
-  customerName?: string,
-  lastServiceStartDate?: string,
-  lastServiceEndDate?: string,
-  proceedingTypeId?: string
+  customerId: string,
+  startDate?: Date,
+  endDate?: Date,
+  anamnesisType?: string
 ): Promise<ApiResponse> => {
-  const URL = `${publicRuntimeConfig.API_URL}/customers`;
+  const URL = `${publicRuntimeConfig.API_URL}/customers/${customerId}/anamnesis?pageNumber=${pageNumber}&limit=${limit}&customerId=${customerId}`;
 
   try {
     const response = await fetch(URL, {
@@ -111,52 +149,14 @@ export const getCustomers = async (
     });
 
     if (response.ok) {
-      const getCustomerResponse: GetCustomersResponse = await response.json();
-      return new ApiResponse(true, response.status, getCustomerResponse);
+      const responseBody: GetAnamnesisResponse = await response.json();
+      return new ApiResponse(true, response.status, responseBody);
     } else {
       return new ApiResponse(
         false,
         response.status,
         response.statusText,
         new ErrorDetails(response.statusText, response.status)
-      );
-    }
-  } catch (error: any) {
-    return new ApiResponse(
-      false,
-      400,
-      error.message,
-      new ErrorDetails(error.message, 400)
-    );
-  }
-};
-
-export const getCustomerById = async (
-  accessToken: string,
-  customerId: string
-): Promise<ApiResponse> => {
-  const URL = `${publicRuntimeConfig.API_URL}/customers/${customerId}`;
-
-  try {
-    const response = await fetch(URL, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-    });
-
-    if (response.ok) {
-      const getCustomerResponse: GetCustomersResponse = await response.json();
-      return new ApiResponse(true, response.status, getCustomerResponse);
-    } else {
-      const error = await response.json();
-      return new ApiResponse(
-        false,
-        response.status,
-        error.message,
-        new ErrorDetails(error.message, response.status)
       );
     }
   } catch (error: any) {

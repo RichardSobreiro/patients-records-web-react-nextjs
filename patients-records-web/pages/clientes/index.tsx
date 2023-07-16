@@ -7,6 +7,7 @@ import LoadingSpinner from "@/components/ui/loading-spinner";
 import { GetCustomersResponse } from "@/models/customers/GetCustomersResponse";
 import { NotificationContext } from "@/store/notification-context";
 import { useSession } from "next-auth/react";
+import Head from "next/head";
 import { useRouter } from "next/router";
 import { useCallback, useContext, useEffect, useState } from "react";
 
@@ -60,6 +61,15 @@ const Clientes = () => {
 
   return (
     <>
+      <Head>
+        <title>Clientes</title>
+        <meta
+          name="description"
+          content="Portal para gerenciamento de empreendimentos na área de beleza."
+        />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
       <Filter />
       {isLoading ? (
         <LoadingSpinner />

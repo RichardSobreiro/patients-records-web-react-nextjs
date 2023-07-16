@@ -1,6 +1,6 @@
 /** @format */
 
-export class CreateCustomerResponse {
+export class UpdateCustomerResponse {
   constructor(
     public customerId: string,
     public customerName: string,

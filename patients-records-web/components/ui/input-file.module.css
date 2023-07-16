@@ -1,0 +1,44 @@
+/** @format */
+
+.containers {
+  display: flex;
+  flex-direction: row;
+}
+
+.container_selected {
+  border: 3px dashed rgb(210, 227, 244);
+  position: relative;
+}
+
+.container_selected:hover {
+  cursor: pointer;
+  opacity: 50%;
+}
+
+.container {
+  text-align: center;
+  border: 3px dashed rgb(210, 227, 244);
+  padding: 1.5rem;
+  position: relative;
+  color: var(--neutral);
+  cursor: pointer;
+  max-width: 15rem;
+}
+
+.number_files {
+  font-size: 0.8rem;
+}
+
+.container input {
+  font-size: 1rem;
+  display: block;
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  opacity: 0;
+  cursor: pointer;
+}

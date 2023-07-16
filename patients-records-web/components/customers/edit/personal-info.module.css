@@ -1,0 +1,13 @@
+/** @format */
+
+.action_group {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  gap: 1rem;
+  margin-bottom: 0.3rem;
+}
+
+.actions {
+  padding-top: 1.4rem;
+}
