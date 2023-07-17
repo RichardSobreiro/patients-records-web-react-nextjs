@@ -3,26 +3,62 @@
 .containers {
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
 }
 
 .container_selected {
-  border: 3px dashed rgb(210, 227, 244);
+  border: 1px dashed rgb(210, 227, 244);
   position: relative;
+  height: 234px;
+  margin: 1rem;
 }
 
 .container_selected:hover {
   cursor: pointer;
-  opacity: 50%;
+  /* opacity: 30%; */
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.on_hover_actions {
+  position: absolute;
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.on_hover_action {
+  background-color: var(--neutral);
+  padding: 0.5rem;
+  border-radius: 10px;
+}
+
+.on_hover_action:hover {
+  opacity: 90%;
+  box-shadow: 5px 5px 2px rgba(0, 0, 0, 1);
 }
 
 .container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   text-align: center;
-  border: 3px dashed rgb(210, 227, 244);
+  border: 1px dashed rgb(210, 227, 244);
   padding: 1.5rem;
   position: relative;
   color: var(--neutral);
   cursor: pointer;
-  max-width: 15rem;
+
+  height: 234px;
+  margin: 1rem;
+
+  width: 220px;
 }
 
 .number_files {

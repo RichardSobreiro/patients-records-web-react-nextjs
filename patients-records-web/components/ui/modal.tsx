@@ -8,6 +8,7 @@ import ReactDOM from "react-dom";
 export enum ModalTheme {
   STANDARD = 1,
   SECONDARY = 2,
+  PHOTO_VIEWWER = 3,
 }
 
 type Props = {
@@ -28,6 +29,9 @@ const Modal = ({
   theme,
 }: Props) => {
   let modalWrapperCssClass = classes.modal_wrapper;
+  let modalOverlayCssClass = classes.modal_overlay;
+  let modalCssClass = classes.modal;
+  let modalBodyCssClass = classes.modal_body;
   if (theme) {
     switch (theme) {
       case ModalTheme.STANDARD:
@@ -35,6 +39,12 @@ const Modal = ({
         break;
       case ModalTheme.SECONDARY:
         modalWrapperCssClass = classes.modal_wrapper_sec;
+        break;
+      case ModalTheme.PHOTO_VIEWWER:
+        modalWrapperCssClass = classes.photo_viewer_modal_wrapper;
+        modalOverlayCssClass = classes.photo_viewer_modal_overlay;
+        modalCssClass = classes.photo_viewer_modal;
+        modalBodyCssClass = classes.photo_viewer_modal_body;
         break;
     }
   }
@@ -45,9 +55,9 @@ const Modal = ({
   };
 
   const modalContent = (
-    <div className={classes.modal_overlay}>
+    <div className={modalOverlayCssClass}>
       <div className={modalWrapperCssClass}>
-        <div className={classes.modal}>
+        <div className={modalCssClass}>
           <div className={classes.modal_header}>
             {title && (
               <h1 style={titleStyle} className={classes.modal_title}>
@@ -62,7 +72,7 @@ const Modal = ({
               x
             </a>
           </div>
-          <div style={bodyStyle} className={classes.modal_body}>
+          <div style={bodyStyle} className={modalBodyCssClass}>
             {children}
           </div>
         </div>
