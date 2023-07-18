@@ -7,7 +7,7 @@ import classes from "./create-service.module.css";
 
 import { useRouter } from "next/router";
 import { useSession } from "next-auth/react";
-import { useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import Input, { InputType } from "@/components/ui/input";
 import { isNotEmpty } from "@/util/field-validations";
 import useInput from "@/hooks/use-input";
@@ -17,6 +17,10 @@ import useDropdown from "@/hooks/use-dropdown";
 import Button, { ButtonStyle } from "@/components/ui/button";
 import TextArea from "@/components/ui/textarea";
 import InputFile from "@/components/ui/input-file";
+import useFileInput from "@/hooks/use-file-input";
+import { getServiceTypesList } from "@/api/customers/serviceTypesApi";
+import { GetServiceTypeResponse } from "@/models/customers/service-types/GetServiceTypesResponse";
+import ServiceTypesDropdown from "./service-types-dropdown";
 
 const CreateService = () => {
   const { data: session, status, update } = useSession();
@@ -57,6 +61,36 @@ const CreateService = () => {
     setEnteredValue: setBeforeComments,
   } = useInput({ validateValue: () => true });
 
+  const {
+    selectedPhotos: selectedBeforePhotos,
+    isValid: selectedBeforePhotosIsValid,
+    hasError: selectedBeforePhotosHasError,
+    valueChangeHandler: selectedBeforePhotosChangeHandler,
+    inputBlurHandler: selectedBeforePhotosBlurHandler,
+    reset: resetSelectedBeforePhotos,
+    errorMessage: selectedBeforePhotosErrorMessage,
+  } = useFileInput({ validateValue: () => true });
+
+  const {
+    value: afterComments,
+    isValid: afterCommentsIsValid,
+    hasError: afterCommentsInputHasError,
+    valueChangeHandler: afterCommentsChangedHandler,
+    inputBlurHandler: afterCommentsBlurHandler,
+    reset: resetAfterCommentsInput,
+    setEnteredValue: setAfterComments,
+  } = useInput({ validateValue: () => true });
+
+  const {
+    selectedPhotos: selectedAfterPhotos,
+    isValid: selectedAfterPhotosIsValid,
+    hasError: selectedAfterPhotosHasError,
+    valueChangeHandler: selectedAfterPhotosChangeHandler,
+    inputBlurHandler: selectedAfterPhotosBlurHandler,
+    reset: resetSelectedAfterPhotos,
+    errorMessage: selectedAfterPhotosErrorMessage,
+  } = useFileInput({ validateValue: () => true });
+
   useEffect(() => {
     let today = new Date();
     setDate(today.toISOString().split("T")[0]);
@@ -87,20 +121,7 @@ const CreateService = () => {
               onBlurHandler={dateBlurHandler}
             />
           </div>
-          <div>
-            <Dropdown
-              label={"Tipo:"}
-              list={anamnesisTypesList}
-              id={"service-type-create"}
-              idPropertyName={"id"}
-              descriptionPropertyName={"description"}
-              value={type}
-              onBlurHandler={typeBlurHandler}
-              onChangeHandler={typeChangeHandler}
-              hasError={typeInputHasError}
-              errorMessage="O tipo da anamnese deve ser selecionado"
-            />
-          </div>
+          <ServiceTypesDropdown />
         </div>
         <div className={classes.header_container_right}>
           <Button style={ButtonStyle.SUCCESS} onClickHandler={handleSubmit}>
@@ -134,11 +155,44 @@ const CreateService = () => {
             onBlurHandler={beforeCommentsBlurHandler}
           />
         </div>
-        <div className={classes.photos_container}>
-          <p className={classes.photos_container_title}>Fotos do Antes:</p>
+        <InputFile
+          label={"Fotos do Antes:"}
+          hasError={selectedBeforePhotosHasError}
+          errorMessage={selectedBeforePhotosErrorMessage}
+          selectedPhotos={selectedBeforePhotos}
+          onChangeHandler={selectedBeforePhotosChangeHandler}
+          onBlurHandler={selectedBeforePhotosBlurHandler}
+        />
+      </section>
 
-          <InputFile />
+      <section className={classes.before_container}>
+        <p className={classes.step_title}>
+          Informações de Depois do Atendimento:
+        </p>
+        <div className={classes.before_comments_container}>
+          <TextArea
+            label={"Observações de Depois do Atendimento:"}
+            id={"before-comments-create-service"}
+            hasError={afterCommentsInputHasError}
+            errorMessage={
+              "Os comentários de depois do atendimento são inválidos"
+            }
+            rows={5}
+            required={false}
+            value={afterComments}
+            onChangeHandler={afterCommentsChangedHandler}
+            onBlurHandler={afterCommentsBlurHandler}
+          />
         </div>
+
+        <InputFile
+          label={"Fotos do Depois:"}
+          hasError={selectedAfterPhotosHasError}
+          errorMessage={selectedAfterPhotosErrorMessage}
+          selectedPhotos={selectedAfterPhotos}
+          onChangeHandler={selectedAfterPhotosChangeHandler}
+          onBlurHandler={selectedAfterPhotosBlurHandler}
+        />
       </section>
     </>
   );

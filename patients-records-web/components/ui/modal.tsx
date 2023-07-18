@@ -31,6 +31,7 @@ const Modal = ({
   let modalWrapperCssClass = classes.modal_wrapper;
   let modalOverlayCssClass = classes.modal_overlay;
   let modalCssClass = classes.modal;
+  let modalHeaderCssClass = classes.modal_header;
   let modalBodyCssClass = classes.modal_body;
   if (theme) {
     switch (theme) {
@@ -44,6 +45,7 @@ const Modal = ({
         modalWrapperCssClass = classes.photo_viewer_modal_wrapper;
         modalOverlayCssClass = classes.photo_viewer_modal_overlay;
         modalCssClass = classes.photo_viewer_modal;
+        modalHeaderCssClass = classes.photo_viewer_modal_header;
         modalBodyCssClass = classes.photo_viewer_modal_body;
         break;
     }
@@ -58,7 +60,7 @@ const Modal = ({
     <div className={modalOverlayCssClass}>
       <div className={modalWrapperCssClass}>
         <div className={modalCssClass}>
-          <div className={classes.modal_header}>
+          <div className={modalHeaderCssClass}>
             {title && (
               <h1 style={titleStyle} className={classes.modal_title}>
                 {title}

@@ -1,4 +1,7 @@
 /** @format */
+.photos_container {
+  margin-top: 0.5rem;
+}
 
 .containers {
   display: flex;
@@ -77,4 +80,16 @@
   right: 0;
   opacity: 0;
   cursor: pointer;
+}
+
+.error_text {
+  color: var(--error-500);
+}
+
+.photos_container_title {
+  color: var(--neutral);
+  font-size: 1rem;
+  font-family: var(--font-family-title);
+
+  line-height: 150%;
 }
