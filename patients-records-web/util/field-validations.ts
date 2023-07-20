@@ -168,3 +168,13 @@ export const atLeastOneSelected = (input?: Item) => {
     return true;
   }
 };
+
+export const atLeastOneSelectedArray = (input?: Item | Item[]) => {
+  if (!Array.isArray(input)) return false;
+  const selected = input?.filter((item) => item.selected);
+  if (!input || !selected || selected.length === 0) {
+    return false;
+  } else {
+    return true;
+  }
+};

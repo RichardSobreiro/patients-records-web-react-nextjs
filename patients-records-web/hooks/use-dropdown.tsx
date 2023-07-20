@@ -4,11 +4,14 @@ import { Item } from "@/components/ui/dropdown";
 import { useState } from "react";
 
 type Props = {
-  validateValue: (input?: Item, setErrorMessage?: any) => boolean | string;
+  validateValue: (
+    input?: Item | Item[],
+    setErrorMessage?: any
+  ) => boolean | string;
 };
 
 const useDropdown = ({ validateValue }: Props) => {
-  const [item, setItem] = useState<Item>();
+  const [item, setItem] = useState<Item | Item[] | undefined>();
   const [isTouched, setIsTouched] = useState(false);
   let errorMessage = "";
 
@@ -21,7 +24,7 @@ const useDropdown = ({ validateValue }: Props) => {
     valueIsValid = false;
   }
 
-  const valueChangeHandler = (itemParam: Item | undefined) => {
+  const valueChangeHandler = (itemParam: Item | Item[] | undefined) => {
     setItem(itemParam);
   };
 

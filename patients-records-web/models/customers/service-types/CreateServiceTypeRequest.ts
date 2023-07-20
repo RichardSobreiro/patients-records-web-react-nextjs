@@ -2,6 +2,6 @@
 export class CreateServiceTypeRequest {
   constructor(
     public serviceTypeDescription: string,
-    public notes: string | null
+    public notes?: string | null
   ) {}
 }

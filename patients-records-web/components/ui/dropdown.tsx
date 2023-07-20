@@ -19,7 +19,7 @@ type Props = {
   id: string;
   idPropertyName: string;
   descriptionPropertyName: string;
-  value: Item | undefined;
+  value: Item | Item[] | undefined;
   onChangeHandler?: (selectedItem: Item | undefined) => void;
   onBlurHandler?: () => void;
   hasError?: boolean;
@@ -66,7 +66,7 @@ const Dropdown = ({
   }, [list]);
 
   const getPlaceHolder = () => {
-    if (value) return value.description;
+    if (value) return (value as Item).description;
     if (placeholder) return placeholder;
     else return "Selecione...";
   };
@@ -124,7 +124,7 @@ const Dropdown = ({
                   type="radio"
                   value={item.id}
                   onChange={changeHandler}
-                  checked={item.id === value?.id}
+                  checked={item.id === (value as Item)?.id}
                 />
                 <p className={classes.list_item_description}>
                   {item.description}

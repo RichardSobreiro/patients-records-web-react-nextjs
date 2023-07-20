@@ -85,7 +85,7 @@ const CreateAnamnesis = () => {
     const createAnamnesisRequest = new CreateAnamnesisRequest(
       router.query.customerId as string,
       dateObject,
-      [type?.description!],
+      [(type as Item)?.description!],
       birthDateObject,
       anamnesisFreeTypeText
     );
@@ -180,7 +180,7 @@ const CreateAnamnesis = () => {
         </div>
       </section>
       <section className={classes.anaminesis_body}>
-        {type?.id == "1" && (
+        {(type as Item)?.id == "1" && (
           <AnamnesisFreeTypeForm
             anamnesisFreeTypeText={anamnesisFreeTypeText}
             anamnesisFreeTypeTextInputHasError={
