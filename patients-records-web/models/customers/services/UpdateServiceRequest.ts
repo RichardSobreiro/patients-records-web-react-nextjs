@@ -3,8 +3,10 @@
 import { FileCustom } from "@/hooks/use-file-input";
 import { GetServiceTypeResponse } from "../service-types/GetServiceTypesResponse";
 
-export class CreateServiceRequest {
+/** @format */
+export class UpdateServiceRequest {
   constructor(
+    public serviceId: string,
     public date: Date,
     public serviceTypes: GetServiceTypeResponse[],
     public beforeNotes?: string,

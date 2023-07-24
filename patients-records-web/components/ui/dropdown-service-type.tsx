@@ -1,6 +1,13 @@
 /** @format */
 
-import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useReducer,
+  useRef,
+  useState,
+} from "react";
 import Image from "next/image";
 
 import classes from "./dropdown-service-type.module.css";
@@ -50,6 +57,8 @@ const DropdownServiceTypes = ({
   onChangeHandler,
   onBlurHandler,
 }: Props) => {
+  const [ignored, forceUpdate] = useReducer((x) => x + 1, 0);
+
   const [serviceTypesList, setServicesTypeList] = useState<
     GetServiceTypesResponse | undefined
   >(undefined);
@@ -187,14 +196,24 @@ const DropdownServiceTypes = ({
     }
   };
 
+  useEffect(() => {
+    (selectedValues as Item[])?.forEach((selected) => {
+      const matchingItems = itemsList?.filter(
+        (item) => item.id === selected.id
+      );
+      matchingItems?.forEach((matchingItem) => (matchingItem.selected = true));
+    });
+    forceUpdate();
+  }, [selectedValues]);
+
   const changeHandler = (e: any) => {
     let item = itemsList?.find((i) => i.id == e.target.value);
     if (item) {
       item.selected = !item.selected;
     }
     setItemsList([...itemsList!]);
-    selectedValues = itemsList?.filter((item) => item.selected);
-    onChangeHandler && onChangeHandler(itemsList!);
+    const selectedItems = itemsList?.filter((item) => item.selected === true);
+    onChangeHandler && onChangeHandler(selectedItems!);
   };
 
   const blurHandler = () => {
@@ -422,9 +441,7 @@ const DropdownServiceTypes = ({
         </Modal>
       )}
       <div ref={wrapperRef} className={classes.container}>
-        <label className={classes.label} htmlFor={id}>
-          {label}
-        </label>
+        <label className={classes.label}>{label}</label>
         <button
           className={classes.chevron_button}
           onClick={() => {
@@ -437,6 +454,7 @@ const DropdownServiceTypes = ({
             getPlaceHolder()
           ) : (
             <input
+              id={id}
               ref={searchInputRef}
               className={classes.input}
               placeholder={"Procurar"}

@@ -1,24 +1,21 @@
 /** @format */
 
-import { useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import classes from "./input-file.module.css";
 
 import Image from "next/image";
 import { saveAs } from "file-saver";
 import Modal, { ModalTheme } from "./modal";
-
-export type Photo = {
-  file: File;
-  url: string;
-};
+import { FileCustom } from "@/hooks/use-file-input";
 
 type Props = {
   label: string;
   hasError: boolean;
   errorMessage: string;
-  selectedPhotos: File[] | undefined;
-  onChangeHandler: (newValue: File[] | undefined) => void;
+  selectedPhotos: FileCustom[] | undefined;
+  onChangeHandler: (newValue: FileCustom[] | undefined) => void;
   onBlurHandler: () => void;
+  onUpdateSelectedPhotos?: () => void;
 };
 
 const InputFile = ({
@@ -37,9 +34,37 @@ const InputFile = ({
   const [isHovered, setHover] = useState(false);
   const [isViewPhotoModalOpen, setIsViewPhotoModalOpen] =
     useState<boolean>(false);
-  const [photoBeingViewed, setPhotoBeingViewed] = useState<Photo | undefined>(
-    undefined
-  );
+  const [photoBeingViewed, setPhotoBeingViewed] = useState<
+    FileCustom | undefined
+  >(undefined);
+
+  useLayoutEffect(() => {
+    if (selectedPhotos && selectedPhotos.length > 0)
+      updateFiles(selectedPhotos);
+  }, [selectedPhotos]);
+
+  const updateFiles = (files: FileCustom[] | null | undefined) => {
+    if (files && files.length > 1) {
+      setDisplayText(`${files.length} fotos selecionadas...`);
+    } else if (files && files.length === 1) {
+      setDisplayText(`1 foto selecionada...`);
+    } else {
+      setDisplayText(`Nenhuma foto selecionada...`);
+    }
+
+    let images: any[] = [];
+    let removeButtonArray: boolean[] = [];
+    if (files) {
+      for (let i = 0; i < files.length; i++) {
+        images.push(URL.createObjectURL(files[i].file));
+        removeButtonArray.push(false);
+      }
+    }
+    setPhotoUrls(images);
+    setShowPhotosActions(removeButtonArray);
+
+    onChangeHandler(selectedPhotos);
+  };
 
   const handleFileChange = (event: any) => {
     if (event.target.files.length > 1) {
@@ -74,9 +99,16 @@ const InputFile = ({
     });
     const newFiles = Array.from(event.target.files) as File[];
     if (selectedPhotos) {
-      selectedPhotos = [...selectedPhotos!, ...newFiles];
+      selectedPhotos = [
+        ...selectedPhotos!,
+        ...newFiles.map((newFile) => {
+          return { file: newFile };
+        }),
+      ];
     } else {
-      selectedPhotos = newFiles;
+      selectedPhotos = newFiles.map((newFile) => {
+        return { file: newFile };
+      });
     }
 
     if (selectedPhotos && selectedPhotos.length > 1) {
@@ -141,9 +173,9 @@ const InputFile = ({
   };
 
   const onViewOriginalPhotoSizeHandler = (index: number) => {
-    const photo: Photo = {
+    const photo: FileCustom = {
       url: photoUrls![index],
-      file: { ...selectedPhotos![index] } as File,
+      file: selectedPhotos![index].file,
     };
     setIsViewPhotoModalOpen(true);
     setPhotoBeingViewed(photo);

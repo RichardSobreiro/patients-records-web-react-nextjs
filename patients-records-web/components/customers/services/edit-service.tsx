@@ -3,11 +3,11 @@
 import LoadingSpinner from "@/components/ui/loading-spinner";
 import PersonalInfo from "../edit/personal-info";
 import { NotificationContext } from "@/store/notification-context";
-import classes from "./create-service.module.css";
+import classes from "./edit-service.module.css";
 
 import { useRouter } from "next/router";
 import { useSession } from "next-auth/react";
-import { useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import Input, { InputType } from "@/components/ui/input";
 import { atLeastOneSelectedArray, isNotEmpty } from "@/util/field-validations";
 import useInput from "@/hooks/use-input";
@@ -15,15 +15,17 @@ import useDropdown from "@/hooks/use-dropdown";
 import Button, { ButtonStyle } from "@/components/ui/button";
 import TextArea from "@/components/ui/textarea";
 import InputFile from "@/components/ui/input-file";
-import useFileInput from "@/hooks/use-file-input";
+import useFileInput, { FileCustom } from "@/hooks/use-file-input";
 import DropdownServiceTypes, {
   Item,
 } from "@/components/ui/dropdown-service-type";
-import { CreateServiceRequest } from "@/models/customers/services/CreateServiceRequest";
+import { getServiceById, updateService } from "@/api/customers/servicesApi";
+import { GetServiceByIdResponse } from "@/models/customers/services/GetServiceByIdResponse";
+import { GetServicePhotosResponse } from "@/models/customers/services/GetServicePhotosResponse";
 import { GetServiceTypeResponse } from "@/models/customers/service-types/GetServiceTypesResponse";
-import { createService } from "@/api/customers/servicesApi";
+import { UpdateServiceRequest } from "@/models/customers/services/UpdateServiceRequest";
 
-const CreateService = () => {
+const EditService = () => {
   const { data: session, status, update } = useSession();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -70,6 +72,7 @@ const CreateService = () => {
     inputBlurHandler: selectedBeforePhotosBlurHandler,
     reset: resetSelectedBeforePhotos,
     errorMessage: selectedBeforePhotosErrorMessage,
+    setSelectedPhotos: setBeforePhotos,
   } = useFileInput({ validateValue: () => true });
 
   const {
@@ -90,12 +93,125 @@ const CreateService = () => {
     inputBlurHandler: selectedAfterPhotosBlurHandler,
     reset: resetSelectedAfterPhotos,
     errorMessage: selectedAfterPhotosErrorMessage,
+    setSelectedPhotos: setAfterPhotos,
   } = useFileInput({ validateValue: () => true });
 
+  const getAndSetPhotosAsync = async (
+    beforePhotos: GetServicePhotosResponse[] | null | undefined,
+    afterPhotos: GetServicePhotosResponse[] | null | undefined
+  ) => {
+    const beforePhotoFiles: FileCustom[] = [];
+    if (beforePhotos) {
+      for (let i = 0; i < beforePhotos?.length; i++) {
+        let response = await fetch(beforePhotos[i].url);
+        let data = await response.blob();
+        let metadata = {
+          type: data.type,
+        };
+        let photoName = `before-photo-${i}.${data.type.split("/")[1]}`;
+        let photoFile = new File([data], photoName, metadata);
+        beforePhotoFiles.push({
+          file: photoFile,
+          id: beforePhotos[i].servicePhotoId,
+          name: photoName,
+          url: URL.createObjectURL(photoFile),
+        });
+      }
+      setBeforePhotos(beforePhotoFiles);
+    }
+
+    const afterPhotoFiles: FileCustom[] = [];
+    if (afterPhotos) {
+      for (let i = 0; i < afterPhotos?.length; i++) {
+        let response = await fetch(afterPhotos[i].url);
+        let data = await response.blob();
+        let metadata = {
+          type: data.type,
+        };
+        let photoName = `after-photo-${i}.${data.type.split("/")[1]}`;
+        let photoFile = new File(
+          [data],
+          `after-photo-${i}.${data.type.split("/")[1]}`,
+          metadata
+        );
+        afterPhotoFiles.push({
+          file: photoFile,
+          id: afterPhotos[i].servicePhotoId,
+          name: photoName,
+          url: URL.createObjectURL(photoFile),
+        });
+      }
+      setAfterPhotos(afterPhotoFiles);
+    }
+  };
+
+  const getServiceByIdAsync = useCallback(async () => {
+    if (userCustom?.accessToken) {
+      try {
+        const response = await getServiceById(
+          userCustom.accessToken,
+          router.query.customerId as string,
+          router.query.serviceId as string
+        );
+        if (response.ok) {
+          const apiResponseBody = response.body as GetServiceByIdResponse;
+          setDate(new Date(apiResponseBody.date).toISOString().split("T")[0]);
+          apiResponseBody.afterNotes &&
+            setAfterComments(apiResponseBody.afterNotes);
+          apiResponseBody.beforeNotes &&
+            setBeforeComments(apiResponseBody.beforeNotes);
+          setType(
+            apiResponseBody.serviceTypes.map((type) => {
+              return {
+                id: type.serviceTypeId,
+                description: type.serviceTypeDescription,
+                selected: true,
+                value: type,
+              } as Item;
+            })
+          );
+          getAndSetPhotosAsync(
+            apiResponseBody.beforePhotos,
+            apiResponseBody.afterPhotos
+          );
+        } else {
+          const notification = {
+            status: "error",
+            title: "Opsss...",
+            message:
+              "Tivemos um problema passageiro. Aguarde alguns segundos e tente novamente!",
+          };
+          notificationCtx.showNotification(notification);
+        }
+      } catch (error: any) {
+        const notification = {
+          status: "error",
+          title: "Opsss...",
+          message:
+            "Tivemos um problema passageiro. Aguarde alguns segundos e tente novamente!",
+        };
+        notificationCtx.showNotification(notification);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+  }, [userCustom?.accessToken, router.query]);
+
   useEffect(() => {
-    let today = new Date();
-    setDate(today.toISOString().split("T")[0]);
-  }, []);
+    setIsLoading(true);
+
+    if (
+      userCustom?.accessToken &&
+      router.query.customerId &&
+      router.query.serviceId
+    ) {
+      getServiceByIdAsync();
+    }
+  }, [
+    userCustom?.accessToken,
+    router.query.customerId,
+    router.query.serviceId,
+  ]);
 
   const handleSubmit = async () => {
     if (!enteredDateIsValid || !typeIsValid) {
@@ -119,7 +235,8 @@ const CreateService = () => {
         )
     );
 
-    const request = new CreateServiceRequest(
+    const request = new UpdateServiceRequest(
+      router.query.serviceId as string,
       dateObject,
       serviceTypesSelected,
       beforeComments,
@@ -128,9 +245,10 @@ const CreateService = () => {
       selectedAfterPhotos
     );
 
-    const apiResponse = await createService(
+    const apiResponse = await updateService(
       userCustom.accessToken,
       router.query.customerId as string,
+      router.query.serviceId as string,
       request
     );
 
@@ -138,12 +256,9 @@ const CreateService = () => {
       const notification = {
         status: "success",
         title: "Sucesso",
-        message: "O atendimento foi criado com sucesso!",
+        message: "O atendimento foi atualizado com sucesso!",
       };
       notificationCtx.showNotification(notification);
-      router.replace(
-        `/clientes/editar/${apiResponse.body.customerId}/atendimentos/${apiResponse.body.serviceId}/editar`
-      );
     } else {
       const notification = {
         status: "error",
@@ -163,7 +278,7 @@ const CreateService = () => {
       <PersonalInfo customerId={`${router.query.customerId}`} />
 
       <section className={classes.title_container}>
-        <p className={classes.title}>Novo Atendimento</p>
+        <p className={classes.title}>Editando Atendimento</p>
       </section>
 
       <section className={classes.header_container}>
@@ -172,7 +287,7 @@ const CreateService = () => {
             <Input
               type={InputType.DATE}
               label={"Data do Atendimento:"}
-              id={"service-date-create"}
+              id={"service-date-edit"}
               hasError={dateInputHasError}
               errorMessage={"A data do atendimento é inválida"}
               value={enteredDate}
@@ -183,7 +298,7 @@ const CreateService = () => {
           <div>
             <DropdownServiceTypes
               label={"Tipo(s) do Atendimento:"}
-              id={"service-type-create"}
+              id={"service-type-edit"}
               idPropertyName={"serviceTypeId"}
               descriptionPropertyName={"serviceTypeDescription"}
               selectedValues={selectedTypes}
@@ -196,11 +311,13 @@ const CreateService = () => {
         </div>
         <div className={classes.header_container_right}>
           <Button style={ButtonStyle.SUCCESS} onClickHandler={handleSubmit}>
-            Criar
+            Salvar
           </Button>
           <Button
             style={ButtonStyle.NEUTRAL}
-            onClickHandler={() => router.back()}
+            onClickHandler={() =>
+              router.push(`/clientes/editar/${router.query.customerId}`)
+            }
           >
             Cancelar
           </Button>
@@ -214,7 +331,7 @@ const CreateService = () => {
         <div className={classes.before_comments_container}>
           <TextArea
             label={"Observações de Antes do Atendimento:"}
-            id={"before-comments-create-service"}
+            id={"before-comments-edit-service"}
             hasError={beforeCommentsInputHasError}
             errorMessage={
               "Os comentários de antes do atendimento são inválidos"
@@ -243,7 +360,7 @@ const CreateService = () => {
         <div className={classes.before_comments_container}>
           <TextArea
             label={"Observações de Depois do Atendimento:"}
-            id={"before-comments-create-service"}
+            id={"after-comments-edit-service"}
             hasError={afterCommentsInputHasError}
             errorMessage={
               "Os comentários de depois do atendimento são inválidos"
@@ -269,4 +386,4 @@ const CreateService = () => {
   );
 };
 
-export default CreateService;
+export default EditService;

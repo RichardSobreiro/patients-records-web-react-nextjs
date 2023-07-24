@@ -3,13 +3,20 @@
 import { useState } from "react";
 
 type Props = {
-  validateValue: (input?: File[] | undefined) => boolean | string;
+  validateValue: (input?: FileCustom[] | undefined) => boolean | string;
+};
+
+export type FileCustom = {
+  id?: string;
+  file: File;
+  url?: string;
+  name?: string;
 };
 
 const useFileInput = ({ validateValue }: Props) => {
-  const [selectedPhotos, setSelectedPhotos] = useState<File[] | undefined>(
-    undefined
-  );
+  const [selectedPhotos, setSelectedPhotos] = useState<
+    FileCustom[] | undefined
+  >(undefined);
   const [isTouched, setIsTouched] = useState(false);
   let errorMessage = "";
 
@@ -22,7 +29,7 @@ const useFileInput = ({ validateValue }: Props) => {
     valueIsValid = false;
   }
 
-  const valueChangeHandler = (newValue: File[] | undefined) => {
+  const valueChangeHandler = (newValue: FileCustom[] | undefined) => {
     setSelectedPhotos(newValue);
   };
 
@@ -43,6 +50,7 @@ const useFileInput = ({ validateValue }: Props) => {
     inputBlurHandler,
     reset,
     errorMessage,
+    setSelectedPhotos,
   };
 };
 

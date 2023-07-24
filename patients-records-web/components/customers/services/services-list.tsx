@@ -6,9 +6,57 @@ import Dropdown from "@/components/ui/dropdown";
 import { serviceTypes } from "@/util/constants/lists";
 import Button, { ButtonStyle } from "@/components/ui/button";
 import { useRouter } from "next/router";
+import { useSession } from "next-auth/react";
+import { useCallback, useContext, useEffect, useState } from "react";
+import { NotificationContext } from "@/store/notification-context";
+import { GetServiceResponse } from "@/models/customers/services/GetServicesResponse";
+import { getServices } from "@/api/customers/servicesApi";
 
 const ServicesList = () => {
   const router = useRouter();
+  const { data: session, status, update } = useSession();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const notificationCtx = useContext(NotificationContext);
+  const [servicesList, setServicesList] = useState<
+    GetServiceResponse | undefined
+  >();
+
+  const userCustom: any = session?.user;
+
+  const getServiceList = useCallback(async () => {
+    if (userCustom?.accessToken) {
+      try {
+        const response = await getServices(
+          userCustom.accessToken,
+          "1",
+          "10",
+          router.query.customerId as string
+        );
+        if (response.ok) {
+          const apiResponseBody = response.body as GetServiceResponse;
+          setServicesList(apiResponseBody);
+        }
+      } catch (error: any) {
+        const notification = {
+          status: "error",
+          title: "Opsss...",
+          message:
+            "Tivemos um problema passageiro. Aguarde alguns segundos e tente novamente!",
+        };
+        notificationCtx.showNotification(notification);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+  }, [userCustom?.accessToken, router.query]);
+
+  useEffect(() => {
+    setIsLoading(true);
+
+    if (userCustom?.accessToken && router.query.customerId) {
+      getServiceList();
+    }
+  }, [userCustom?.accessToken, router.query.customerId]);
 
   return (
     <>

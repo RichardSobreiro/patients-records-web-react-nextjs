@@ -4,6 +4,10 @@ import { ApiResponse } from "@/models/Api/ApiResponse";
 import { ErrorDetails } from "@/models/Api/ErrorDetails";
 import { CreateServiceRequest } from "@/models/customers/services/CreateServiceRequest";
 import { CreateServiceResponse } from "@/models/customers/services/CreateServiceResponde";
+import { GetServiceByIdResponse } from "@/models/customers/services/GetServiceByIdResponse";
+import { GetServiceResponse } from "@/models/customers/services/GetServicesResponse";
+import { UpdateServiceRequest } from "@/models/customers/services/UpdateServiceRequest";
+import { UpdateServiceResponse } from "@/models/customers/services/UpdateServiceResponse";
 
 import getConfig from "next/config";
 
@@ -14,54 +18,28 @@ export const createService = async (
   customerId: string,
   request: CreateServiceRequest
 ): Promise<ApiResponse> => {
-  const URL = `${publicRuntimeConfig.API_URL}/customers/${customerId}/services`;
-
-  const formData = new FormData();
-  formData.append("date", request.date.toDateString());
-  formData.append("serviceTypes", JSON.stringify(request.serviceTypes));
-  // for (const serviceType of request.serviceTypes) {
-  //   formData.append("serviceTypes", {
-  //     serviceTypeId: serviceType.serviceTypeId,
-  //     serviceTypeDescription: serviceType.serviceTypeDescription,
-  //     notes: serviceType.notes,
-  //     isDefault: serviceType.isDefault,
-  //   } as unknown as Blob);
-  // }
-  formData.append("beforeNotes", request.beforeNotes!);
-  formData.append("afterNotes", request.afterNotes!);
-  for (const photo of request.beforePhotos) {
-    let localUri = photo.uri;
-    let filename = localUri?.split("/").pop();
-    let match = /\.(\w+)$/.exec(filename!);
-    let type = match ? `image/${match[1]}` : `image`;
-    formData.append("beforePhotos", {
-      name: filename,
-      type: type,
-      uri: localUri,
-      width: photo.width,
-      height: photo.height,
-    } as unknown as Blob);
-  }
-  for (const photo of request.afterPhotos) {
-    let localUri = photo.uri;
-    let filename = localUri?.split("/").pop();
-    let match = /\.(\w+)$/.exec(filename!);
-    let type = match ? `image/${match[1]}` : `image`;
-    formData.append("afterPhotos", {
-      name: filename,
-      type: type,
-      uri: localUri,
-      width: photo.width,
-      height: photo.height,
-    } as unknown as Blob);
-  }
-
   try {
-    const response = await fetch(URL, {
+    const URL_ADDRESS = `${publicRuntimeConfig.API_URL}/customers/${customerId}/services`;
+
+    const formData = new FormData();
+    formData.append("date", request.date.toDateString());
+    formData.append("serviceTypes", JSON.stringify(request.serviceTypes));
+    formData.append("beforeNotes", request.beforeNotes!);
+    formData.append("afterNotes", request.afterNotes!);
+    if (request.beforePhotos) {
+      for (const photo of request.beforePhotos) {
+        formData.append("beforePhotos", photo.file);
+      }
+    }
+    if (request.afterPhotos) {
+      for (const photo of request.afterPhotos) {
+        formData.append("afterPhotos", photo.file);
+      }
+    }
+    const response = await fetch(URL_ADDRESS, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${accessToken}`,
-        "Content-Type": "multipart/form-data",
         Accept: "application/json",
       },
       body: formData,
@@ -69,6 +47,138 @@ export const createService = async (
 
     if (response.ok) {
       const responseBody: CreateServiceResponse = await response.json();
+      return new ApiResponse(true, response.status, responseBody);
+    } else {
+      return new ApiResponse(
+        false,
+        response.status,
+        ``,
+        new ErrorDetails(``, response.status)
+      );
+    }
+  } catch (error: any) {
+    return new ApiResponse(
+      false,
+      400,
+      error.message,
+      new ErrorDetails(error.message, 400)
+    );
+  }
+};
+
+export const getServiceById = async (
+  accessToken: string,
+  customerId: string,
+  serviceId: string
+): Promise<ApiResponse> => {
+  const URL = `${publicRuntimeConfig.API_URL}/customers/${customerId}/services/${serviceId}`;
+  try {
+    const response = await fetch(URL, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    });
+
+    if (response.ok) {
+      const responseBody: GetServiceByIdResponse = await response.json();
+      return new ApiResponse(true, response.status, responseBody);
+    } else {
+      return new ApiResponse(
+        false,
+        response.status,
+        ``,
+        new ErrorDetails(``, response.status)
+      );
+    }
+  } catch (error: any) {
+    return new ApiResponse(
+      false,
+      400,
+      error.message,
+      new ErrorDetails(error.message, 400)
+    );
+  }
+};
+
+export const updateService = async (
+  accessToken: string,
+  customerId: string,
+  serviceId: string,
+  request: UpdateServiceRequest
+): Promise<ApiResponse> => {
+  try {
+    const URL_ADDRESS = `${publicRuntimeConfig.API_URL}/customers/${customerId}/services/${serviceId}`;
+
+    const formData = new FormData();
+    formData.append("date", request.date.toDateString());
+    formData.append("serviceTypes", JSON.stringify(request.serviceTypes));
+    formData.append("beforeNotes", request.beforeNotes!);
+    formData.append("afterNotes", request.afterNotes!);
+    if (request.beforePhotos) {
+      for (const photo of request.beforePhotos) {
+        formData.append("beforePhotos", photo.file, photo.id);
+      }
+    }
+    if (request.afterPhotos) {
+      for (const photo of request.afterPhotos) {
+        formData.append("afterPhotos", photo.file, photo.id);
+      }
+    }
+    const response = await fetch(URL_ADDRESS, {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        Accept: "application/json",
+      },
+      body: formData,
+    });
+
+    if (response.ok) {
+      const responseBody: UpdateServiceResponse = await response.json();
+      return new ApiResponse(true, response.status, responseBody);
+    } else {
+      return new ApiResponse(
+        false,
+        response.status,
+        ``,
+        new ErrorDetails(``, response.status)
+      );
+    }
+  } catch (error: any) {
+    return new ApiResponse(
+      false,
+      400,
+      error.message,
+      new ErrorDetails(error.message, 400)
+    );
+  }
+};
+
+export const getServices = async (
+  accessToken: string,
+  pageNumber: string,
+  limit: string,
+  customerId: string,
+  startDate?: Date,
+  endDate?: Date,
+  serviceTypeIds?: string[]
+): Promise<ApiResponse> => {
+  const URL = `${publicRuntimeConfig.API_URL}/customers/${customerId}/services?pageNumber=${pageNumber}&limit=${limit}`;
+  try {
+    const response = await fetch(URL, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    });
+
+    if (response.ok) {
+      const responseBody: GetServiceResponse = await response.json();
       return new ApiResponse(true, response.status, responseBody);
     } else {
       return new ApiResponse(

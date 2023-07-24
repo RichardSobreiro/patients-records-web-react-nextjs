@@ -137,7 +137,7 @@ const EditAnamnesis = () => {
       router.query.anamnesisId as string,
       router.query.customerId as string,
       dateObject,
-      [type?.description!],
+      [(type as Item)?.description!],
       birthDateObject,
       anamnesisFreeTypeText
     );
@@ -243,7 +243,7 @@ const EditAnamnesis = () => {
         </div>
       </section>
       <section className={classes.anaminesis_body}>
-        {type?.id == "1" && (
+        {(type as Item)?.id == "1" && (
           <AnamnesisFreeTypeForm
             anamnesisFreeTypeText={anamnesisFreeTypeText}
             anamnesisFreeTypeTextInputHasError={
