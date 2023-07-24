@@ -8,6 +8,7 @@ export enum InputType {
   TEXT,
   EMAIL,
   DATE,
+  DATE_TIME,
 }
 
 export enum InputTheme {
@@ -60,6 +61,9 @@ const Input = ({
       break;
     case InputType.DATE:
       typeString = "date";
+      break;
+    case InputType.DATE_TIME:
+      typeString = "datetime-local";
       break;
   }
 

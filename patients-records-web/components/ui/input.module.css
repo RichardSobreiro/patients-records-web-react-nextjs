@@ -104,6 +104,7 @@
 
 .error_text {
   color: var(--error-500);
+  position: absolute;
 }
 
 .readOnly_label {

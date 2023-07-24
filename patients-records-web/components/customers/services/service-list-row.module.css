@@ -1,0 +1,16 @@
+/** @format */
+
+.row {
+  display: grid;
+  grid-auto-columns: 33% 33% 33%;
+  grid-auto-flow: column;
+  justify-content: center;
+
+  font-size: 1rem;
+  font-family: var(--font-family-title);
+  line-height: 150%;
+
+  color: var(--neutral);
+
+  padding: 0.2rem;
+}

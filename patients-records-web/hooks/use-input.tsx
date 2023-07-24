@@ -6,16 +6,16 @@ type Props = {
   validateValue: (
     input?: any | string,
     setErrorMessage?: any,
-    mustMatchWith?: any
+    secondValueValidationFunction?: any
   ) => boolean | string;
-  mustMatchWith?: string;
+  secondValueValidationFunction?: any;
   initialValue?: string;
   maskFunction?: (value: string) => string;
 };
 
 const useInput = ({
   validateValue,
-  mustMatchWith,
+  secondValueValidationFunction,
   initialValue,
   maskFunction,
 }: Props) => {
@@ -23,7 +23,7 @@ const useInput = ({
   const [isTouched, setIsTouched] = useState(false);
   let errorMessage = "";
 
-  let valueIsValid = validateValue(enteredValue, mustMatchWith);
+  let valueIsValid = validateValue(enteredValue, secondValueValidationFunction);
   const hasError =
     (!valueIsValid || typeof valueIsValid === "string") && isTouched;
 

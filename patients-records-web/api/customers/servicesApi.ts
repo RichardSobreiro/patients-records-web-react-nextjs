@@ -5,7 +5,10 @@ import { ErrorDetails } from "@/models/Api/ErrorDetails";
 import { CreateServiceRequest } from "@/models/customers/services/CreateServiceRequest";
 import { CreateServiceResponse } from "@/models/customers/services/CreateServiceResponde";
 import { GetServiceByIdResponse } from "@/models/customers/services/GetServiceByIdResponse";
-import { GetServiceResponse } from "@/models/customers/services/GetServicesResponse";
+import {
+  GetServiceResponse,
+  GetServicesResponse,
+} from "@/models/customers/services/GetServicesResponse";
 import { UpdateServiceRequest } from "@/models/customers/services/UpdateServiceRequest";
 import { UpdateServiceResponse } from "@/models/customers/services/UpdateServiceResponse";
 
@@ -166,7 +169,17 @@ export const getServices = async (
   endDate?: Date,
   serviceTypeIds?: string[]
 ): Promise<ApiResponse> => {
-  const URL = `${publicRuntimeConfig.API_URL}/customers/${customerId}/services?pageNumber=${pageNumber}&limit=${limit}`;
+  let URL = `${publicRuntimeConfig.API_URL}/customers/${customerId}/services?pageNumber=${pageNumber}&limit=${limit}`;
+
+  if (startDate && endDate) {
+    URL += `&startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}`;
+  }
+
+  if (serviceTypeIds && serviceTypeIds.length > 0) {
+    for (const serviceTypeId of serviceTypeIds) {
+      URL += `&serviceTypeIds=${serviceTypeId}`;
+    }
+  }
   try {
     const response = await fetch(URL, {
       method: "GET",
@@ -178,7 +191,7 @@ export const getServices = async (
     });
 
     if (response.ok) {
-      const responseBody: GetServiceResponse = await response.json();
+      const responseBody: GetServicesResponse = await response.json();
       return new ApiResponse(true, response.status, responseBody);
     } else {
       return new ApiResponse(

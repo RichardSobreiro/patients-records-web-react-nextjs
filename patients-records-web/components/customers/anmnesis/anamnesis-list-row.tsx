@@ -17,11 +17,9 @@ const AnamnesisListRow = ({ anamnesis }: Props) => {
     <>
       <article key={anamnesis.anamneseId} className={classes.row}>
         <div className={classes.cell}>{anamnesis.type[0]}</div>
-        <div className={classes.cell}>{`${new Date(
-          anamnesis.date
-        ).getDate()}/${new Date(anamnesis.date).getMonth()}/${new Date(
-          anamnesis.date
-        ).getFullYear()}`}</div>
+        <div className={classes.cell}>{`${new Date(anamnesis.date).getDate()}/${
+          new Date(anamnesis.date).getMonth() + 1
+        }/${new Date(anamnesis.date).getFullYear()}`}</div>
         <div className={classes.cell}>
           <Button
             style={ButtonStyle.SUCCESS_SMALL}

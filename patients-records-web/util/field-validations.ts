@@ -2,6 +2,10 @@
 
 import { Item } from "@/components/ui/dropdown";
 
+export const isDate = (date: string): boolean =>
+  (new Date(date) as unknown as string) !== "Invalid Date" &&
+  !isNaN(new Date(date) as unknown as number);
+
 export const isNotEmpty = (value: any) => value.trim() !== "";
 
 export const ifExistsMustBeGreatherThanThree = (value?: any) =>
@@ -31,7 +35,10 @@ export const isPassword = (value: any) => {
   }
 };
 
-export const isPasswordConfirmation = (value: any, mustMatchWith?: string) => {
+export const isPasswordConfirmation = (
+  value: any,
+  secondValueValidationFunction?: string
+) => {
   let returnValue: boolean | string = false;
   if (/^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{6,16}$/.test(value)) {
     returnValue = true;
@@ -39,7 +46,7 @@ export const isPasswordConfirmation = (value: any, mustMatchWith?: string) => {
     return "Senha Inválida!";
   }
 
-  if (value === mustMatchWith) {
+  if (value === secondValueValidationFunction) {
     returnValue = true;
   } else {
     returnValue =

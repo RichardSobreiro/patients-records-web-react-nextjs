@@ -73,7 +73,7 @@ const CriarConta = () => {
     errorMessage: errorMessagePasswordConfirmation,
   } = useInput({
     validateValue: isPasswordConfirmation,
-    mustMatchWith: enteredPassword,
+    secondValueValidationFunction: enteredPassword,
   });
 
   let formIsValid = false;
