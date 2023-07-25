@@ -24,6 +24,7 @@ import { GetServiceByIdResponse } from "@/models/customers/services/GetServiceBy
 import { GetServicePhotosResponse } from "@/models/customers/services/GetServicePhotosResponse";
 import { GetServiceTypeResponse } from "@/models/customers/service-types/GetServiceTypesResponse";
 import { UpdateServiceRequest } from "@/models/customers/services/UpdateServiceRequest";
+import { formatDateTime } from "@/util/date-helpers";
 
 const EditService = () => {
   const { data: session, status, update } = useSession();
@@ -155,7 +156,8 @@ const EditService = () => {
         );
         if (response.ok) {
           const apiResponseBody = response.body as GetServiceByIdResponse;
-          setDate(new Date(apiResponseBody.date).toISOString().split("T")[0]);
+          //setDate(new Date(apiResponseBody.date).toISOString().split("T")[0]);
+          setDate(formatDateTime(apiResponseBody.date));
           apiResponseBody.afterNotes &&
             setAfterComments(apiResponseBody.afterNotes);
           apiResponseBody.beforeNotes &&
@@ -220,7 +222,8 @@ const EditService = () => {
     }
     setIsLoading(true);
 
-    const dateObject = new Date(enteredDate.replace(/-/g, "/"));
+    //const dateObject = new Date(enteredDate.replace(/-/g, "/"));
+    const dateObject = new Date(enteredDate);
 
     const selectedTypesArray = (selectedTypes as Item[]).filter(
       (type) => type.selected
@@ -285,7 +288,7 @@ const EditService = () => {
         <div className={classes.header_container_left}>
           <div>
             <Input
-              type={InputType.DATE}
+              type={InputType.DATE_TIME}
               label={"Data do Atendimento:"}
               id={"service-date-edit"}
               hasError={dateInputHasError}

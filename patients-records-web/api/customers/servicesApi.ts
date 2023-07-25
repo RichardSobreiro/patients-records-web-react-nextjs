@@ -25,7 +25,7 @@ export const createService = async (
     const URL_ADDRESS = `${publicRuntimeConfig.API_URL}/customers/${customerId}/services`;
 
     const formData = new FormData();
-    formData.append("date", request.date.toDateString());
+    formData.append("date", request.date.toLocaleString());
     formData.append("serviceTypes", JSON.stringify(request.serviceTypes));
     formData.append("beforeNotes", request.beforeNotes!);
     formData.append("afterNotes", request.afterNotes!);
@@ -116,7 +116,7 @@ export const updateService = async (
     const URL_ADDRESS = `${publicRuntimeConfig.API_URL}/customers/${customerId}/services/${serviceId}`;
 
     const formData = new FormData();
-    formData.append("date", request.date.toDateString());
+    formData.append("date", request.date.toLocaleString());
     formData.append("serviceTypes", JSON.stringify(request.serviceTypes));
     formData.append("beforeNotes", request.beforeNotes!);
     formData.append("afterNotes", request.afterNotes!);
@@ -172,7 +172,7 @@ export const getServices = async (
   let URL = `${publicRuntimeConfig.API_URL}/customers/${customerId}/services?pageNumber=${pageNumber}&limit=${limit}`;
 
   if (startDate && endDate) {
-    URL += `&startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}`;
+    URL += `&startDate=${startDate.toLocaleString()}&endDate=${endDate.toLocaleString()}`;
   }
 
   if (serviceTypeIds && serviceTypeIds.length > 0) {

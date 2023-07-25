@@ -17,6 +17,9 @@ import useInput from "@/hooks/use-input";
 import { isDate } from "@/util/field-validations";
 import useDropdown from "@/hooks/use-dropdown";
 import DropdownServiceTypes from "@/components/ui/dropdown-service-type";
+import Pagination from "@/components/ui/pagination";
+
+const PAGE_SIZE = 10;
 
 const ServicesList = () => {
   const router = useRouter();
@@ -26,6 +29,8 @@ const ServicesList = () => {
   const [servicesList, setServicesList] = useState<
     GetServicesResponse | undefined
   >();
+
+  const [currentPage, setCurrentPage] = useState<number | string>(1);
 
   const userCustom: any = session?.user;
 
@@ -237,6 +242,16 @@ const ServicesList = () => {
                 </p>
               ))}
           </div>
+          {servicesList && servicesList?.servicesCount > 0 && (
+            <Pagination
+              className="pagination_bar"
+              currentPage={currentPage as number}
+              siblingCount={2}
+              totalCount={servicesList?.servicesCount}
+              pageSize={PAGE_SIZE}
+              onPageChange={(page) => setCurrentPage(page)}
+            />
+          )}
         </div>
       </section>
     </>

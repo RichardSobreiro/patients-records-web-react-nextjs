@@ -104,7 +104,8 @@ const CreateService = () => {
     }
     setIsLoading(true);
 
-    const dateObject = new Date(enteredDate.replace(/-/g, "/"));
+    //const dateObject = new Date(enteredDate.replace(/-/g, "/"));
+    const dateObject = new Date(enteredDate);
 
     const selectedTypesArray = (selectedTypes as Item[]).filter(
       (type) => type.selected
@@ -170,7 +171,7 @@ const CreateService = () => {
         <div className={classes.header_container_left}>
           <div>
             <Input
-              type={InputType.DATE}
+              type={InputType.DATE_TIME}
               label={"Data do Atendimento:"}
               id={"service-date-create"}
               hasError={dateInputHasError}
