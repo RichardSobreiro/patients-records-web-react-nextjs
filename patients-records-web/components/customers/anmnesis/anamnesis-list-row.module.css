@@ -13,4 +13,8 @@
   color: var(--neutral);
 
   padding: 0.2rem;
+
+  border-bottom: 1px solid var(--neutral);
+  border-left: 1px solid var(--neutral);
+  border-right: 1px solid var(--neutral);
 }

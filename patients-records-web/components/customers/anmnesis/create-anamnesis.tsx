@@ -18,6 +18,7 @@ import { useSession } from "next-auth/react";
 import { CreateAnamnesisRequest } from "@/models/customers/CreateAnamnesisRequest";
 import { createAnamnesis } from "@/api/customers/anamnesisApi";
 import LoadingSpinner from "@/components/ui/loading-spinner";
+import { formatDateTime } from "@/util/date-helpers";
 
 const CreateAnamnesis = () => {
   const { data: session, status, update } = useSession();
@@ -49,16 +50,6 @@ const CreateAnamnesis = () => {
   } = useDropdown({ validateValue: () => true });
 
   const {
-    value: birthdate,
-    isValid: birthdateIsValid,
-    hasError: birthdateInputHasError,
-    valueChangeHandler: birthdateChangedHandler,
-    inputBlurHandler: birthdateBlurHandler,
-    reset: resetbirthdateInput,
-    setEnteredValue: setBirthdate,
-  } = useInput({ validateValue: isNotEmpty });
-
-  const {
     value: anamnesisFreeTypeText,
     isValid: anamnesisFreeTypeTextIsValid,
     hasError: anamnesisFreeTypeTextInputHasError,
@@ -69,24 +60,27 @@ const CreateAnamnesis = () => {
 
   useEffect(() => {
     let today = new Date();
-    setDate(today.toISOString().split("T")[0]);
+    setDate(formatDateTime(today));
     const defaultType = anamnesisTypesList.find((at) => at.id == 1);
     setType(defaultType as unknown as Item);
   }, []);
 
   const handleSubmit = async () => {
-    if (!enteredDateIsValid || !typeIsValid || !birthdateIsValid) return;
+    if (!enteredDateIsValid || !typeIsValid || !anamnesisFreeTypeTextIsValid) {
+      dateBlurHandler(undefined);
+      typeBlurHandler();
+      anamnesisFreeTypeTextBlurHandler(undefined);
+      return;
+    }
 
     setIsLoading(true);
 
-    const dateObject = new Date(enteredDate.replace(/-/g, "/"));
-    const birthDateObject = new Date(birthdate.replace(/-/g, "/"));
+    const dateObject = new Date(enteredDate);
 
     const createAnamnesisRequest = new CreateAnamnesisRequest(
       router.query.customerId as string,
       dateObject,
       [(type as Item)?.description!],
-      birthDateObject,
       anamnesisFreeTypeText
     );
 
@@ -130,7 +124,7 @@ const CreateAnamnesis = () => {
         <div className={classes.header_container_left}>
           <div>
             <Input
-              type={InputType.DATE}
+              type={InputType.DATE_TIME}
               label={"Data"}
               id={"anamnesis-date-create"}
               hasError={dateInputHasError}
@@ -152,18 +146,6 @@ const CreateAnamnesis = () => {
               onChangeHandler={typeChangeHandler}
               hasError={typeInputHasError}
               errorMessage="O tipo da anamnese deve ser selecionado"
-            />
-          </div>
-          <div>
-            <Input
-              type={InputType.DATE}
-              label={"Data de Aniversário"}
-              id={"anamnesis-birthdate-create"}
-              hasError={birthdateInputHasError}
-              errorMessage={"A data de aniversário é inválida"}
-              value={birthdate}
-              onChangeHandler={birthdateChangedHandler}
-              onBlurHandler={birthdateBlurHandler}
             />
           </div>
         </div>

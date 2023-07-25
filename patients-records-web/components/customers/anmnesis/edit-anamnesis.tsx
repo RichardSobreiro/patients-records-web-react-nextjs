@@ -24,6 +24,7 @@ import LoadingSpinner from "@/components/ui/loading-spinner";
 import { GetAnamnesisByIdResponse } from "@/models/customers/GetAnamnesisByIdResponse";
 import { UpdateAnamnesisRequest } from "@/models/customers/UpdateAnamnesisRequest";
 import { UpdateAnamnesisResponse } from "@/models/customers/UpdateAnamnesisResponse";
+import { formatDateTime } from "@/util/date-helpers";
 
 const EditAnamnesis = () => {
   const { data: session, status, update } = useSession();
@@ -55,16 +56,6 @@ const EditAnamnesis = () => {
   } = useDropdown({ validateValue: () => true });
 
   const {
-    value: birthdate,
-    isValid: birthdateIsValid,
-    hasError: birthdateInputHasError,
-    valueChangeHandler: birthdateChangedHandler,
-    inputBlurHandler: birthdateBlurHandler,
-    reset: resetbirthdateInput,
-    setEnteredValue: setBirthdate,
-  } = useInput({ validateValue: isNotEmpty });
-
-  const {
     value: anamnesisFreeTypeText,
     isValid: anamnesisFreeTypeTextIsValid,
     hasError: anamnesisFreeTypeTextInputHasError,
@@ -84,14 +75,11 @@ const EditAnamnesis = () => {
         );
         if (response.ok) {
           const apiResponseBody = response.body as GetAnamnesisByIdResponse;
-          setDate(new Date(apiResponseBody.date).toISOString().split("T")[0]);
+          setDate(formatDateTime(apiResponseBody.date));
           const type = anamnesisTypesList.find(
             (item) => item.description === apiResponseBody.type[0]
           );
           setType(type as unknown as Item);
-          setBirthdate(
-            new Date(apiResponseBody.birthDate).toISOString().split("T")[0]
-          );
           apiResponseBody.freeTypeText &&
             setAnamnesisFreeTypeText(apiResponseBody.freeTypeText);
         }
@@ -126,19 +114,22 @@ const EditAnamnesis = () => {
   ]);
 
   const handleSubmit = async () => {
-    if (!enteredDateIsValid || !typeIsValid || !birthdateIsValid) return;
+    if (!enteredDateIsValid || !typeIsValid || !anamnesisFreeTypeTextIsValid) {
+      dateBlurHandler(undefined);
+      typeBlurHandler();
+      anamnesisFreeTypeTextBlurHandler(undefined);
+      return;
+    }
 
     setIsLoading(true);
 
     const dateObject = new Date(enteredDate.replace(/-/g, "/"));
-    const birthDateObject = new Date(birthdate.replace(/-/g, "/"));
 
     const updateAnamnesisRequest = new UpdateAnamnesisRequest(
       router.query.anamnesisId as string,
       router.query.customerId as string,
       dateObject,
       [(type as Item)?.description!],
-      birthDateObject,
       anamnesisFreeTypeText
     );
 
@@ -161,9 +152,6 @@ const EditAnamnesis = () => {
         (item) => item.description === apiResponseBody.type[0]
       );
       setType(type as unknown as Item);
-      setBirthdate(
-        new Date(apiResponseBody.birthDate).toISOString().split("T")[0]
-      );
       apiResponseBody.freeTypeText &&
         setAnamnesisFreeTypeText(apiResponseBody.freeTypeText);
     } else {
@@ -191,7 +179,7 @@ const EditAnamnesis = () => {
         <div className={classes.header_container_left}>
           <div>
             <Input
-              type={InputType.DATE}
+              type={InputType.DATE_TIME}
               label={"Data"}
               id={"anamnesis-date-edit"}
               hasError={dateInputHasError}
@@ -213,18 +201,6 @@ const EditAnamnesis = () => {
               onChangeHandler={typeChangeHandler}
               hasError={typeInputHasError}
               errorMessage="O tipo da anamnese deve ser selecionado"
-            />
-          </div>
-          <div>
-            <Input
-              type={InputType.DATE}
-              label={"Data de Aniversário"}
-              id={"anamnesis-birthdate-edit"}
-              hasError={birthdateInputHasError}
-              errorMessage={"A data de aniversário é inválida"}
-              value={birthdate}
-              onChangeHandler={birthdateChangedHandler}
-              onBlurHandler={birthdateBlurHandler}
             />
           </div>
         </div>

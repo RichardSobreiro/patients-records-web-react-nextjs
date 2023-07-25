@@ -2,7 +2,7 @@
 
 import Input, { InputType } from "@/components/ui/input";
 import classes from "./anamnesis-list.module.css";
-import Dropdown from "@/components/ui/dropdown";
+import Dropdown, { Item } from "@/components/ui/dropdown";
 import { anamnesisTypesList } from "@/util/constants/lists";
 import Button, { ButtonStyle } from "@/components/ui/button";
 
@@ -14,6 +14,12 @@ import { getAnamnesis } from "@/api/customers/anamnesisApi";
 import { GetAnamnesisResponse } from "@/models/customers/GetAnamnesisResponse";
 import LoadingSpinner from "@/components/ui/loading-spinner";
 import AnamnesisListRow from "./anamnesis-list-row";
+import useInput from "@/hooks/use-input";
+import useDropdown from "@/hooks/use-dropdown";
+import { isDate } from "@/util/field-validations";
+import Pagination from "@/components/ui/pagination";
+
+const PAGE_SIZE = 10;
 
 const AnamnesisList = () => {
   const { data: session, status, update } = useSession();
@@ -24,16 +30,86 @@ const AnamnesisList = () => {
     GetAnamnesisResponse | undefined
   >();
 
+  const [currentPage, setCurrentPage] = useState<number | string>(1);
+
   const userCustom: any = session?.user;
+
+  const {
+    value: startDate,
+    isValid: startDateIsValid,
+    hasError: startDateInputHasError,
+    errorMessage: startDateErrorMessage,
+    valueChangeHandler: startDateChangedHandler,
+    inputBlurHandler: startDateBlurHandler,
+    reset: resetstartDateInput,
+    setEnteredValue: setstartDate,
+  } = useInput({ validateValue: () => true });
+
+  const validateEndDate = (
+    endDate?: string,
+    startDate?: string
+  ): boolean | string => {
+    if (!isDate(startDate!) && !isDate(endDate!)) {
+      return true;
+    } else if (
+      (!isDate(startDate!) && isDate(endDate!)) ||
+      (isDate(startDate!) && !isDate(endDate!))
+    ) {
+      return "As datas de início e fim devem ser preenchidas";
+    } else if (isDate(startDate!) && isDate(endDate!)) {
+      const startDateObject = new Date(startDate!);
+      const endDateObject = new Date(endDate!);
+      if (startDateObject > endDateObject) {
+        return "A data de início deve ser menor que a data fim";
+      } else {
+        return true;
+      }
+    } else {
+      return false;
+    }
+  };
+
+  const {
+    value: endDate,
+    isValid: endDateIsValid,
+    hasError: endEndInputHasError,
+    errorMessage: endDateErrorMessage,
+    valueChangeHandler: endDateChangedHandler,
+    inputBlurHandler: endDateBlurHandler,
+    reset: resetEndDateInput,
+    setEnteredValue: setEndDate,
+  } = useInput({
+    validateValue: validateEndDate,
+    secondValueValidationFunction: startDate,
+  });
+
+  const {
+    value: type,
+    isValid: typeIsValid,
+    hasError: typeInputHasError,
+    valueChangeHandler: typeChangeHandler,
+    inputBlurHandler: typeBlurHandler,
+    reset: resetType,
+    errorMessage: typeErrorMessage,
+    setItem: setType,
+  } = useDropdown({ validateValue: () => true });
 
   const getAnamnesisList = useCallback(async () => {
     if (userCustom?.accessToken) {
       try {
+        const startDateObject = isDate(startDate)
+          ? new Date(startDate)
+          : undefined;
+        const endDateObject = isDate(endDate) ? new Date(endDate) : undefined;
+
         const response = await getAnamnesis(
           userCustom.accessToken,
-          "1",
-          "10",
-          router.query.customerId as string
+          currentPage as string,
+          PAGE_SIZE as unknown as string,
+          router.query.customerId as string,
+          startDateObject,
+          endDateObject,
+          (type as Item)?.description
         );
         if (response.ok) {
           const apiResponseBody = response.body as GetAnamnesisResponse;
@@ -51,7 +127,14 @@ const AnamnesisList = () => {
         setIsLoading(false);
       }
     }
-  }, [userCustom?.accessToken, router.query]);
+  }, [
+    userCustom?.accessToken,
+    router.query,
+    startDate,
+    endDate,
+    type,
+    currentPage,
+  ]);
 
   useEffect(() => {
     setIsLoading(true);
@@ -59,11 +142,19 @@ const AnamnesisList = () => {
     if (userCustom?.accessToken && router.query.customerId) {
       getAnamnesisList();
     }
-  }, [
-    userCustom?.accessToken,
-    router.query.customerId,
-    router.query.anamnesisId,
-  ]);
+  }, [userCustom?.accessToken, router.query.customerId]);
+
+  const onSubmitFilter = async () => {
+    if (!startDateIsValid || !endDateIsValid) {
+      return;
+    }
+    setIsLoading(true);
+    await getAnamnesisList();
+  };
+
+  useEffect(() => {
+    onSubmitFilter();
+  }, [currentPage]);
 
   return (
     <>
@@ -76,36 +167,54 @@ const AnamnesisList = () => {
           <div className={classes.search_container_left}>
             <div>
               <Input
-                type={InputType.DATE}
-                label={"Início (Data de Criação)"}
-                id={""}
-                hasError={false}
-                errorMessage={""}
+                type={InputType.DATE_TIME}
+                label={"Início (Data da Anamnese)"}
+                id={"start-date-anamnesis-list"}
+                hasError={startDateInputHasError}
+                errorMessage={startDateErrorMessage}
+                value={startDate}
+                onChangeHandler={startDateChangedHandler}
+                onBlurHandler={startDateBlurHandler}
               />
             </div>
             <div>
               <Input
-                type={InputType.DATE}
-                label={"Fim (Data de Criação)"}
-                id={""}
-                hasError={false}
-                errorMessage={""}
+                type={InputType.DATE_TIME}
+                label={"Fim (Data da Anamnese)"}
+                id={"end-date-anamnesis-list"}
+                hasError={endEndInputHasError}
+                errorMessage={endDateErrorMessage}
+                value={endDate}
+                onChangeHandler={endDateChangedHandler}
+                onBlurHandler={endDateBlurHandler}
               />
             </div>
             <div>
               <Dropdown
-                label={"Tipo de Anamnese"}
+                label={"Tipo"}
                 list={anamnesisTypesList}
-                id={"search-anaminesis-type"}
+                id={"anamnesis-type-create"}
                 idPropertyName={"id"}
                 descriptionPropertyName={"description"}
-                value={undefined}
+                value={type}
+                onBlurHandler={typeBlurHandler}
+                onChangeHandler={typeChangeHandler}
+                hasError={typeInputHasError}
+                errorMessage="O tipo da anamnese deve ser selecionado"
               />
+            </div>
+            <div className={classes.filter_button_group}>
+              <Button
+                style={ButtonStyle.PRIMARY_BODERED}
+                onClickHandler={onSubmitFilter}
+              >
+                Filtrar
+              </Button>
             </div>
           </div>
           <div className={classes.search_container_right}>
             <Button
-              style={ButtonStyle.PRIMARY_BODERED}
+              style={ButtonStyle.SUCCESS}
               onClickHandler={() => {
                 router.push(
                   `/clientes/editar/${router.query.customerId}/anamneses/criar`
@@ -134,9 +243,19 @@ const AnamnesisList = () => {
             {!anamnesisList ||
               (anamnesisList?.count == 0 && (
                 <p className={classes.list_empty}>
-                  Nenhuma anamnese criada para o cliente!
+                  Nenhuma anamnese encontrada!
                 </p>
               ))}
+            {anamnesisList && anamnesisList?.count > 0 && (
+              <Pagination
+                className="pagination_bar"
+                currentPage={currentPage as number}
+                siblingCount={2}
+                totalCount={anamnesisList?.count}
+                pageSize={PAGE_SIZE}
+                onPageChange={(page) => setCurrentPage(page)}
+              />
+            )}
           </div>
         </div>
       </section>

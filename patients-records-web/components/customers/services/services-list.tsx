@@ -108,8 +108,8 @@ const ServicesList = () => {
       try {
         const response = await getServices(
           userCustom.accessToken,
-          "1",
-          "10",
+          currentPage as string,
+          PAGE_SIZE as unknown as string,
           router.query.customerId as string,
           startDateObject,
           endDateObject,
@@ -137,6 +137,7 @@ const ServicesList = () => {
     endDate,
     startDate,
     selectedTypes,
+    currentPage,
   ]);
 
   useEffect(() => {
@@ -154,6 +155,10 @@ const ServicesList = () => {
     setIsLoading(true);
     await getServiceList();
   };
+
+  useEffect(() => {
+    onSubmitFilter();
+  }, [currentPage]);
 
   return (
     <>
@@ -242,16 +247,6 @@ const ServicesList = () => {
                 </p>
               ))}
           </div>
-          {servicesList && servicesList?.servicesCount > 0 && (
-            <Pagination
-              className="pagination_bar"
-              currentPage={currentPage as number}
-              siblingCount={2}
-              totalCount={servicesList?.servicesCount}
-              pageSize={PAGE_SIZE}
-              onPageChange={(page) => setCurrentPage(page)}
-            />
-          )}
         </div>
       </section>
     </>

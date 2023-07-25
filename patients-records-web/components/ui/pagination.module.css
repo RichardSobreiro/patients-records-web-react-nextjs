@@ -3,6 +3,10 @@
 .pagination_container {
   display: flex;
   list-style-type: none;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
 }
 
 .pagination_item {
@@ -17,7 +21,7 @@
   letter-spacing: 0.01071em;
   border-radius: 16px;
   line-height: 1.43;
-  font-size: 13px;
+  font-size: 1rem;
   min-width: 32px;
 }
 
@@ -43,15 +47,15 @@
   display: inline-block;
   width: 0.4em;
   height: 0.4em;
-  border-right: 0.12em solid rgba(0, 0, 0, 0.87);
-  border-top: 0.12em solid rgba(0, 0, 0, 0.87);
+  border-right: 0.2rem solid rgba(0, 0, 0, 0.87);
+  border-top: 0.2rem solid rgba(0, 0, 0, 0.87);
 }
 
-.arrow .left {
-  transform: rotate(-135deg) translate(-50%);
+.left {
+  transform: rotate(-135deg);
 }
 
-.arrow .right {
+.right {
   transform: rotate(45deg);
 }
 
@@ -60,8 +64,8 @@
 }
 
 .disabled .arrow::before {
-  border-right: 0.12em solid rgba(0, 0, 0, 0.43);
-  border-top: 0.12em solid rgba(0, 0, 0, 0.43);
+  border-right: 0.2rem solid rgba(0, 0, 0, 0.43);
+  border-top: 0.2rem solid rgba(0, 0, 0, 0.43);
 }
 
 .disabled .arrow:hover {

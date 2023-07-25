@@ -37,7 +37,6 @@
   display: flex;
   /* grid-template-columns: repeat(1, 100%); */
   flex-direction: column;
-  gap: 0.3rem;
   flex: 1 1 0;
   min-width: 35rem;
   margin-top: 1rem;
@@ -58,7 +57,7 @@
 
   padding: 0.2rem;
 
-  border-bottom: 1px solid var(--neutral);
+  border-bottom: 3px solid var(--neutral);
 }
 
 .list_empty {
@@ -69,4 +68,8 @@
 .table_body {
   display: flex;
   flex-direction: column;
+}
+
+.filter_button_group {
+  padding-top: 1.3rem;
 }

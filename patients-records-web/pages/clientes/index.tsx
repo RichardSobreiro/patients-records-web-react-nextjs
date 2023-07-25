@@ -4,6 +4,7 @@ import { getCustomers } from "@/api/customers/customersApi";
 import Filter from "@/components/customers/filter";
 import CustomersList from "@/components/customers/list";
 import LoadingSpinner from "@/components/ui/loading-spinner";
+import Pagination from "@/components/ui/pagination";
 import { GetCustomersResponse } from "@/models/customers/GetCustomersResponse";
 import { NotificationContext } from "@/store/notification-context";
 import { useSession } from "next-auth/react";
@@ -18,6 +19,8 @@ const Clientes = () => {
   const [customersList, setCustomersList] = useState<GetCustomersResponse>();
   const notificationCtx = useContext(NotificationContext);
 
+  const [currentPage, setCurrentPage] = useState<number | string>(1);
+
   const userCustom: any = session?.user;
 
   if (status === "unauthenticated") {
@@ -26,7 +29,11 @@ const Clientes = () => {
 
   const getCustomersAsync = useCallback(async () => {
     try {
-      const response = await getCustomers(userCustom.accessToken, "1", "10");
+      const response = await getCustomers(
+        userCustom.accessToken,
+        currentPage as string,
+        "10"
+      );
       if (response.ok) {
         setCustomersList(response.body as GetCustomersResponse);
       } else {
@@ -49,7 +56,7 @@ const Clientes = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [userCustom?.accessToken]);
+  }, [userCustom?.accessToken, currentPage]);
 
   useEffect(() => {
     setIsLoading(true);
@@ -58,6 +65,18 @@ const Clientes = () => {
       getCustomersAsync();
     }
   }, [userCustom?.accessToken]);
+
+  const onSubmitFilter = async () => {
+    // if (!startDateIsValid || !endDateIsValid) {
+    //   return;
+    // }
+    setIsLoading(true);
+    await getCustomersAsync();
+  };
+
+  useEffect(() => {
+    onSubmitFilter();
+  }, [currentPage]);
 
   return (
     <>
@@ -74,7 +93,19 @@ const Clientes = () => {
       {isLoading ? (
         <LoadingSpinner />
       ) : (
-        <CustomersList customersList={customersList} />
+        <>
+          <CustomersList customersList={customersList} />
+          {customersList && customersList?.customersCount > 0 && (
+            <Pagination
+              className="pagination_bar"
+              currentPage={currentPage as number}
+              siblingCount={2}
+              totalCount={customersList?.customersCount}
+              pageSize={10}
+              onPageChange={(page) => setCurrentPage(page)}
+            />
+          )}
+        </>
       )}
     </>
   );

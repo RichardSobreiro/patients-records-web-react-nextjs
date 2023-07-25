@@ -136,7 +136,15 @@ export const getAnamnesis = async (
   endDate?: Date,
   anamnesisType?: string
 ): Promise<ApiResponse> => {
-  const URL = `${publicRuntimeConfig.API_URL}/customers/${customerId}/anamnesis?pageNumber=${pageNumber}&limit=${limit}&customerId=${customerId}`;
+  let URL = `${publicRuntimeConfig.API_URL}/customers/${customerId}/anamnesis?pageNumber=${pageNumber}&limit=${limit}&customerId=${customerId}`;
+
+  if (startDate && endDate) {
+    URL += `&startDate=${startDate.toLocaleString()}&endDate=${endDate.toLocaleString()}`;
+  }
+
+  if (anamnesisType) {
+    URL += `&anamnesisType=${anamnesisType}`;
+  }
 
   try {
     const response = await fetch(URL, {

@@ -1,6 +1,6 @@
 /** @format */
 
-import { GetAnamneseByIdResponse } from "./GetAnamnesisByIdResponse";
+import { GetAnamnesisByIdResponse } from "./GetAnamnesisByIdResponse";
 
 export class GetCustomerByIdResponse {
   constructor(
@@ -9,7 +9,8 @@ export class GetCustomerByIdResponse {
     public customerName: string,
     public phoneNumber: string,
     public creationDate: Date,
-    public anamneses?: GetAnamneseByIdResponse[],
+    public birthDate: Date,
+    public anamneses?: GetAnamnesisByIdResponse[],
     public email?: string,
     public mostRecentProceedingId?: string,
     public mostRecentProceedingDate?: Date,

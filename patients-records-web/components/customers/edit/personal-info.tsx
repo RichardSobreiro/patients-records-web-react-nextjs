@@ -65,6 +65,16 @@ const PersonalInfo = ({ customerId }: Props) => {
     setEnteredValue: setEmail,
   } = useInput({ validateValue: ifEnteredMustBeEmail });
 
+  const {
+    value: birthdate,
+    isValid: birthdateIsValid,
+    hasError: birthdateInputHasError,
+    valueChangeHandler: birthdateChangedHandler,
+    inputBlurHandler: birthdateBlurHandler,
+    reset: resetbirthdateInput,
+    setEnteredValue: setBirthdate,
+  } = useInput({ validateValue: isNotEmpty });
+
   const getCustomerByIdAsync = useCallback(async () => {
     if (userCustom?.accessToken) {
       try {
@@ -76,6 +86,10 @@ const PersonalInfo = ({ customerId }: Props) => {
           const customerResponse = response.body as GetCustomerByIdResponse;
           setCustomerName(customerResponse.customerName);
           setPhoneNumber(customerResponse.phoneNumber);
+          customerResponse.birthDate &&
+            setBirthdate(
+              new Date(customerResponse.birthDate).toISOString().split("T")[0]
+            );
           customerResponse.email && setEmail(customerResponse.email);
         }
       } catch (error: any) {
@@ -103,12 +117,25 @@ const PersonalInfo = ({ customerId }: Props) => {
   const handleSubmit = async (event: any) => {
     event.preventDefault();
 
+    if (
+      !birthdateIsValid ||
+      !enteredEmailIsValid ||
+      !enteredPhoneNumberIsValid ||
+      !enteredCustomerNameIsValid
+    ) {
+      birthdateBlurHandler(undefined);
+      return;
+    }
+
     setIsLoading(true);
+
+    const birthDateObject = new Date(birthdate.replace(/-/g, "/"));
 
     const request = new UpdateCustomerRequest(
       customerId,
       enteredCustomerName,
       enteredPhoneNumber,
+      birthDateObject,
       enteredEmail
     );
 
@@ -177,6 +204,18 @@ const PersonalInfo = ({ customerId }: Props) => {
               value={enteredEmail}
               onChangeHandler={emailChangedHandler}
               onBlurHandler={emailBlurHandler}
+            />
+          </div>
+          <div>
+            <Input
+              type={InputType.DATE}
+              label={"Data de Aniversário"}
+              id={"anamnesis-birthdate-create"}
+              hasError={birthdateInputHasError}
+              errorMessage={"A data de aniversário é inválida"}
+              value={birthdate}
+              onChangeHandler={birthdateChangedHandler}
+              onBlurHandler={birthdateBlurHandler}
             />
           </div>
           <div className={classes.actions}>

@@ -3,6 +3,7 @@
 import classes from "./service-list-row.module.css";
 import Button, { ButtonStyle } from "@/components/ui/button";
 import { GetServiceResponse } from "@/models/customers/services/GetServicesResponse";
+import { formatDateTimePTBR } from "@/util/date-helpers";
 
 import { useRouter } from "next/router";
 
@@ -22,9 +23,7 @@ const ServiceListRow = ({ service }: Props) => {
               return <p>{type.serviceTypeDescription}</p>;
             })}
         </div>
-        <div className={classes.cell}>{`${new Date(service.date).getDate()}/${
-          new Date(service.date).getMonth() + 1
-        }/${new Date(service.date).getFullYear()}`}</div>
+        <div className={classes.cell}>{formatDateTimePTBR(service.date)}</div>
         <div className={classes.cell}>
           <Button
             style={ButtonStyle.SUCCESS_SMALL}

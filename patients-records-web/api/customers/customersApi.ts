@@ -98,7 +98,7 @@ export const getCustomers = async (
   lastServiceEndDate?: string,
   proceedingTypeId?: string
 ): Promise<ApiResponse> => {
-  const URL = `${publicRuntimeConfig.API_URL}/customers`;
+  const URL = `${publicRuntimeConfig.API_URL}/customers?pageNumber=${pageNumber}&limit=${limit}`;
 
   try {
     const response = await fetch(URL, {
