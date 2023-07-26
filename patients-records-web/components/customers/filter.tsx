@@ -9,10 +9,22 @@ import { useState } from "react";
 import Modal, { ModalTheme } from "../ui/modal";
 import Button, { ButtonStyle } from "../ui/button";
 import { useRouter } from "next/router";
-import PersonalInfo from "./edit/personal-info";
 import CreateCustomerModalContent from "./create/create-customer-modal";
+import { isDate } from "@/util/field-validations";
+import DropdownServiceTypes from "../ui/dropdown-service-type";
+import useDropdown from "@/hooks/use-dropdown";
 
-const Filter = () => {
+type Props = {
+  currentPage: string | number;
+  getCustomersAsync: (
+    customerName?: string,
+    startDate?: Date,
+    endDate?: Date
+  ) => void;
+  setIsLoading: any;
+};
+
+const Filter = ({ currentPage, getCustomersAsync, setIsLoading }: Props) => {
   const router = useRouter();
 
   const [lastServiceDateModalIsOpen, setLastServiceDateModalIsOpen] =
@@ -75,16 +87,36 @@ const Filter = () => {
   } = useInput({ validateValue: validateLastServiceDateEnd });
 
   const {
-    value: enteredLastServiceType,
-    isValid: enteredLastServiceTypeIsValid,
-    hasError: enteredLastServiceTypeInputHasError,
-    valueChangeHandler: enteredLastServiceTypeChangedHandler,
-    inputBlurHandler: enteredLastServiceTypeBlurHandler,
-    reset: resetEnteredLastServiceTypeTextInput,
-  } = useInput({ validateValue: () => true });
+    value: selectedTypes,
+    isValid: typeIsValid,
+    hasError: typeInputHasError,
+    valueChangeHandler: typeChangeHandler,
+    inputBlurHandler: typeBlurHandler,
+    reset: resetType,
+    errorMessage: typeErrorMessage,
+    setItem: setType,
+  } = useDropdown({ validateValue: () => true });
 
-  const onSubmitHandler = (e: any) => {
+  const onSubmitHandler = async (e: any) => {
     e.preventDefault();
+
+    if (
+      !enteredTextIsValid ||
+      !enteredLastServiceDateStartIsValid ||
+      !enteredLastServiceDateEndIsValid ||
+      !typeIsValid
+    ) {
+      return;
+    }
+
+    const startDateObject = isDate(enteredLastServiceDateStart)
+      ? new Date(enteredLastServiceDateStart.replace(/-/g, "/"))
+      : undefined;
+    const endDateObject = isDate(enteredLastServiceDateEnd)
+      ? new Date(enteredLastServiceDateEnd.replace(/-/g, "/"))
+      : undefined;
+    setIsLoading(true);
+    await getCustomersAsync(enteredText, startDateObject, endDateObject);
   };
 
   const dateStringToDate = (str: string) => {
@@ -103,11 +135,14 @@ const Filter = () => {
         <div className={classes.search_group}>
           <Input
             type={InputType.TEXT}
-            label={"Procurar por nome"}
+            label={"Procurar por nome:"}
             inputStyle={{ minWidth: "20rem" }}
             id={"main-search-input"}
             hasError={enteredTextInputHasError}
             errorMessage={"O texto de busca é inválido"}
+            value={enteredText}
+            onChangeHandler={enteredTextChangedHandler}
+            onBlurHandler={enteredTextBlurHandler}
           />
           <button type="submit" className={classes.search_button}>
             <Image
@@ -139,10 +174,10 @@ const Filter = () => {
           <p className={classes.text_extra_filters}>
             {enteredLastServiceDateStart != "" &&
             enteredLastServiceDateStartIsValid
-              ? `Último atendimento entre: ${dateStringToDate(
+              ? `Atendimentos entre as datas: ${dateStringToDate(
                   enteredLastServiceDateStart
                 )} e ${dateStringToDate(enteredLastServiceDateEnd)}`
-              : "Data do último procedimento..."}
+              : "Filtrar por data de atendimento..."}
           </p>
         </button>
         <button
@@ -161,6 +196,7 @@ const Filter = () => {
         <Modal
           onClose={() => setLastServiceDateModalIsOpen(false)}
           title="Data do último atendimento:"
+          theme={ModalTheme.SECONDARY}
         >
           <Input
             type={InputType.DATE}
@@ -202,6 +238,7 @@ const Filter = () => {
               style={ButtonStyle.PRIMARY_BODERED_SMALL}
               onClickHandler={() => {
                 resetenteredLastServiceDateStartTextInput();
+                resetenteredLastServiceDateEndTextInput();
               }}
             >
               Limpar
@@ -224,18 +261,18 @@ const Filter = () => {
       {lastServiceTypeModalIsOpen && (
         <Modal
           onClose={() => setLastServiceTypeModalIsOpen(false)}
-          title="Tipo de atendimento"
+          title="Tipo(s) de Atendimento(s)"
         >
-          <Input
-            type={InputType.TEXT}
-            label={""}
-            id={"last-service-type"}
-            inputStyle={{ background: "#32b44f" }}
-            hasError={enteredLastServiceTypeInputHasError}
-            errorMessage={"O tipo de procedimento é inválido"}
-            value={enteredLastServiceType}
-            onChangeHandler={enteredLastServiceTypeChangedHandler}
-            onBlurHandler={enteredLastServiceTypeBlurHandler}
+          <DropdownServiceTypes
+            label={"Tipo(s) do Atendimento:"}
+            id={"service-type-edit"}
+            idPropertyName={"serviceTypeId"}
+            descriptionPropertyName={"serviceTypeDescription"}
+            selectedValues={selectedTypes}
+            onBlurHandler={typeBlurHandler}
+            onChangeHandler={typeChangeHandler}
+            hasError={typeInputHasError}
+            errorMessage="O tipo do atendimento deve ser selecionado"
           />
           <div className={classes.extra_filters_modal_actions}>
             <Button
@@ -246,9 +283,7 @@ const Filter = () => {
             </Button>
             <Button
               style={ButtonStyle.PRIMARY_BODERED_SMALL}
-              onClickHandler={() => {
-                resetEnteredLastServiceTypeTextInput();
-              }}
+              onClickHandler={() => {}}
             >
               Limpar
             </Button>
