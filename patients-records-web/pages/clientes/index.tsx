@@ -27,16 +27,29 @@ const Clientes = () => {
     router && router.replace("/entrar");
   }
 
-  const getCustomersAsync = useCallback(async () => {
-    try {
-      const response = await getCustomers(
-        userCustom.accessToken,
-        currentPage as string,
-        "10"
-      );
-      if (response.ok) {
-        setCustomersList(response.body as GetCustomersResponse);
-      } else {
+  const getCustomersAsync = useCallback(
+    async (customerName?: string, startDate?: Date, endDate?: Date) => {
+      try {
+        const response = await getCustomers(
+          userCustom.accessToken,
+          currentPage as string,
+          "10",
+          customerName,
+          startDate,
+          endDate
+        );
+        if (response.ok) {
+          setCustomersList(response.body as GetCustomersResponse);
+        } else {
+          const notification = {
+            status: "error",
+            title: "Opsss...",
+            message:
+              "Tivemos um problema passageiro. Aguarde alguns segundos e tente novamente!",
+          };
+          notificationCtx.showNotification(notification);
+        }
+      } catch (error: any) {
         const notification = {
           status: "error",
           title: "Opsss...",
@@ -44,19 +57,12 @@ const Clientes = () => {
             "Tivemos um problema passageiro. Aguarde alguns segundos e tente novamente!",
         };
         notificationCtx.showNotification(notification);
+      } finally {
+        setIsLoading(false);
       }
-    } catch (error: any) {
-      const notification = {
-        status: "error",
-        title: "Opsss...",
-        message:
-          "Tivemos um problema passageiro. Aguarde alguns segundos e tente novamente!",
-      };
-      notificationCtx.showNotification(notification);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [userCustom?.accessToken, currentPage]);
+    },
+    [userCustom?.accessToken, currentPage]
+  );
 
   useEffect(() => {
     setIsLoading(true);
@@ -67,9 +73,6 @@ const Clientes = () => {
   }, [userCustom?.accessToken]);
 
   const onSubmitFilter = async () => {
-    // if (!startDateIsValid || !endDateIsValid) {
-    //   return;
-    // }
     setIsLoading(true);
     await getCustomersAsync();
   };
@@ -89,7 +92,11 @@ const Clientes = () => {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Filter />
+      <Filter
+        currentPage={currentPage}
+        getCustomersAsync={getCustomersAsync}
+        setIsLoading={setIsLoading}
+      />
       {isLoading ? (
         <LoadingSpinner />
       ) : (

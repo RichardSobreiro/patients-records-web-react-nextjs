@@ -94,11 +94,19 @@ export const getCustomers = async (
   pageNumber: string,
   limit: string,
   customerName?: string,
-  lastServiceStartDate?: string,
-  lastServiceEndDate?: string,
+  lastServiceStartDate?: Date,
+  lastServiceEndDate?: Date,
   proceedingTypeId?: string
 ): Promise<ApiResponse> => {
-  const URL = `${publicRuntimeConfig.API_URL}/customers?pageNumber=${pageNumber}&limit=${limit}`;
+  let URL = `${publicRuntimeConfig.API_URL}/customers?pageNumber=${pageNumber}&limit=${limit}`;
+
+  if (customerName) {
+    URL += `&customerName=${customerName}`;
+  }
+
+  if (lastServiceStartDate && lastServiceEndDate) {
+    URL += `&lastServiceStartDate=${lastServiceStartDate.toLocaleString()}&lastServiceEndDate=${lastServiceEndDate.toLocaleString()}`;
+  }
 
   try {
     const response = await fetch(URL, {

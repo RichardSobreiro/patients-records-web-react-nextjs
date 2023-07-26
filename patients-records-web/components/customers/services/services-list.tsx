@@ -17,7 +17,6 @@ import useInput from "@/hooks/use-input";
 import { isDate } from "@/util/field-validations";
 import useDropdown from "@/hooks/use-dropdown";
 import DropdownServiceTypes from "@/components/ui/dropdown-service-type";
-import Pagination from "@/components/ui/pagination";
 
 const PAGE_SIZE = 10;
 
