@@ -2,23 +2,26 @@
 
 import Input, { InputType } from "@/components/ui/input";
 import classes from "./create-anamnesis.module.css";
-import Dropdown, { Item } from "@/components/ui/dropdown";
-import { anamnesisTypesList } from "@/util/constants/lists";
 import PersonalInfo from "../edit/personal-info";
 
 import { useRouter } from "next/router";
 import useInput from "@/hooks/use-input";
-import { isNotEmpty } from "@/util/field-validations";
+import { atLeastOneSelectedArray, isNotEmpty } from "@/util/field-validations";
 import { useContext, useEffect, useState } from "react";
 import useDropdown from "@/hooks/use-dropdown";
 import AnamnesisFreeTypeForm from "./types/free-type";
 import Button, { ButtonStyle } from "@/components/ui/button";
 import { NotificationContext } from "@/store/notification-context";
 import { useSession } from "next-auth/react";
-import { CreateAnamnesisRequest } from "@/models/customers/CreateAnamnesisRequest";
-import { createAnamnesis } from "@/api/customers/anamnesisApi";
+import {
+  CreateAnamnesisRequest,
+  CreateAnamnesisTypeContentRequest,
+} from "@/models/customers/CreateAnamnesisRequest";
 import LoadingSpinner from "@/components/ui/loading-spinner";
 import { formatDateTime } from "@/util/date-helpers";
+import DropdownAnamnesisTypes, {
+  ItemAnamnesis,
+} from "@/components/ui/dropdown-anamnesis-type";
 
 const CreateAnamnesis = () => {
   const { data: session, status, update } = useSession();
@@ -39,7 +42,7 @@ const CreateAnamnesis = () => {
   } = useInput({ validateValue: isNotEmpty });
 
   const {
-    value: type,
+    value: selectedTypes,
     isValid: typeIsValid,
     hasError: typeInputHasError,
     valueChangeHandler: typeChangeHandler,
@@ -47,29 +50,25 @@ const CreateAnamnesis = () => {
     reset: resetType,
     errorMessage: typeErrorMessage,
     setItem: setType,
-  } = useDropdown({ validateValue: () => true });
-
-  const {
-    value: anamnesisFreeTypeText,
-    isValid: anamnesisFreeTypeTextIsValid,
-    hasError: anamnesisFreeTypeTextInputHasError,
-    valueChangeHandler: anamnesisFreeTypeTextChangedHandler,
-    inputBlurHandler: anamnesisFreeTypeTextBlurHandler,
-    reset: resetAnamnesisFreeTypeTextInput,
-  } = useInput({ validateValue: isNotEmpty });
+  } = useDropdown({ validateValue: atLeastOneSelectedArray });
 
   useEffect(() => {
     let today = new Date();
     setDate(formatDateTime(today));
-    const defaultType = anamnesisTypesList.find((at) => at.id == 1);
-    setType(defaultType as unknown as Item);
   }, []);
 
   const handleSubmit = async () => {
-    if (!enteredDateIsValid || !typeIsValid || !anamnesisFreeTypeTextIsValid) {
+    let anamnesisTypeContentsIsValid: boolean | string | undefined = true;
+    selectedTypes &&
+      (selectedTypes as ItemAnamnesis[]).length > 0 &&
+      (selectedTypes as ItemAnamnesis[]).forEach((type) => {
+        anamnesisTypeContentsIsValid =
+          anamnesisTypeContentsIsValid && type.anamnesisTypeContentIsValid;
+      });
+    if (!enteredDateIsValid || !typeIsValid || !anamnesisTypeContentsIsValid) {
       dateBlurHandler(undefined);
       typeBlurHandler();
-      anamnesisFreeTypeTextBlurHandler(undefined);
+      //anamnesisFreeTypeTextBlurHandler(undefined);
       return;
     }
 
@@ -77,28 +76,41 @@ const CreateAnamnesis = () => {
 
     const dateObject = new Date(enteredDate);
 
+    const selectedTypesArray = (selectedTypes as ItemAnamnesis[]).filter(
+      (type) => type.selected
+    );
+    const anamnesisTypeContents = selectedTypesArray.map(
+      (item) =>
+        new CreateAnamnesisTypeContentRequest(
+          item.id,
+          item.description,
+          item.value.isDefault,
+          item.anamnesisTypeContent
+        )
+    );
+
     const createAnamnesisRequest = new CreateAnamnesisRequest(
       router.query.customerId as string,
       dateObject,
-      [(type as Item)?.description!],
-      anamnesisFreeTypeText
+      anamnesisTypeContents
     );
 
-    const apiResponse = await createAnamnesis(
-      userCustom.accessToken,
-      createAnamnesisRequest
-    );
+    // const apiResponse = await createAnamnesis(
+    //   userCustom.accessToken,
+    //   createAnamnesisRequest
+    // );
 
-    if (apiResponse.ok) {
+    //if (apiResponse.ok) {
+    if (true) {
       const notification = {
         status: "success",
         title: "Sucesso",
         message: "Sua anamnese foi criada com sucesso!",
       };
       notificationCtx.showNotification(notification);
-      router.replace(
-        `/clientes/editar/${apiResponse.body.customerId}/anamneses/${apiResponse.body.anamneseId}/editar`
-      );
+      // router.replace(
+      //   `/clientes/editar/${apiResponse.body.customerId}/anamneses/${apiResponse.body.anamneseId}/editar`
+      // );
     } else {
       const notification = {
         status: "error",
@@ -135,17 +147,16 @@ const CreateAnamnesis = () => {
             />
           </div>
           <div>
-            <Dropdown
-              label={"Tipo"}
-              list={anamnesisTypesList}
+            <DropdownAnamnesisTypes
+              label={"Tipo(s) da Anamnese(s):"}
               id={"anamnesis-type-create"}
-              idPropertyName={"id"}
-              descriptionPropertyName={"description"}
-              value={type}
+              idPropertyName={"anamnesisTypeId"}
+              descriptionPropertyName={"anamnesisTypeDescription"}
+              selectedValues={selectedTypes}
               onBlurHandler={typeBlurHandler}
               onChangeHandler={typeChangeHandler}
               hasError={typeInputHasError}
-              errorMessage="O tipo da anamnese deve ser selecionado"
+              errorMessage="O tipo da anamenese deve ser selecionado"
             />
           </div>
         </div>
@@ -162,18 +173,29 @@ const CreateAnamnesis = () => {
         </div>
       </section>
       <section className={classes.anaminesis_body}>
-        {(type as Item)?.id == "1" && (
-          <AnamnesisFreeTypeForm
-            anamnesisFreeTypeText={anamnesisFreeTypeText}
-            anamnesisFreeTypeTextInputHasError={
-              anamnesisFreeTypeTextInputHasError
+        {selectedTypes &&
+          (selectedTypes as ItemAnamnesis[]).length > 0 &&
+          (selectedTypes as ItemAnamnesis[])?.map((type) => {
+            if (type.description === "Arquivo") {
+              return <h1>Upload de Arquivo</h1>;
+            } else {
+              return (
+                <>
+                  <AnamnesisFreeTypeForm
+                    anamnesisTypeId={type.id}
+                    template={type.value.template}
+                    selectedTypes={selectedTypes}
+                    setTypes={setType}
+                    anamnesisTypeDescription={type.description}
+                    anamnesisTypeContent={type.anamnesisTypeContent}
+                    anamnesisTypeContentIsValid={
+                      type.anamnesisTypeContentIsValid
+                    }
+                  />
+                </>
+              );
             }
-            anamnesisFreeTypeTextChangedHandler={
-              anamnesisFreeTypeTextChangedHandler
-            }
-            anamnesisFreeTypeTextBlurHandler={anamnesisFreeTypeTextBlurHandler}
-          />
-        )}
+          })}
       </section>
     </>
   );

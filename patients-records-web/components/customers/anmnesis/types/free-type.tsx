@@ -1,27 +1,74 @@
 /** @format */
 
+import { ItemAnamnesis } from "@/components/ui/dropdown-anamnesis-type";
+import { Item } from "@/components/ui/dropdown-service-type";
 import TextArea from "@/components/ui/textarea";
+import useInput from "@/hooks/use-input";
+import { isNotEmpty } from "@/util/field-validations";
+import { useEffect } from "react";
 
 type Props = {
-  anamnesisFreeTypeText: string;
-  anamnesisFreeTypeTextInputHasError: boolean;
-  anamnesisFreeTypeTextChangedHandler: (event: any) => void;
-  anamnesisFreeTypeTextBlurHandler: (event: any) => void;
+  anamnesisTypeId: string;
+  anamnesisTypeDescription: string;
+  selectedTypes: Item | Item[] | ItemAnamnesis[] | undefined;
+  setTypes: any;
+  anamnesisTypeContent?: string | null;
+  anamnesisTypeContentIsValid?: boolean | string;
+  template?: string;
 };
 
-const AnamnesisFreeTypeForm = (props: Props) => {
+const AnamnesisFreeTypeForm = ({
+  anamnesisTypeId,
+  anamnesisTypeDescription,
+  selectedTypes,
+  setTypes,
+  template,
+  anamnesisTypeContent,
+  anamnesisTypeContentIsValid,
+}: Props) => {
+  const {
+    value: anamnesisFreeTypeText,
+    isValid: anamnesisFreeTypeTextIsValid,
+    hasError: anamnesisFreeTypeTextInputHasError,
+    valueChangeHandler: anamnesisFreeTypeTextChangedHandler,
+    inputBlurHandler: anamnesisFreeTypeTextBlurHandler,
+    reset: resetAnamnesisFreeTypeTextInput,
+    setEnteredValue: setTemplate,
+  } = useInput({ validateValue: isNotEmpty });
+
+  useEffect(() => {
+    template && setTemplate(template);
+  }, [template]);
+
+  useEffect(() => {
+    if (selectedTypes) {
+      const newSelectedTypes = [...(selectedTypes as ItemAnamnesis[])];
+      const targetType = newSelectedTypes.filter(
+        (type) => type.id === anamnesisTypeId
+      );
+      if (targetType && targetType.length === 1) {
+        targetType[0].anamnesisTypeContentIsValid =
+          anamnesisFreeTypeTextIsValid;
+        targetType[0].anamnesisTypeContent = anamnesisFreeTypeText;
+        setTypes(newSelectedTypes);
+      }
+    }
+  }, [anamnesisFreeTypeText]);
+
+  anamnesisTypeContentIsValid = anamnesisFreeTypeTextIsValid;
+
   return (
     <>
       <TextArea
-        label={""}
-        id={"anamnesis-free-type-form-textarea"}
-        hasError={props.anamnesisFreeTypeTextInputHasError}
+        label={anamnesisTypeDescription}
+        id={`${anamnesisTypeDescription}`}
+        hasError={anamnesisFreeTypeTextInputHasError}
         errorMessage={"O conteúdo da anamnese é inválido"}
         rows={20}
         required={false}
-        value={props.anamnesisFreeTypeText}
-        onChangeHandler={props.anamnesisFreeTypeTextChangedHandler}
-        onBlurHandler={props.anamnesisFreeTypeTextBlurHandler}
+        value={anamnesisFreeTypeText}
+        onChangeHandler={anamnesisFreeTypeTextChangedHandler}
+        onBlurHandler={anamnesisFreeTypeTextBlurHandler}
       />
     </>
   );

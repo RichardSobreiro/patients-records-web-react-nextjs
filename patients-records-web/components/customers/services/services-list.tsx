@@ -17,6 +17,7 @@ import useInput from "@/hooks/use-input";
 import { isDate } from "@/util/field-validations";
 import useDropdown from "@/hooks/use-dropdown";
 import DropdownServiceTypes from "@/components/ui/dropdown-service-type";
+import Pagination from "@/components/ui/pagination";
 
 const PAGE_SIZE = 10;
 
@@ -245,6 +246,16 @@ const ServicesList = () => {
                   Nenhum atendimento encontrado!
                 </p>
               ))}
+            {servicesList && servicesList?.servicesCount > 0 && (
+              <Pagination
+                className="pagination_bar"
+                currentPage={currentPage as number}
+                siblingCount={2}
+                totalCount={servicesList?.servicesCount}
+                pageSize={PAGE_SIZE}
+                onPageChange={(page) => setCurrentPage(page)}
+              />
+            )}
           </div>
         </div>
       </section>

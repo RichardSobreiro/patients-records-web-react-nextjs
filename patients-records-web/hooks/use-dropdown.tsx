@@ -1,17 +1,20 @@
 /** @format */
 
 import { Item } from "@/components/ui/dropdown";
+import { ItemAnamnesis } from "@/components/ui/dropdown-anamnesis-type";
 import { useState } from "react";
 
 type Props = {
   validateValue: (
-    input?: Item | Item[],
+    input?: Item | Item[] | ItemAnamnesis[],
     setErrorMessage?: any
   ) => boolean | string;
 };
 
 const useDropdown = ({ validateValue }: Props) => {
-  const [item, setItem] = useState<Item | Item[] | undefined>();
+  const [item, setItem] = useState<
+    Item | Item[] | ItemAnamnesis[] | undefined
+  >();
   const [isTouched, setIsTouched] = useState(false);
   let errorMessage = "";
 
@@ -24,7 +27,9 @@ const useDropdown = ({ validateValue }: Props) => {
     valueIsValid = false;
   }
 
-  const valueChangeHandler = (itemParam: Item | Item[] | undefined) => {
+  const valueChangeHandler = (
+    itemParam: Item | Item[] | ItemAnamnesis[] | undefined
+  ) => {
     setItem(itemParam);
   };
 

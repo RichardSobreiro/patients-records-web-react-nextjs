@@ -2,20 +2,22 @@
 
 import { ApiResponse } from "@/models/Api/ApiResponse";
 import { ErrorDetails } from "@/models/Api/ErrorDetails";
-import { CreateCustomerRequest } from "@/models/customers/CreateCustomerRequest";
-import { CreateCustomerResponse } from "@/models/customers/CreateCustomerResponse";
-import { GetCustomersResponse } from "@/models/customers/GetCustomersResponse";
-import { UpdateCustomerRequest } from "@/models/customers/UpdateCustomerRequest";
-import { UpdateCustomerResponse } from "@/models/customers/UpdateCustomerResponse";
+import { CreateAnamnesisTypeRequest } from "@/models/customers/anamnesis-types/CreateAnamnesisTypeRequest";
+import { CreateAnamnesisTypeResponse } from "@/models/customers/anamnesis-types/CreateAnamnesisTypeResponse";
+import { GetAnamnesisTypeByIdResponse } from "@/models/customers/anamnesis-types/GetAnamnesisTypeByIdResponse";
+import { GetAnamnesisTypeResponse } from "@/models/customers/anamnesis-types/GetAnamnesisTypesResponse";
+import { UpdateAnamnesisTypeRequest } from "@/models/customers/anamnesis-types/UpdateAnamnesisTypeRequest";
+import { UpdateAnamnesisTypeResponse } from "@/models/customers/anamnesis-types/UpdateAnamnesisTypeResponse";
+
 import getConfig from "next/config";
 
 const { publicRuntimeConfig } = getConfig();
 
-export const createCustomer = async (
+export const createAnamnesisType = async (
   accessToken: string,
-  request: CreateCustomerRequest
+  request: CreateAnamnesisTypeRequest
 ): Promise<ApiResponse> => {
-  const URL = `${publicRuntimeConfig.API_URL}/customers`;
+  const URL = `${publicRuntimeConfig.API_URL}/customers/anamnesis/types`;
 
   try {
     const response = await fetch(URL, {
@@ -29,9 +31,8 @@ export const createCustomer = async (
     });
 
     if (response.ok) {
-      const createCustomerResponse: CreateCustomerResponse =
-        await response.json();
-      return new ApiResponse(true, response.status, createCustomerResponse);
+      const responseBody: CreateAnamnesisTypeResponse = await response.json();
+      return new ApiResponse(true, response.status, responseBody);
     } else {
       return new ApiResponse(
         false,
@@ -50,11 +51,89 @@ export const createCustomer = async (
   }
 };
 
-export const updateCustomer = async (
+export const getAnamnesisTypeById = async (
   accessToken: string,
-  request: UpdateCustomerRequest
+  anamnesisTypeId: string
 ): Promise<ApiResponse> => {
-  const URL = `${publicRuntimeConfig.API_URL}/customers/${request.customerId}`;
+  let URL = `${publicRuntimeConfig.API_URL}/customers/anamnesis/types/${anamnesisTypeId}`;
+
+  try {
+    const response = await fetch(URL, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    });
+
+    if (response.ok) {
+      const responseBody: GetAnamnesisTypeByIdResponse = await response.json();
+      return new ApiResponse(true, response.status, responseBody);
+    } else {
+      return new ApiResponse(
+        false,
+        response.status,
+        ``,
+        new ErrorDetails(``, response.status)
+      );
+    }
+  } catch (error: any) {
+    return new ApiResponse(
+      false,
+      400,
+      error.message,
+      new ErrorDetails(error.message, 400)
+    );
+  }
+};
+
+export const getAnamnesisTypesList = async (
+  accessToken: string,
+  anamnesisTypeDescription?: string
+): Promise<ApiResponse> => {
+  let URL = `${publicRuntimeConfig.API_URL}/customers/anamnesis/types`;
+
+  if (anamnesisTypeDescription) {
+    URL += `?anamnesisTypeDescription=${anamnesisTypeDescription}`;
+  }
+
+  try {
+    const response = await fetch(URL, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    });
+
+    if (response.ok) {
+      const responseBody: GetAnamnesisTypeResponse = await response.json();
+      return new ApiResponse(true, response.status, responseBody);
+    } else {
+      return new ApiResponse(
+        false,
+        response.status,
+        ``,
+        new ErrorDetails(``, response.status)
+      );
+    }
+  } catch (error: any) {
+    return new ApiResponse(
+      false,
+      400,
+      error.message,
+      new ErrorDetails(error.message, 400)
+    );
+  }
+};
+
+export const updateAnamnesisType = async (
+  accessToken: string,
+  request: UpdateAnamnesisTypeRequest
+): Promise<ApiResponse> => {
+  const URL = `${publicRuntimeConfig.API_URL}/customers/anamnesis/types/${request.anamnesisTypeId}`;
 
   try {
     const response = await fetch(URL, {
@@ -68,109 +147,14 @@ export const updateCustomer = async (
     });
 
     if (response.ok) {
-      const createCustomerResponse: UpdateCustomerResponse =
-        await response.json();
-      return new ApiResponse(true, response.status, createCustomerResponse);
+      const responseBody: UpdateAnamnesisTypeResponse = await response.json();
+      return new ApiResponse(true, response.status, responseBody);
     } else {
       return new ApiResponse(
         false,
         response.status,
         ``,
         new ErrorDetails(``, response.status)
-      );
-    }
-  } catch (error: any) {
-    return new ApiResponse(
-      false,
-      400,
-      error.message,
-      new ErrorDetails(error.message, 400)
-    );
-  }
-};
-
-export const getCustomers = async (
-  accessToken: string,
-  pageNumber: string,
-  limit: string,
-  customerName?: string,
-  lastServiceStartDate?: Date,
-  lastServiceEndDate?: Date,
-  serviceTypeIds?: string[]
-): Promise<ApiResponse> => {
-  let URL = `${publicRuntimeConfig.API_URL}/customers?pageNumber=${pageNumber}&limit=${limit}`;
-
-  if (customerName) {
-    URL += `&customerName=${customerName}`;
-  }
-
-  if (lastServiceStartDate && lastServiceEndDate) {
-    URL += `&lastServiceStartDate=${lastServiceStartDate.toLocaleString()}&lastServiceEndDate=${lastServiceEndDate.toLocaleString()}`;
-  }
-
-  if (serviceTypeIds && serviceTypeIds.length > 0) {
-    for (const serviceTypeId of serviceTypeIds) {
-      URL += `&serviceTypeIds=${serviceTypeId}`;
-    }
-  }
-
-  try {
-    const response = await fetch(URL, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-    });
-
-    if (response.ok) {
-      const getCustomerResponse: GetCustomersResponse = await response.json();
-      return new ApiResponse(true, response.status, getCustomerResponse);
-    } else {
-      return new ApiResponse(
-        false,
-        response.status,
-        response.statusText,
-        new ErrorDetails(response.statusText, response.status)
-      );
-    }
-  } catch (error: any) {
-    return new ApiResponse(
-      false,
-      400,
-      error.message,
-      new ErrorDetails(error.message, 400)
-    );
-  }
-};
-
-export const getCustomerById = async (
-  accessToken: string,
-  customerId: string
-): Promise<ApiResponse> => {
-  const URL = `${publicRuntimeConfig.API_URL}/customers/${customerId}`;
-
-  try {
-    const response = await fetch(URL, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-    });
-
-    if (response.ok) {
-      const getCustomerResponse: GetCustomersResponse = await response.json();
-      return new ApiResponse(true, response.status, getCustomerResponse);
-    } else {
-      const error = await response.json();
-      return new ApiResponse(
-        false,
-        response.status,
-        error.message,
-        new ErrorDetails(error.message, response.status)
       );
     }
   } catch (error: any) {

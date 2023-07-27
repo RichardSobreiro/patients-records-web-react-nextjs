@@ -180,6 +180,7 @@ export const getServices = async (
       URL += `&serviceTypeIds=${serviceTypeId}`;
     }
   }
+
   try {
     const response = await fetch(URL, {
       method: "GET",

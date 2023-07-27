@@ -6,6 +6,7 @@ import classes from "./list-item.module.css";
 import Image from "next/image";
 import Button, { ButtonStyle } from "../ui/button";
 import { useRouter } from "next/router";
+import { getAgePTBR } from "@/util/date-helpers";
 
 type Props = {
   customer: GetCustomer;
@@ -18,7 +19,7 @@ const ListItem = ({ customer }: Props) => {
     <>
       <article className={classes.row}>
         <div className={classes.cell}>{customer.customerName}</div>
-        <div className={classes.cell}>29 anos</div>
+        <div className={classes.cell}>{getAgePTBR(customer.birthDate)}</div>
         <div className={classes.cell}>{customer.phoneNumber}</div>
         <div className={classes.cell}>
           <Button

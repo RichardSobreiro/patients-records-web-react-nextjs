@@ -9,6 +9,7 @@ export enum ModalTheme {
   STANDARD = 1,
   SECONDARY = 2,
   PHOTO_VIEWWER = 3,
+  LIGHT_BLUE = 4,
 }
 
 type Props = {
@@ -43,6 +44,13 @@ const Modal = ({
         break;
       case ModalTheme.PHOTO_VIEWWER:
         modalWrapperCssClass = classes.photo_viewer_modal_wrapper;
+        modalOverlayCssClass = classes.photo_viewer_modal_overlay;
+        modalCssClass = classes.photo_viewer_modal;
+        modalHeaderCssClass = classes.photo_viewer_modal_header;
+        modalBodyCssClass = classes.photo_viewer_modal_body;
+        break;
+      case ModalTheme.LIGHT_BLUE:
+        modalWrapperCssClass = classes.light_blue_modal_wrapper;
         modalOverlayCssClass = classes.photo_viewer_modal_overlay;
         modalCssClass = classes.photo_viewer_modal;
         modalHeaderCssClass = classes.photo_viewer_modal_header;

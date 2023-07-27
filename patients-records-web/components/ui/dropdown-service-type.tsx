@@ -81,9 +81,6 @@ const DropdownServiceTypes = ({
   const [showConfirmationModal, setShowConfirmationModal] =
     useState<boolean>(false);
 
-  const [isMouseOverDropdown, setIsMouseOverDropdown] =
-    useState<boolean>(false);
-
   const { data: session, status, update } = useSession();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -122,8 +119,10 @@ const DropdownServiceTypes = ({
   useEffect(() => {
     setIsLoading(true);
 
-    if (userCustom?.accessToken && router.query.customerId) {
+    if (userCustom?.accessToken) {
       getServiceTypesAsync();
+    } else {
+      setIsLoading(false);
     }
   }, [
     userCustom?.accessToken,
@@ -166,7 +165,7 @@ const DropdownServiceTypes = ({
     }
   }, [serviceTypesList]);
 
-  const getPlaceHolder = () => {
+  const getPlaceHolder = useCallback(() => {
     const selectedItems = itemsList?.filter((item) => item.selected);
     if (selectedItems != undefined && selectedItems.length > 0) {
       return (
@@ -194,9 +193,10 @@ const DropdownServiceTypes = ({
         </div>
       );
     }
-  };
+  }, [selectedValues, itemsList]);
 
   useEffect(() => {
+    itemsList?.forEach((item) => (item.selected = false));
     (selectedValues as Item[])?.forEach((selected) => {
       const matchingItems = itemsList?.filter(
         (item) => item.id === selected.id
@@ -204,7 +204,7 @@ const DropdownServiceTypes = ({
       matchingItems?.forEach((matchingItem) => (matchingItem.selected = true));
     });
     forceUpdate();
-  }, [selectedValues]);
+  }, [selectedValues, itemsList]);
 
   const changeHandler = (e: any) => {
     let item = itemsList?.find((i) => i.id == e.target.value);

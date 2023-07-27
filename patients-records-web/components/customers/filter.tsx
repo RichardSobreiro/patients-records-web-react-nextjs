@@ -11,7 +11,7 @@ import Button, { ButtonStyle } from "../ui/button";
 import { useRouter } from "next/router";
 import CreateCustomerModalContent from "./create/create-customer-modal";
 import { isDate } from "@/util/field-validations";
-import DropdownServiceTypes from "../ui/dropdown-service-type";
+import DropdownServiceTypes, { Item } from "../ui/dropdown-service-type";
 import useDropdown from "@/hooks/use-dropdown";
 
 type Props = {
@@ -19,7 +19,8 @@ type Props = {
   getCustomersAsync: (
     customerName?: string,
     startDate?: Date,
-    endDate?: Date
+    endDate?: Date,
+    serviceTypeIds?: string[]
   ) => void;
   setIsLoading: any;
 };
@@ -115,8 +116,18 @@ const Filter = ({ currentPage, getCustomersAsync, setIsLoading }: Props) => {
     const endDateObject = isDate(enteredLastServiceDateEnd)
       ? new Date(enteredLastServiceDateEnd.replace(/-/g, "/"))
       : undefined;
+
+    const selectedTypesIds = (selectedTypes as Item[])
+      ?.filter((type) => type.selected)
+      ?.map((selectedType) => selectedType.id);
+
     setIsLoading(true);
-    await getCustomersAsync(enteredText, startDateObject, endDateObject);
+    await getCustomersAsync(
+      enteredText,
+      startDateObject,
+      endDateObject,
+      selectedTypesIds
+    );
   };
 
   const dateStringToDate = (str: string) => {
@@ -158,7 +169,6 @@ const Filter = ({ currentPage, getCustomersAsync, setIsLoading }: Props) => {
             style={ButtonStyle.PRIMARY_BODERED}
             onClickHandler={() => {
               setCreateCustomerModalIsOpen(true);
-              //router.push("/clientes/criar")
             }}
           >
             + Cliente
@@ -186,9 +196,11 @@ const Filter = ({ currentPage, getCustomersAsync, setIsLoading }: Props) => {
         >
           <Image src={`/images/plus.svg`} alt="Plus" width={20} height={20} />
           <p className={classes.text_extra_filters}>
-            {enteredLastServiceType
-              ? enteredLastServiceType
-              : "Tipo de procedimento..."}
+            {selectedTypes && (selectedTypes as Item[]).length > 0
+              ? (selectedTypes as Item[]).length === 1
+                ? `${(selectedTypes as Item[])[0].description}`
+                : `${(selectedTypes as Item[])[0].description}...`
+              : "Tipo de Atendimento..."}
           </p>
         </button>
       </div>
@@ -262,9 +274,10 @@ const Filter = ({ currentPage, getCustomersAsync, setIsLoading }: Props) => {
         <Modal
           onClose={() => setLastServiceTypeModalIsOpen(false)}
           title="Tipo(s) de Atendimento(s)"
+          theme={ModalTheme.SECONDARY}
         >
           <DropdownServiceTypes
-            label={"Tipo(s) do Atendimento:"}
+            label={""}
             id={"service-type-edit"}
             idPropertyName={"serviceTypeId"}
             descriptionPropertyName={"serviceTypeDescription"}
@@ -283,7 +296,10 @@ const Filter = ({ currentPage, getCustomersAsync, setIsLoading }: Props) => {
             </Button>
             <Button
               style={ButtonStyle.PRIMARY_BODERED_SMALL}
-              onClickHandler={() => {}}
+              onClickHandler={() => {
+                resetType();
+                setType(undefined);
+              }}
             >
               Limpar
             </Button>

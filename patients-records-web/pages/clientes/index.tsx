@@ -28,7 +28,12 @@ const Clientes = () => {
   }
 
   const getCustomersAsync = useCallback(
-    async (customerName?: string, startDate?: Date, endDate?: Date) => {
+    async (
+      customerName?: string,
+      startDate?: Date,
+      endDate?: Date,
+      serviceTypeIds?: string[]
+    ) => {
       try {
         const response = await getCustomers(
           userCustom.accessToken,
@@ -36,7 +41,8 @@ const Clientes = () => {
           "10",
           customerName,
           startDate,
-          endDate
+          endDate,
+          serviceTypeIds
         );
         if (response.ok) {
           setCustomersList(response.body as GetCustomersResponse);
@@ -74,7 +80,11 @@ const Clientes = () => {
 
   const onSubmitFilter = async () => {
     setIsLoading(true);
-    await getCustomersAsync();
+    if (userCustom?.accessToken) {
+      getCustomersAsync();
+    } else {
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {

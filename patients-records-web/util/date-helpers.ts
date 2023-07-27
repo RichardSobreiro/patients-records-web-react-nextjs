@@ -29,3 +29,18 @@ export const formatDateTimePTBR = (dateTime: Date): string => {
     (m.getUTCMinutes() < 10 ? "0" + m.getMinutes() : m.getMinutes());
   return dateString;
 };
+
+export const getAgePTBR = (brithdate?: Date): string => {
+  if (brithdate) {
+    var today = new Date();
+    var birthDate = new Date(brithdate);
+    var age = today.getFullYear() - birthDate.getFullYear();
+    var m = today.getMonth() - birthDate.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return `${age} anos`;
+  } else {
+    return "...";
+  }
+};
