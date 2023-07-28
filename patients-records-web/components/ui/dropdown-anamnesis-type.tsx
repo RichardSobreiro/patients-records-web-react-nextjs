@@ -22,6 +22,7 @@ import LoadingSpinner from "./loading-spinner";
 import {
   createAnamnesisType,
   getAnamnesisTypesList,
+  updateAnamnesisType,
 } from "@/api/customers/anamnesisTypesApi";
 import { GetAnamnesisTypesResponse } from "@/models/customers/anamnesis-types/GetAnamnesisTypesResponse";
 import { CreateAnamnesisTypeRequest } from "@/models/customers/anamnesis-types/CreateAnamnesisTypeRequest";
@@ -30,7 +31,10 @@ import { Item } from "./dropdown-service-type";
 import useInput from "@/hooks/use-input";
 import { isNotEmpty } from "@/util/field-validations";
 import Input, { InputTheme, InputType } from "./input";
-import TextArea from "./textarea";
+import TextArea, { TextAreaTheme } from "./textarea";
+import { ApiResponse } from "@/models/Api/ApiResponse";
+import { UpdateAnamnesisTypeRequest } from "@/models/customers/anamnesis-types/UpdateAnamnesisTypeRequest";
+import { UpdateAnamnesisTypeResponse } from "@/models/customers/anamnesis-types/UpdateAnamnesisTypeResponse";
 
 export type ItemAnamnesis = {
   id: string;
@@ -76,22 +80,14 @@ const DropdownAnamnesisTypes = ({
   const [searchText, setSearchText] = useState<string | undefined>("");
   const searchInputRef = useRef<HTMLInputElement | null>(null);
 
-  const [newAnamnesisDescription, setNewAnamnesisDescription] = useState<
-    string | undefined
-  >("");
-  const [newAnamnesisTemplate, setNewAnamnesisTemplate] = useState<
-    string | undefined
-  >("");
-
   const [existingAnamnesisTypes, setExistingAnamnesisTypes] = useState<
     ItemAnamnesis[] | undefined
   >(undefined);
-  const [showCreateNewAnamnesisTypeModal, setShowCreateNewAnamnesisTypeModal] =
-    useState<boolean>(false);
-  const [alreadyValidated, setAlreadyValidated] = useState<boolean>(false);
 
-  const [showCreateAnamnesisTypeModal, setShowCreateAnamnesisTypeModal] =
-    useState<boolean>(false);
+  const [
+    showCreateEditAnamnesisTypeModal,
+    setShowCreateEditAnamnesisTypeModal,
+  ] = useState<boolean>(false);
 
   const {
     value: enteredAnamnesisTypeDescription,
@@ -112,6 +108,10 @@ const DropdownAnamnesisTypes = ({
     reset: resetEnteredAnamnesisTypeTemplateInput,
     setEnteredValue: setEnteredAnamnesisTypeTemplate,
   } = useInput({ validateValue: isNotEmpty });
+
+  const [anamnesisTypeBeingEditedId, setAnamnesisTypeBeingEditedId] = useState<
+    string | undefined
+  >(undefined);
 
   const { data: session, status, update } = useSession();
   const router = useRouter();
@@ -292,83 +292,116 @@ const DropdownAnamnesisTypes = ({
     blurHandler();
   };
 
-  const onNewAnamnesisInputChangeHandler = (event: any) => {
-    setNewAnamnesisDescription(event.target.value);
-  };
-
-  const onNewAnamnesisInputBlurHandler = () => {};
-
   const validaCreateNewAnamnesisType = (): boolean => {
     if (
-      !newAnamnesisDescription ||
-      newAnamnesisDescription === "" ||
-      !newAnamnesisTemplate ||
-      newAnamnesisTemplate === ""
-    )
+      !enteredAnamnesisTypeDescriptionIsValid ||
+      !enteredAnamnesisTypeTemplateIsValid
+    ) {
       return false;
-
-    const existingAnamnesisType = itemsList?.filter((item) =>
-      item.description.includes(newAnamnesisDescription)
-    );
-
-    if (existingAnamnesisType && existingAnamnesisType.length > 0) {
-      setShowDropdown(false);
-      setExistingAnamnesisTypes(existingAnamnesisType);
-      setShowCreateNewAnamnesisTypeModal(true);
-      return false;
-    } else {
-      return true;
     }
+    return true;
   };
 
   const onClickCreateNewAnamnesisType = () => {
-    // if (!validaCreateNewAnamnesisType()) {
-    //   return;
-    // }
     setShowDropdown(false);
-    setShowCreateAnamnesisTypeModal(true);
+    setShowCreateEditAnamnesisTypeModal(true);
   };
 
-  const onCancelCreateNewAnamnesisTypeHandler = () => {
-    setNewAnamnesisDescription("");
-    setShowCreateAnamnesisTypeModal(false);
+  const onClickUpdateAnamnesisType = (item: ItemAnamnesis) => {
+    setShowDropdown(false);
+
+    setEnteredAnamnesisTypeDescription(item.description);
+    setEnteredAnamnesisTypeTemplate(item.value.template);
+    setAnamnesisTypeBeingEditedId(item.id);
+
+    setShowCreateEditAnamnesisTypeModal(true);
   };
 
-  const createNewAnamnesisType = async () => {
+  const onCancelCreateEditAnamnesisTypeHandler = () => {
+    resetEnteredAnamnesisTypeDescriptionInput();
+    resetEnteredAnamnesisTypeTemplateInput();
+    setAnamnesisTypeBeingEditedId(undefined);
+    setShowCreateEditAnamnesisTypeModal(false);
+  };
+
+  const saveCreateEditAnamnesisType = async () => {
+    if (!validaCreateNewAnamnesisType()) {
+      return;
+    }
     setIsLoading(true);
 
-    const createAnamnesisTypeRequest = new CreateAnamnesisTypeRequest(
-      newAnamnesisDescription!,
-      newAnamnesisTemplate!
-    );
+    let apiResponse: ApiResponse | undefined = undefined;
 
-    const apiResponse = await createAnamnesisType(
-      userCustom.accessToken,
-      createAnamnesisTypeRequest
-    );
+    if (anamnesisTypeBeingEditedId !== undefined) {
+      const editAnamnesisTypeRequest = new UpdateAnamnesisTypeRequest(
+        anamnesisTypeBeingEditedId,
+        enteredAnamnesisTypeDescription!,
+        enteredAnamnesisTypeTemplate!
+      );
 
-    if (apiResponse.ok) {
+      apiResponse = await updateAnamnesisType(
+        userCustom.accessToken,
+        editAnamnesisTypeRequest
+      );
+    } else {
+      const createAnamnesisTypeRequest = new CreateAnamnesisTypeRequest(
+        enteredAnamnesisTypeDescription!,
+        enteredAnamnesisTypeTemplate!
+      );
+
+      apiResponse = await createAnamnesisType(
+        userCustom.accessToken,
+        createAnamnesisTypeRequest
+      );
+    }
+
+    if (apiResponse?.ok) {
+      let newItemList: ItemAnamnesis[] = [...itemsList!];
+
+      if (anamnesisTypeBeingEditedId === undefined) {
+        const createAnamnesisTypeResponse =
+          apiResponse.body as CreateAnamnesisTypeResponse;
+        newItemList.push({
+          id: createAnamnesisTypeResponse.anamnesisTypeId,
+          description: createAnamnesisTypeResponse.anamnesisTypeDescription,
+          selected: true,
+          value: createAnamnesisTypeResponse,
+          show: true,
+          anamnesisTypeContent: createAnamnesisTypeResponse.template,
+          anamnesisTypeContentIsValid: true,
+        });
+      } else {
+        const updateAnamnesisTypeResponse =
+          apiResponse.body as UpdateAnamnesisTypeResponse;
+        const existingItem = newItemList.find(
+          (item) => item.id === updateAnamnesisTypeResponse.anamnesisTypeId
+        );
+        if (existingItem) {
+          existingItem!.description =
+            updateAnamnesisTypeResponse.anamnesisTypeDescription;
+          existingItem.selected = true;
+          existingItem.value.template = updateAnamnesisTypeResponse.template;
+        }
+      }
+
+      const newSelectedTypes = newItemList.filter((item) => item.selected);
+      onChangeHandler && onChangeHandler(newSelectedTypes);
+      setItemsList(sortItemsList(newItemList));
+      setShowCreateEditAnamnesisTypeModal(false);
+
       const notification = {
         status: "success",
         title: "Sucesso",
-        message: "Seu novo tipo de anamnese foi criado!",
+        message:
+          anamnesisTypeBeingEditedId !== undefined
+            ? "Template de anamnese atualizado!"
+            : "Seu novo tipo de anamnese foi criado!",
       };
       notificationCtx.showNotification(notification);
-      const createAnamnesisTypeResponse =
-        apiResponse.body as CreateAnamnesisTypeResponse;
-      const newItemList = [...itemsList!];
-      newItemList.push({
-        id: createAnamnesisTypeResponse.anamnesisTypeId,
-        description: createAnamnesisTypeResponse.anamnesisTypeDescription,
-        selected: true,
-        value: createAnamnesisTypeResponse,
-        show: true,
-      });
 
-      setItemsList(sortItemsList(newItemList));
-      setShowCreateAnamnesisTypeModal(false);
-      setShowCreateNewAnamnesisTypeModal(false);
-      setNewAnamnesisDescription("");
+      resetEnteredAnamnesisTypeDescriptionInput();
+      resetEnteredAnamnesisTypeTemplateInput();
+      setAnamnesisTypeBeingEditedId(undefined);
     } else {
       const notification = {
         status: "error",
@@ -382,90 +415,17 @@ const DropdownAnamnesisTypes = ({
     setIsLoading(false);
   };
 
-  const existingTypesChangeHandler = (e: any) => {
-    let item = existingAnamnesisTypes?.find((i) => i.id == e.target.value);
-    if (item) {
-      item.selected = !item.selected;
-    }
-    setExistingAnamnesisTypes([...existingAnamnesisTypes!]);
-  };
-
-  const useExistingAnamnesisTypes = () => {
-    const selectedExistingAnamnesisTypes = existingAnamnesisTypes?.filter(
-      (item) => item.selected
-    );
-
-    if (
-      !selectedExistingAnamnesisTypes ||
-      selectedExistingAnamnesisTypes.length === 0
-    ) {
-      return;
-    }
-
-    const newItemList = [...itemsList!];
-    selectedExistingAnamnesisTypes.forEach((item) => {
-      const existingAnamnesisType = newItemList?.find(
-        (itemsListItem) => itemsListItem.id === item.id
-      );
-      existingAnamnesisType!.selected = true;
-    });
-    setItemsList(newItemList);
-    setExistingAnamnesisTypes(undefined);
-    setShowCreateNewAnamnesisTypeModal(false);
-    setNewAnamnesisDescription("");
-    setAlreadyValidated(true);
-  };
-
   return (
     <>
       {isLoading && <LoadingSpinner />}
-      {showCreateNewAnamnesisTypeModal && (
+      {showCreateEditAnamnesisTypeModal && (
         <Modal
-          onClose={() => setShowCreateNewAnamnesisTypeModal(false)}
-          title="Existem tipos de atendimentos semelhantes:"
-          titleStyle={{ fontSize: "1.5rem" }}
-        >
-          <p className={classes.existing_service_types_modal_subtitle}>
-            Os seguintes tipos podem atender a sua solicitação:
-          </p>
-          <div className={classes.existing_service_types_modal_list}>
-            {existingAnamnesisTypes?.map((item, index) => (
-              <div key={index} className={classes.list_item}>
-                <input
-                  name={item.description}
-                  className={classes.list_item_input}
-                  type="radio"
-                  value={item.id}
-                  onClick={existingTypesChangeHandler}
-                  onChange={() => {}}
-                  checked={item.selected === true}
-                />
-                <p className={classes.list_item_description}>
-                  {item.description}
-                </p>
-              </div>
-            ))}
-          </div>
-          <div className={classes.existing_service_types_modal_actions}>
-            <Button
-              style={ButtonStyle.NEUTRAL}
-              onClickHandler={createNewAnamnesisType}
-            >
-              Prosseguir com a criação
-            </Button>
-            <Button
-              style={ButtonStyle.SUCCESS_BORDERED}
-              onClickHandler={useExistingAnamnesisTypes}
-            >
-              Usar o(s) tipo(s) selecionado(s)
-            </Button>
-          </div>
-        </Modal>
-      )}
-      {showCreateAnamnesisTypeModal && (
-        <Modal
-          onClose={() => setShowCreateAnamnesisTypeModal(false)}
-          title="Novo Tipo de Anamnese"
+          onClose={() => setShowCreateEditAnamnesisTypeModal(false)}
+          title={
+            anamnesisTypeBeingEditedId != undefined
+              ? "Editando Template de Anamnese"
+              : "Novo Template de Anamnese"
+          }
           titleStyle={{ fontSize: "1.5rem" }}
           theme={ModalTheme.LIGHT_BLUE}
         >
@@ -485,7 +445,7 @@ const DropdownAnamnesisTypes = ({
             </div>
             <div>
               <TextArea
-                label={"Nome"}
+                label={"Template da Anamnese"}
                 rows={20}
                 id={"new-anamnesis-type-template-create"}
                 hasError={enteredAnamnesisTypeTemplateInputHasError}
@@ -494,21 +454,22 @@ const DropdownAnamnesisTypes = ({
                 onChangeHandler={enteredAnamnesisTypeTemplateChangedHandler}
                 onBlurHandler={enteredAnamnesisTypeTemplateBlurHandler}
                 required
+                theme={TextAreaTheme.SECONDARY}
               />
             </div>
           </div>
           <div className={classes.existing_service_types_modal_actions}>
             <Button
               style={ButtonStyle.NEUTRAL}
-              onClickHandler={onCancelCreateNewAnamnesisTypeHandler}
+              onClickHandler={onCancelCreateEditAnamnesisTypeHandler}
             >
               Cancelar
             </Button>
             <Button
-              style={ButtonStyle.SUCCESS_BORDERED}
-              onClickHandler={createNewAnamnesisType}
+              style={ButtonStyle.SUCCESS}
+              onClickHandler={saveCreateEditAnamnesisType}
             >
-              Criar
+              Salvar
             </Button>
           </div>
         </Modal>
@@ -546,7 +507,7 @@ const DropdownAnamnesisTypes = ({
           </button>
           {showDropdown && (
             <div className={classes.list}>
-              <button className={classes.chevron_button}>
+              {/* <button className={classes.chevron_button}>
                 <input
                   className={classes.input}
                   placeholder={"Cadastre um novo tipo..."}
@@ -562,23 +523,41 @@ const DropdownAnamnesisTypes = ({
                   onClick={onClickCreateNewAnamnesisType}
                   className={classes.plus_button}
                 />
-              </button>
+              </button> */}
               {itemsList?.map((item) => (
                 <div key={item.id}>
                   {item.show && (
                     <div key={item.id} className={classes.list_item}>
-                      <input
-                        name={item.description}
-                        className={classes.list_item_input}
-                        type="radio"
-                        value={item.id}
-                        onClick={changeHandler}
-                        onChange={() => {}}
-                        checked={item.selected}
-                      />
-                      <p className={classes.list_item_description}>
-                        {item.description}
-                      </p>
+                      <div className={classes.list_item_left}>
+                        <input
+                          name={item.description}
+                          className={classes.list_item_input}
+                          type="radio"
+                          value={item.id}
+                          onClick={changeHandler}
+                          onChange={() => {}}
+                          checked={item.selected}
+                        />
+                        <p className={classes.list_item_description}>
+                          {item.description}
+                        </p>
+                      </div>
+
+                      <div className={classes.list_item_right}>
+                        {!item.value.isDefault && (
+                          <Image
+                            src={`/images/pencil.svg`}
+                            alt="Criar novo tipo"
+                            width={25}
+                            height={25}
+                            onClick={onClickUpdateAnamnesisType.bind(
+                              null,
+                              item
+                            )}
+                            className={classes.plus_button}
+                          />
+                        )}
+                      </div>
                     </div>
                   )}
                 </div>
@@ -586,11 +565,14 @@ const DropdownAnamnesisTypes = ({
             </div>
           )}
         </div>
-        {/* <div className={classes.actions}>
-          <Button style={ButtonStyle.SUCCESS} onClickHandler={() => {}}>
+        <div className={classes.actions}>
+          <Button
+            style={ButtonStyle.SUCCESS}
+            onClickHandler={onClickCreateNewAnamnesisType}
+          >
             Criar Template
           </Button>
-        </div> */}
+        </div>
       </div>
       {hasError && <p className={classes.error_text}>{errorMessage}</p>}
     </>

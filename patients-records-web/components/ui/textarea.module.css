@@ -7,6 +7,14 @@
   line-height: 150%;
 }
 
+.secondary_label {
+  color: var(--tertiary);
+  font-size: 1rem;
+  font-family: var(--font-family-title);
+  font-weight: 500;
+  line-height: 150%;
+}
+
 .textarea {
   display: flex;
   padding: 0.625rem;

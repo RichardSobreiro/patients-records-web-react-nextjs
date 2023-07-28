@@ -2,6 +2,13 @@
 
 import classes from "./textarea.module.css";
 
+export enum TextAreaTheme {
+  STANDARD = 1,
+  SECONDARY = 2,
+  PHOTO_VIEWER = 3,
+  LIGHT_BLUE = 4,
+}
+
 type Props = {
   label: string;
   id: string;
@@ -13,6 +20,7 @@ type Props = {
   value?: any;
   onChangeHandler?: any;
   onBlurHandler?: any;
+  theme?: TextAreaTheme;
 };
 
 const TextArea = ({
@@ -26,10 +34,23 @@ const TextArea = ({
   value,
   onChangeHandler,
   onBlurHandler,
+  theme,
 }: Props) => {
+  let labelCssClass = classes.label;
+
+  if (theme) {
+    switch (theme) {
+      case TextAreaTheme.STANDARD:
+        break;
+      case TextAreaTheme.SECONDARY:
+        labelCssClass = classes.secondary_label;
+        break;
+    }
+  }
+
   return (
     <>
-      <label htmlFor={id} className={classes.label}>
+      <label htmlFor={id} className={labelCssClass}>
         {label}
       </label>
       <textarea

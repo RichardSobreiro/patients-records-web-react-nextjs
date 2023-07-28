@@ -66,9 +66,24 @@
 .list_item {
   display: flex;
   flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
   gap: 0.6rem;
 
   padding: 0.5rem;
+}
+
+.list_item_left {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.list_item_right {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
 }
 
 .invalid {
@@ -125,6 +140,7 @@
 .existing_service_types_modal_actions {
   display: flex;
   flex-direction: row;
+  justify-content: flex-end;
   flex-wrap: nowrap;
   gap: 1rem;
 }

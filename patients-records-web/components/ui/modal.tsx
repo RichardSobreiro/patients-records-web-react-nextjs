@@ -53,7 +53,7 @@ const Modal = ({
         modalWrapperCssClass = classes.light_blue_modal_wrapper;
         modalOverlayCssClass = classes.photo_viewer_modal_overlay;
         modalCssClass = classes.photo_viewer_modal;
-        modalHeaderCssClass = classes.photo_viewer_modal_header;
+        modalHeaderCssClass = classes.light_blue_modal_header;
         modalBodyCssClass = classes.photo_viewer_modal_body;
         break;
     }
