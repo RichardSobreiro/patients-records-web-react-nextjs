@@ -22,6 +22,7 @@ import { formatDateTime } from "@/util/date-helpers";
 import DropdownAnamnesisTypes, {
   ItemAnamnesis,
 } from "@/components/ui/dropdown-anamnesis-type";
+import { createAnamnesis } from "@/api/customers/anamnesisApi";
 
 const CreateAnamnesis = () => {
   const { data: session, status, update } = useSession();
@@ -68,7 +69,6 @@ const CreateAnamnesis = () => {
     if (!enteredDateIsValid || !typeIsValid || !anamnesisTypeContentsIsValid) {
       dateBlurHandler(undefined);
       typeBlurHandler();
-      //anamnesisFreeTypeTextBlurHandler(undefined);
       return;
     }
 
@@ -95,22 +95,22 @@ const CreateAnamnesis = () => {
       anamnesisTypeContents
     );
 
-    // const apiResponse = await createAnamnesis(
-    //   userCustom.accessToken,
-    //   createAnamnesisRequest
-    // );
+    const apiResponse = await createAnamnesis(
+      userCustom.accessToken,
+      createAnamnesisRequest
+    );
 
-    //if (apiResponse.ok) {
-    if (true) {
+    if (apiResponse.ok) {
+      //if (true) {
       const notification = {
         status: "success",
         title: "Sucesso",
         message: "Sua anamnese foi criada com sucesso!",
       };
       notificationCtx.showNotification(notification);
-      // router.replace(
-      //   `/clientes/editar/${apiResponse.body.customerId}/anamneses/${apiResponse.body.anamneseId}/editar`
-      // );
+      router.replace(
+        `/clientes/editar/${apiResponse.body.customerId}/anamneses/${apiResponse.body.anamneseId}/editar`
+      );
     } else {
       const notification = {
         status: "error",
@@ -162,7 +162,7 @@ const CreateAnamnesis = () => {
         </div>
         <div className={classes.header_container_right}>
           <Button style={ButtonStyle.SUCCESS} onClickHandler={handleSubmit}>
-            Criar
+            Salvar
           </Button>
           <Button
             style={ButtonStyle.NEUTRAL}
@@ -180,19 +180,16 @@ const CreateAnamnesis = () => {
               return <h1>Upload de Arquivo</h1>;
             } else {
               return (
-                <>
-                  <AnamnesisFreeTypeForm
-                    anamnesisTypeId={type.id}
-                    template={type.value.template}
-                    selectedTypes={selectedTypes}
-                    setTypes={setType}
-                    anamnesisTypeDescription={type.description}
-                    anamnesisTypeContent={type.anamnesisTypeContent}
-                    anamnesisTypeContentIsValid={
-                      type.anamnesisTypeContentIsValid
-                    }
-                  />
-                </>
+                <AnamnesisFreeTypeForm
+                  key={type.id}
+                  anamnesisTypeId={type.id}
+                  template={type.value.template}
+                  selectedTypes={selectedTypes}
+                  setTypes={setType}
+                  anamnesisTypeDescription={type.description}
+                  anamnesisTypeContent={type.anamnesisTypeContent}
+                  anamnesisTypeContentIsValid={type.anamnesisTypeContentIsValid}
+                />
               );
             }
           })}

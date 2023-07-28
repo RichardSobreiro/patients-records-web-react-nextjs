@@ -201,7 +201,11 @@ const DropdownAnamnesisTypes = ({
         }
       });
       setItemsList(sortItemsList(newItems));
-      if (newSelectedTypes && newSelectedTypes.length > 0) {
+      if (
+        newSelectedTypes &&
+        newSelectedTypes.length > 0 &&
+        (!selectedValues || (selectedValues as ItemAnamnesis[]).length === 0)
+      ) {
         onChangeHandler && onChangeHandler(newSelectedTypes!);
       }
     }
@@ -238,7 +242,15 @@ const DropdownAnamnesisTypes = ({
   }, [selectedValues, itemsList]);
 
   useEffect(() => {
-    itemsList?.forEach((item) => (item.selected = false));
+    itemsList?.forEach((item) => {
+      item.selected = false;
+      // const selectedValue = (selectedValues as ItemAnamnesis[]).find(
+      //   (s) => s.id === item.id
+      // );
+      // if (selectedValue) {
+      //   item.anamnesisTypeContent = selectedValue.anamnesisTypeContent;
+      // }
+    });
     (selectedValues as ItemAnamnesis[])?.length > 0 &&
       (selectedValues as ItemAnamnesis[])?.forEach((selected) => {
         const matchingItems = itemsList?.filter(
@@ -257,7 +269,17 @@ const DropdownAnamnesisTypes = ({
       item.selected = !item.selected;
     }
     setItemsList([...itemsList!]);
-    const selectedItems = itemsList?.filter((item) => item.selected === true);
+    //const selectedItems = itemsList?.filter((item) => item.selected === true);
+    let selectedItems = [
+      ...(selectedValues as ItemAnamnesis[]),
+    ] as ItemAnamnesis[];
+    if (item?.selected) {
+      selectedItems.push(item);
+    } else {
+      selectedItems = selectedItems.filter(
+        (selectedItem) => selectedItem.id !== item?.id
+      );
+    }
     onChangeHandler && onChangeHandler(selectedItems!);
   };
 

@@ -8,7 +8,7 @@ import PersonalInfo from "../edit/personal-info";
 
 import { useRouter } from "next/router";
 import useInput from "@/hooks/use-input";
-import { isNotEmpty } from "@/util/field-validations";
+import { atLeastOneSelectedArray, isNotEmpty } from "@/util/field-validations";
 import { useCallback, useContext, useEffect, useState } from "react";
 import useDropdown from "@/hooks/use-dropdown";
 import AnamnesisFreeTypeForm from "./types/free-type";
@@ -22,9 +22,15 @@ import {
 } from "@/api/customers/anamnesisApi";
 import LoadingSpinner from "@/components/ui/loading-spinner";
 import { GetAnamnesisByIdResponse } from "@/models/customers/GetAnamnesisByIdResponse";
-import { UpdateAnamnesisRequest } from "@/models/customers/UpdateAnamnesisRequest";
+import {
+  UpdateAnamnesisRequest,
+  UpdateAnamnesisTypeContentRequest,
+} from "@/models/customers/UpdateAnamnesisRequest";
 import { UpdateAnamnesisResponse } from "@/models/customers/UpdateAnamnesisResponse";
 import { formatDateTime } from "@/util/date-helpers";
+import DropdownAnamnesisTypes, {
+  ItemAnamnesis,
+} from "@/components/ui/dropdown-anamnesis-type";
 
 const EditAnamnesis = () => {
   const { data: session, status, update } = useSession();
@@ -45,25 +51,15 @@ const EditAnamnesis = () => {
   } = useInput({ validateValue: isNotEmpty });
 
   const {
-    value: type,
-    isValid: typeIsValid,
-    hasError: typeInputHasError,
-    valueChangeHandler: typeChangeHandler,
-    inputBlurHandler: typeBlurHandler,
-    reset: resetType,
-    errorMessage: typeErrorMessage,
-    setItem: setType,
-  } = useDropdown({ validateValue: () => true });
-
-  const {
-    value: anamnesisFreeTypeText,
-    isValid: anamnesisFreeTypeTextIsValid,
-    hasError: anamnesisFreeTypeTextInputHasError,
-    valueChangeHandler: anamnesisFreeTypeTextChangedHandler,
-    inputBlurHandler: anamnesisFreeTypeTextBlurHandler,
-    reset: resetAnamnesisFreeTypeTextInput,
-    setEnteredValue: setAnamnesisFreeTypeText,
-  } = useInput({ validateValue: isNotEmpty });
+    value: selectedAnamnesisTypes,
+    isValid: anamnesisTypesIsValid,
+    hasError: anamnesisTypesDropdownHasError,
+    valueChangeHandler: anamnesisTypesDropdownChangeHandler,
+    inputBlurHandler: anamnesisTypesDropdownBlurHandler,
+    reset: resetAnamnesisDropdown,
+    errorMessage: anamnesisDropdownErrorMessage,
+    setItem: setSelectedAnamnesisTypes,
+  } = useDropdown({ validateValue: atLeastOneSelectedArray });
 
   const getAnamnesisByIdAsync = useCallback(async () => {
     if (userCustom?.accessToken) {
@@ -76,12 +72,20 @@ const EditAnamnesis = () => {
         if (response.ok) {
           const apiResponseBody = response.body as GetAnamnesisByIdResponse;
           setDate(formatDateTime(apiResponseBody.date));
-          const type = anamnesisTypesList.find(
-            (item) => item.description === apiResponseBody.type[0]
-          );
-          setType(type as unknown as Item);
-          apiResponseBody.freeTypeText &&
-            setAnamnesisFreeTypeText(apiResponseBody.freeTypeText);
+          const newSelectedTypes: ItemAnamnesis[] = [];
+          apiResponseBody.anamnesisTypesContent.forEach((typeContent) => {
+            const selectedType: ItemAnamnesis = {
+              id: typeContent.anamnesisTypeId,
+              description: typeContent.anamnesisTypeDescription,
+              selected: true,
+              value: typeContent,
+              show: true,
+              anamnesisTypeContent: typeContent.content,
+              anamnesisTypeContentIsValid: true,
+            };
+            newSelectedTypes.push(selectedType);
+          });
+          setSelectedAnamnesisTypes(newSelectedTypes);
         }
       } catch (error: any) {
         const notification = {
@@ -114,23 +118,46 @@ const EditAnamnesis = () => {
   ]);
 
   const handleSubmit = async () => {
-    if (!enteredDateIsValid || !typeIsValid || !anamnesisFreeTypeTextIsValid) {
+    let anamnesisTypeContentsIsValid: boolean | string | undefined = true;
+    selectedAnamnesisTypes &&
+      (selectedAnamnesisTypes as ItemAnamnesis[]).length > 0 &&
+      (selectedAnamnesisTypes as ItemAnamnesis[]).forEach((type) => {
+        anamnesisTypeContentsIsValid =
+          anamnesisTypeContentsIsValid && type.anamnesisTypeContentIsValid;
+      });
+
+    if (
+      !enteredDateIsValid ||
+      !anamnesisTypesIsValid ||
+      !anamnesisTypeContentsIsValid
+    ) {
       dateBlurHandler(undefined);
-      typeBlurHandler();
-      anamnesisFreeTypeTextBlurHandler(undefined);
+      anamnesisTypesDropdownBlurHandler();
       return;
     }
 
     setIsLoading(true);
 
-    const dateObject = new Date(enteredDate.replace(/-/g, "/"));
+    const dateObject = new Date(enteredDate);
+
+    const selectedAnamnesisTypesArray = (
+      selectedAnamnesisTypes as ItemAnamnesis[]
+    ).filter((type) => type.selected);
+    const anamnesisTypeContents = selectedAnamnesisTypesArray.map(
+      (item) =>
+        new UpdateAnamnesisTypeContentRequest(
+          item.id,
+          item.description,
+          item.value.isDefault,
+          item.anamnesisTypeContent
+        )
+    );
 
     const updateAnamnesisRequest = new UpdateAnamnesisRequest(
       router.query.anamnesisId as string,
       router.query.customerId as string,
       dateObject,
-      [(type as Item)?.description!],
-      anamnesisFreeTypeText
+      anamnesisTypeContents
     );
 
     const apiResponse = await updateAnamnesis(
@@ -142,18 +169,27 @@ const EditAnamnesis = () => {
       const notification = {
         status: "success",
         title: "Sucesso",
-        message: "Sua anamnese foi alterada com sucesso!",
+        message: "Sua anamnese foi atualizada com sucesso!",
       };
       notificationCtx.showNotification(notification);
 
       const apiResponseBody = apiResponse.body as UpdateAnamnesisResponse;
-      setDate(new Date(apiResponseBody.date).toISOString().split("T")[0]);
-      const type = anamnesisTypesList.find(
-        (item) => item.description === apiResponseBody.type[0]
-      );
-      setType(type as unknown as Item);
-      apiResponseBody.freeTypeText &&
-        setAnamnesisFreeTypeText(apiResponseBody.freeTypeText);
+      //setDate(new Date(apiResponseBody.date).toISOString().split("T")[0]);
+      setDate(formatDateTime(new Date(apiResponseBody.date)));
+      const newSelectedTypes: ItemAnamnesis[] = [];
+      apiResponseBody.anamnesisTypesContent.forEach((typeContent) => {
+        const selectedType: ItemAnamnesis = {
+          id: typeContent.anamnesisTypeId,
+          description: typeContent.anamnesisTypeDescription,
+          selected: true,
+          value: typeContent,
+          show: true,
+          anamnesisTypeContent: typeContent.content,
+          anamnesisTypeContentIsValid: true,
+        };
+        newSelectedTypes.push(selectedType);
+      });
+      setSelectedAnamnesisTypes(newSelectedTypes);
     } else {
       const notification = {
         status: "error",
@@ -190,16 +226,15 @@ const EditAnamnesis = () => {
             />
           </div>
           <div>
-            <Dropdown
-              label={"Tipo"}
-              list={anamnesisTypesList}
+            <DropdownAnamnesisTypes
+              label={"Tipo(s) da Anamnese(s):"}
               id={"anamnesis-type-edit"}
-              idPropertyName={"id"}
-              descriptionPropertyName={"description"}
-              value={type}
-              onBlurHandler={typeBlurHandler}
-              onChangeHandler={typeChangeHandler}
-              hasError={typeInputHasError}
+              idPropertyName={"anamnesisTypeId"}
+              descriptionPropertyName={"anamnesisTypeDescription"}
+              selectedValues={selectedAnamnesisTypes}
+              onBlurHandler={anamnesisTypesDropdownBlurHandler}
+              onChangeHandler={anamnesisTypesDropdownChangeHandler}
+              hasError={anamnesisTypesDropdownHasError}
               errorMessage="O tipo da anamnese deve ser selecionado"
             />
           </div>
@@ -219,18 +254,30 @@ const EditAnamnesis = () => {
         </div>
       </section>
       <section className={classes.anaminesis_body}>
-        {(type as Item)?.id == "1" && (
-          <AnamnesisFreeTypeForm
-            anamnesisFreeTypeText={anamnesisFreeTypeText}
-            anamnesisFreeTypeTextInputHasError={
-              anamnesisFreeTypeTextInputHasError
+        {selectedAnamnesisTypes &&
+          (selectedAnamnesisTypes as ItemAnamnesis[]).length > 0 &&
+          (selectedAnamnesisTypes as ItemAnamnesis[])?.map((type) => {
+            if (type.description === "Arquivo") {
+              return <h1>Upload de Arquivo</h1>;
+            } else {
+              return (
+                <AnamnesisFreeTypeForm
+                  key={type.id}
+                  anamnesisTypeId={type.id}
+                  template={
+                    type.value.template && type.value.template !== ""
+                      ? type.value.template
+                      : type.value.content
+                  }
+                  selectedTypes={selectedAnamnesisTypes}
+                  setTypes={setSelectedAnamnesisTypes}
+                  anamnesisTypeDescription={type.description}
+                  anamnesisTypeContent={type.anamnesisTypeContent}
+                  anamnesisTypeContentIsValid={type.anamnesisTypeContentIsValid}
+                />
+              );
             }
-            anamnesisFreeTypeTextChangedHandler={
-              anamnesisFreeTypeTextChangedHandler
-            }
-            anamnesisFreeTypeTextBlurHandler={anamnesisFreeTypeTextBlurHandler}
-          />
-        )}
+          })}
       </section>
     </>
   );
