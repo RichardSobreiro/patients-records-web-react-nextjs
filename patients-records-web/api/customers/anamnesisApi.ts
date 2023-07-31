@@ -105,19 +105,33 @@ export const getAnamnesisById = async (
 
 export const updateAnamnesis = async (
   accessToken: string,
-  request: UpdateAnamnesisRequest
+  request: UpdateAnamnesisRequest,
+  files?: FileCustom[] | undefined
 ): Promise<ApiResponse> => {
   const URL = `${publicRuntimeConfig.API_URL}/customers/${request.customerId}/anamnesis/${request.anamneseId}`;
+
+  const formData = new FormData();
+  formData.append("anamneseId", request.anamneseId);
+  formData.append("customerId", request.customerId);
+  formData.append("date", request.date.toLocaleString());
+  formData.append(
+    "anamnesisTypesContent",
+    JSON.stringify(request.anamnesisTypesContent)
+  );
+  if (files) {
+    for (const file of files) {
+      formData.append("files", file.file);
+    }
+  }
 
   try {
     const response = await fetch(URL, {
       method: "PUT",
       headers: {
         Authorization: `Bearer ${accessToken}`,
-        "Content-Type": "application/json",
         Accept: "application/json",
       },
-      body: JSON.stringify(request),
+      body: formData,
     });
 
     if (response.ok) {

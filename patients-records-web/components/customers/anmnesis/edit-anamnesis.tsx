@@ -76,7 +76,7 @@ const EditAnamnesis = () => {
           const apiResponseBody = response.body as GetAnamnesisByIdResponse;
           setDate(formatDateTime(apiResponseBody.date));
           const newSelectedTypes: ItemAnamnesis[] = [];
-          apiResponseBody.anamnesisTypesContent.forEach((typeContent) => {
+          for (const typeContent of apiResponseBody.anamnesisTypesContent) {
             const selectedType: ItemAnamnesis = {
               id: typeContent.anamnesisTypeId,
               description: typeContent.anamnesisTypeDescription,
@@ -87,24 +87,36 @@ const EditAnamnesis = () => {
               anamnesisTypeContentIsValid: true,
             };
             newSelectedTypes.push(selectedType);
-            if (typeContent.anamnesisTypeDescription === "Arquivo") {
-              for (let i = 0; i < beforePhotos?.length; i++) {
-                let response = await fetch(beforePhotos[i].url);
+            if (
+              typeContent.anamnesisTypeDescription === "Arquivo" &&
+              typeContent.files
+            ) {
+              const typeContentFiles: FileCustom[] = [];
+              for (let i = 0; i < typeContent.files.length; i++) {
+                let response = await fetch(
+                  `${typeContent.files[i].baseUrl}?${typeContent.files[i].sasToken}`
+                );
                 let data = await response.blob();
                 let metadata = {
                   type: data.type,
                 };
-                let photoName = `before-photo-${i}.${data.type.split("/")[1]}`;
-                let photoFile = new File([data], photoName, metadata);
-                beforePhotoFiles.push({
-                  file: photoFile,
-                  id: beforePhotos[i].servicePhotoId,
+                //let photoName = `before-photo-${i}.${data.type.split("/")[1]}`;
+                let photoName = typeContent.files[i].originalName;
+                let typeContentFileObject = new File(
+                  [data],
+                  photoName,
+                  metadata
+                );
+                typeContentFiles.push({
+                  file: typeContentFileObject,
+                  id: typeContent.files[i].fileId,
                   name: photoName,
-                  url: URL.createObjectURL(photoFile),
+                  url: URL.createObjectURL(typeContentFileObject),
                 });
               }
+              setSelectedFiles(typeContentFiles);
             }
-          });
+          }
           setSelectedAnamnesisTypes(newSelectedTypes);
         }
       } catch (error: any) {
@@ -184,7 +196,8 @@ const EditAnamnesis = () => {
 
     const apiResponse = await updateAnamnesis(
       userCustom.accessToken,
-      updateAnamnesisRequest
+      updateAnamnesisRequest,
+      selectedFiles
     );
 
     if (apiResponse.ok) {
@@ -283,6 +296,7 @@ const EditAnamnesis = () => {
               return (
                 <FileAnamnesisType
                   key={type.id}
+                  selectedFiles={selectedFiles}
                   setSelectedFiles={setSelectedFiles}
                   anamnesisTypeId={type.id}
                   selectedTypes={selectedAnamnesisTypes}

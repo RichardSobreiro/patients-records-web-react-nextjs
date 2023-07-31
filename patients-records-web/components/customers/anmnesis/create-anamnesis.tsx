@@ -189,6 +189,7 @@ const CreateAnamnesis = () => {
               return (
                 <FileAnamnesisType
                   key={type.id}
+                  selectedFiles={selectedFiles}
                   setSelectedFiles={setSelectedFiles}
                   anamnesisTypeId={type.id}
                   selectedTypes={selectedTypes}

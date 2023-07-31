@@ -55,10 +55,13 @@ const Pagination = ({
         <div className={`${classes.arrow} ${classes.left}`} />
       </li>
       {paginationRange &&
-        paginationRange.map((pageNumber) => {
+        paginationRange.map((pageNumber, index) => {
           if (pageNumber === DOTS) {
             return (
-              <li className={`${classes.pagination_item} ${classes.dots}`}>
+              <li
+                key={index}
+                className={`${classes.pagination_item} ${classes.dots}`}
+              >
                 &#8230;
               </li>
             );
@@ -66,6 +69,7 @@ const Pagination = ({
 
           return (
             <li
+              key={index}
               className={`${classes.pagination_item} ${
                 pageNumber === currentPage ? classes.selected : ""
               }`}

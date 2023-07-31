@@ -9,6 +9,7 @@ import { ItemAnamnesis } from "@/components/ui/dropdown-anamnesis-type";
 
 type Props = {
   anamnesisTypeId: string;
+  selectedFiles: FileCustom[] | undefined;
   setSelectedFiles: (files: FileCustom[] | undefined) => void;
   selectedTypes: Item | Item[] | ItemAnamnesis[] | undefined;
   setTypes: any;
@@ -16,6 +17,7 @@ type Props = {
 
 const FileAnamnesisType = ({
   anamnesisTypeId,
+  selectedFiles,
   setSelectedFiles,
   selectedTypes,
   setTypes,
@@ -34,6 +36,10 @@ const FileAnamnesisType = ({
   useEffect(() => {
     setSelectedFiles(files);
   }, [files]);
+
+  useEffect(() => {
+    if (selectedFiles && selectedFiles.length > 0) setFiles(selectedFiles);
+  }, []);
 
   return (
     <>
