@@ -48,7 +48,7 @@ export const createAccount = async (
         method: "post",
         body: formBodyString,
         headers: {
-          // "Content-Type": "application/x-www-form-urlencoded",
+          "Content-Type": "application/x-www-form-urlencoded",
           Accept: "application/json",
         },
       }

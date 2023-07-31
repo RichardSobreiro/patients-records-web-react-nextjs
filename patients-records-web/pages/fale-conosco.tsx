@@ -8,6 +8,7 @@ import useInput from "@/hooks/use-input";
 import { NotificationContext } from "@/store/notification-context";
 import classes from "@/styles/FaleConosco.module.css";
 import { isEmail, isNotEmpty } from "@/util/field-validations";
+import Head from "next/head";
 
 import Image from "next/image";
 import { useContext, useEffect, useState } from "react";
@@ -111,6 +112,15 @@ const FaleConosco = () => {
 
   return (
     <>
+      <Head>
+        <title>Fale Conosco</title>
+        <meta
+          name="description"
+          content="Portal para gerenciamento de empreendimentos na área de beleza."
+        />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
       <section className={classes.content}>
         <div className={classes.content_left}>
           <form id="newsletter-form" onSubmit={sendMessageHandler}>

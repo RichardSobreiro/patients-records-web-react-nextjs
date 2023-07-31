@@ -15,6 +15,7 @@ import ErrorDialog from "@/components/ui/error-dialog";
 import { useRouter } from "next/router";
 import Image from "next/image";
 import { signIn } from "next-auth/react";
+import Head from "next/head";
 
 const Entrar = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -108,6 +109,15 @@ const Entrar = () => {
 
   return (
     <>
+      <Head>
+        <title>Entrar</title>
+        <meta
+          name="description"
+          content="Portal para gerenciamento de empreendimentos na área de beleza."
+        />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
       {isLoading && <LoadingSpinner />}
       {error && (
         <ErrorDialog

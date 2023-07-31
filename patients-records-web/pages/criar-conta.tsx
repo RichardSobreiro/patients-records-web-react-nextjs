@@ -16,6 +16,7 @@ import {
   isPassword,
   isPasswordConfirmation,
 } from "@/util/field-validations";
+import Head from "next/head";
 
 import Image from "next/image";
 import { useRouter } from "next/router";
@@ -136,6 +137,15 @@ const CriarConta = () => {
 
   return (
     <>
+      <Head>
+        <title>Criar Conta</title>
+        <meta
+          name="description"
+          content="Portal para gerenciamento de empreendimentos na área de beleza."
+        />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
       {isLoading && <LoadingSpinner />}
       {error && (
         <ErrorDialog
