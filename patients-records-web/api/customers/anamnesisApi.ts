@@ -1,5 +1,6 @@
 /** @format */
 
+import { FileCustom } from "@/hooks/use-file-input";
 import { ApiResponse } from "@/models/Api/ApiResponse";
 import { ErrorDetails } from "@/models/Api/ErrorDetails";
 import { CreateAnamnesisRequest } from "@/models/customers/CreateAnamnesisRequest";
@@ -15,19 +16,32 @@ const { publicRuntimeConfig } = getConfig();
 
 export const createAnamnesis = async (
   accessToken: string,
-  request: CreateAnamnesisRequest
+  request: CreateAnamnesisRequest,
+  files?: FileCustom[] | undefined
 ): Promise<ApiResponse> => {
   const URL = `${publicRuntimeConfig.API_URL}/customers/${request.customerId}/anamnesis`;
+
+  const formData = new FormData();
+  formData.append("customerId", request.customerId);
+  formData.append("date", request.date.toLocaleString());
+  formData.append(
+    "anamnesisTypesContent",
+    JSON.stringify(request.anamnesisTypesContent)
+  );
+  if (files) {
+    for (const file of files) {
+      formData.append("files", file.file);
+    }
+  }
 
   try {
     const response = await fetch(URL, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${accessToken}`,
-        "Content-Type": "application/json",
         Accept: "application/json",
       },
-      body: JSON.stringify(request),
+      body: formData,
     });
 
     if (response.ok) {
@@ -134,7 +148,7 @@ export const getAnamnesis = async (
   customerId: string,
   startDate?: Date,
   endDate?: Date,
-  anamnesisType?: string
+  anamnesisTypeIds?: string[]
 ): Promise<ApiResponse> => {
   let URL = `${publicRuntimeConfig.API_URL}/customers/${customerId}/anamnesis?pageNumber=${pageNumber}&limit=${limit}&customerId=${customerId}`;
 
@@ -142,8 +156,9 @@ export const getAnamnesis = async (
     URL += `&startDate=${startDate.toLocaleString()}&endDate=${endDate.toLocaleString()}`;
   }
 
-  if (anamnesisType) {
-    URL += `&anamnesisType=${anamnesisType}`;
+  if (anamnesisTypeIds && anamnesisTypeIds.length > 0) {
+    for (const anamnesisTypeId of anamnesisTypeIds)
+      URL += `&anamnesisTypeIds=${anamnesisTypeId}`;
   }
 
   try {

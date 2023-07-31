@@ -27,9 +27,12 @@ export default function Home() {
         <div className={classes.top_body}>
           <div className={classes.top_body_main_text}>
             <p>
-              O jeito mais barato e mais eficiente de gerenciar o seu negócio na
-              área de beleza
+              O jeito mais barato e eficiente de gerenciar os seus atendimentos
             </p>
+            <small className={classes.small_text}>
+              (Ideal para consultórios médicos, odontológicos, salões de beleza,
+              clínicas estéticas, manicures, etc.)
+            </small>
           </div>
           <div className={classes.top_body_main_image}>
             <Image

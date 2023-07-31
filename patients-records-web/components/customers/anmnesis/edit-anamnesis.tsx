@@ -2,8 +2,6 @@
 
 import Input, { InputType } from "@/components/ui/input";
 import classes from "./create-anamnesis.module.css";
-import Dropdown, { Item } from "@/components/ui/dropdown";
-import { anamnesisTypesList } from "@/util/constants/lists";
 import PersonalInfo from "../edit/personal-info";
 
 import { useRouter } from "next/router";
@@ -16,7 +14,6 @@ import Button, { ButtonStyle } from "@/components/ui/button";
 import { NotificationContext } from "@/store/notification-context";
 import { useSession } from "next-auth/react";
 import {
-  createAnamnesis,
   getAnamnesisById,
   updateAnamnesis,
 } from "@/api/customers/anamnesisApi";
@@ -31,6 +28,8 @@ import { formatDateTime } from "@/util/date-helpers";
 import DropdownAnamnesisTypes, {
   ItemAnamnesis,
 } from "@/components/ui/dropdown-anamnesis-type";
+import FileAnamnesisType from "./types/file-anamnesis-type";
+import { FileCustom } from "@/hooks/use-file-input";
 
 const EditAnamnesis = () => {
   const { data: session, status, update } = useSession();
@@ -61,6 +60,10 @@ const EditAnamnesis = () => {
     setItem: setSelectedAnamnesisTypes,
   } = useDropdown({ validateValue: atLeastOneSelectedArray });
 
+  const [selectedFiles, setSelectedFiles] = useState<FileCustom[] | undefined>(
+    undefined
+  );
+
   const getAnamnesisByIdAsync = useCallback(async () => {
     if (userCustom?.accessToken) {
       try {
@@ -84,6 +87,23 @@ const EditAnamnesis = () => {
               anamnesisTypeContentIsValid: true,
             };
             newSelectedTypes.push(selectedType);
+            if (typeContent.anamnesisTypeDescription === "Arquivo") {
+              for (let i = 0; i < beforePhotos?.length; i++) {
+                let response = await fetch(beforePhotos[i].url);
+                let data = await response.blob();
+                let metadata = {
+                  type: data.type,
+                };
+                let photoName = `before-photo-${i}.${data.type.split("/")[1]}`;
+                let photoFile = new File([data], photoName, metadata);
+                beforePhotoFiles.push({
+                  file: photoFile,
+                  id: beforePhotos[i].servicePhotoId,
+                  name: photoName,
+                  url: URL.createObjectURL(photoFile),
+                });
+              }
+            }
           });
           setSelectedAnamnesisTypes(newSelectedTypes);
         }
@@ -122,8 +142,10 @@ const EditAnamnesis = () => {
     selectedAnamnesisTypes &&
       (selectedAnamnesisTypes as ItemAnamnesis[]).length > 0 &&
       (selectedAnamnesisTypes as ItemAnamnesis[]).forEach((type) => {
-        anamnesisTypeContentsIsValid =
-          anamnesisTypeContentsIsValid && type.anamnesisTypeContentIsValid;
+        if (type.description !== "Arquivo") {
+          anamnesisTypeContentsIsValid =
+            anamnesisTypeContentsIsValid && type.anamnesisTypeContentIsValid;
+        }
       });
 
     if (
@@ -258,7 +280,15 @@ const EditAnamnesis = () => {
           (selectedAnamnesisTypes as ItemAnamnesis[]).length > 0 &&
           (selectedAnamnesisTypes as ItemAnamnesis[])?.map((type) => {
             if (type.description === "Arquivo") {
-              return <h1>Upload de Arquivo</h1>;
+              return (
+                <FileAnamnesisType
+                  key={type.id}
+                  setSelectedFiles={setSelectedFiles}
+                  anamnesisTypeId={type.id}
+                  selectedTypes={selectedAnamnesisTypes}
+                  setTypes={setSelectedAnamnesisTypes}
+                />
+              );
             } else {
               return (
                 <AnamnesisFreeTypeForm

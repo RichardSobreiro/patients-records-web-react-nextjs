@@ -23,6 +23,8 @@ import DropdownAnamnesisTypes, {
   ItemAnamnesis,
 } from "@/components/ui/dropdown-anamnesis-type";
 import { createAnamnesis } from "@/api/customers/anamnesisApi";
+import FileAnamnesisType from "./types/file-anamnesis-type";
+import { FileCustom } from "@/hooks/use-file-input";
 
 const CreateAnamnesis = () => {
   const { data: session, status, update } = useSession();
@@ -53,6 +55,10 @@ const CreateAnamnesis = () => {
     setItem: setType,
   } = useDropdown({ validateValue: atLeastOneSelectedArray });
 
+  const [selectedFiles, setSelectedFiles] = useState<FileCustom[] | undefined>(
+    undefined
+  );
+
   useEffect(() => {
     let today = new Date();
     setDate(formatDateTime(today));
@@ -63,8 +69,10 @@ const CreateAnamnesis = () => {
     selectedTypes &&
       (selectedTypes as ItemAnamnesis[]).length > 0 &&
       (selectedTypes as ItemAnamnesis[]).forEach((type) => {
-        anamnesisTypeContentsIsValid =
-          anamnesisTypeContentsIsValid && type.anamnesisTypeContentIsValid;
+        if (type.description !== "Arquivo") {
+          anamnesisTypeContentsIsValid =
+            anamnesisTypeContentsIsValid && type.anamnesisTypeContentIsValid;
+        }
       });
     if (!enteredDateIsValid || !typeIsValid || !anamnesisTypeContentsIsValid) {
       dateBlurHandler(undefined);
@@ -97,7 +105,8 @@ const CreateAnamnesis = () => {
 
     const apiResponse = await createAnamnesis(
       userCustom.accessToken,
-      createAnamnesisRequest
+      createAnamnesisRequest,
+      selectedFiles
     );
 
     if (apiResponse.ok) {
@@ -177,7 +186,15 @@ const CreateAnamnesis = () => {
           (selectedTypes as ItemAnamnesis[]).length > 0 &&
           (selectedTypes as ItemAnamnesis[])?.map((type) => {
             if (type.description === "Arquivo") {
-              return <h1>Upload de Arquivo</h1>;
+              return (
+                <FileAnamnesisType
+                  key={type.id}
+                  setSelectedFiles={setSelectedFiles}
+                  anamnesisTypeId={type.id}
+                  selectedTypes={selectedTypes}
+                  setTypes={setType}
+                />
+              );
             } else {
               return (
                 <AnamnesisFreeTypeForm

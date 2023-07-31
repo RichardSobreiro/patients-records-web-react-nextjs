@@ -14,13 +14,13 @@ export type FileCustom = {
 };
 
 const useFileInput = ({ validateValue }: Props) => {
-  const [selectedPhotos, setSelectedPhotos] = useState<
-    FileCustom[] | undefined
-  >(undefined);
+  const [selectedFile, setSelectedFile] = useState<FileCustom[] | undefined>(
+    undefined
+  );
   const [isTouched, setIsTouched] = useState(false);
   let errorMessage = "";
 
-  let valueIsValid = validateValue(selectedPhotos);
+  let valueIsValid = validateValue(selectedFile);
   const hasError =
     (!valueIsValid || typeof valueIsValid === "string") && isTouched;
 
@@ -30,7 +30,7 @@ const useFileInput = ({ validateValue }: Props) => {
   }
 
   const valueChangeHandler = (newValue: FileCustom[] | undefined) => {
-    setSelectedPhotos(newValue);
+    setSelectedFile(newValue);
   };
 
   const inputBlurHandler = () => {
@@ -38,19 +38,19 @@ const useFileInput = ({ validateValue }: Props) => {
   };
 
   const reset = () => {
-    setSelectedPhotos(undefined);
+    setSelectedFile(undefined);
     setIsTouched(false);
   };
 
   return {
-    selectedPhotos,
+    selectedFile,
     isValid: valueIsValid,
     hasError,
     valueChangeHandler,
     inputBlurHandler,
     reset,
     errorMessage,
-    setSelectedPhotos,
+    setSelectedFile,
   };
 };
 

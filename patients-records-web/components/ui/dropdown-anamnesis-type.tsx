@@ -35,13 +35,14 @@ import TextArea, { TextAreaTheme } from "./textarea";
 import { ApiResponse } from "@/models/Api/ApiResponse";
 import { UpdateAnamnesisTypeRequest } from "@/models/customers/anamnesis-types/UpdateAnamnesisTypeRequest";
 import { UpdateAnamnesisTypeResponse } from "@/models/customers/anamnesis-types/UpdateAnamnesisTypeResponse";
+import { FileCustom } from "@/hooks/use-file-input";
 
 export type ItemAnamnesis = {
   id: string;
   description: string;
   selected: boolean;
   value: any;
-  anamnesisTypeContent?: string | null;
+  anamnesisTypeContent?: string | null | FileCustom[];
   anamnesisTypeContentIsValid?: boolean | string;
   show?: boolean;
 };
@@ -56,6 +57,7 @@ type Props = {
   onBlurHandler?: () => void;
   hasError?: boolean;
   errorMessage?: string;
+  onlyFilter?: boolean;
 };
 
 const DropdownAnamnesisTypes = ({
@@ -68,6 +70,7 @@ const DropdownAnamnesisTypes = ({
   selectedValues,
   onChangeHandler,
   onBlurHandler,
+  onlyFilter,
 }: Props) => {
   const [ignored, forceUpdate] = useReducer((x) => x + 1, 0);
 
@@ -183,7 +186,7 @@ const DropdownAnamnesisTypes = ({
       const newSelectedTypes: ItemAnamnesis[] = [];
       anamnesisTypesList.anamnesisTypes!.forEach((element: any) => {
         let selected = false;
-        if (element[descriptionPropertyName] === "Texto Livre") {
+        if (element[descriptionPropertyName] === "Texto Livre" && !onlyFilter) {
           selected = true;
         }
         const newItem = {
@@ -244,12 +247,6 @@ const DropdownAnamnesisTypes = ({
   useEffect(() => {
     itemsList?.forEach((item) => {
       item.selected = false;
-      // const selectedValue = (selectedValues as ItemAnamnesis[]).find(
-      //   (s) => s.id === item.id
-      // );
-      // if (selectedValue) {
-      //   item.anamnesisTypeContent = selectedValue.anamnesisTypeContent;
-      // }
     });
     (selectedValues as ItemAnamnesis[])?.length > 0 &&
       (selectedValues as ItemAnamnesis[])?.forEach((selected) => {
@@ -269,10 +266,10 @@ const DropdownAnamnesisTypes = ({
       item.selected = !item.selected;
     }
     setItemsList([...itemsList!]);
-    //const selectedItems = itemsList?.filter((item) => item.selected === true);
-    let selectedItems = [
-      ...(selectedValues as ItemAnamnesis[]),
-    ] as ItemAnamnesis[];
+    let selectedItems: ItemAnamnesis[] =
+      selectedValues && (selectedValues as ItemAnamnesis[])?.length > 0
+        ? ([...(selectedValues as ItemAnamnesis[])] as ItemAnamnesis[])
+        : [];
     if (item?.selected) {
       selectedItems.push(item);
     } else {
@@ -392,6 +389,8 @@ const DropdownAnamnesisTypes = ({
           anamnesisTypeContent: createAnamnesisTypeResponse.template,
           anamnesisTypeContentIsValid: true,
         });
+        const newSelectedTypes = newItemList.filter((item) => item.selected);
+        onChangeHandler && onChangeHandler(newSelectedTypes);
       } else {
         const updateAnamnesisTypeResponse =
           apiResponse.body as UpdateAnamnesisTypeResponse;
@@ -406,8 +405,6 @@ const DropdownAnamnesisTypes = ({
         }
       }
 
-      const newSelectedTypes = newItemList.filter((item) => item.selected);
-      onChangeHandler && onChangeHandler(newSelectedTypes);
       setItemsList(sortItemsList(newItemList));
       setShowCreateEditAnamnesisTypeModal(false);
 
@@ -588,12 +585,14 @@ const DropdownAnamnesisTypes = ({
           )}
         </div>
         <div className={classes.actions}>
-          <Button
-            style={ButtonStyle.SUCCESS}
-            onClickHandler={onClickCreateNewAnamnesisType}
-          >
-            Criar Template
-          </Button>
+          {!onlyFilter && (
+            <Button
+              style={ButtonStyle.SUCCESS}
+              onClickHandler={onClickCreateNewAnamnesisType}
+            >
+              Criar Template
+            </Button>
+          )}
         </div>
       </div>
       {hasError && <p className={classes.error_text}>{errorMessage}</p>}

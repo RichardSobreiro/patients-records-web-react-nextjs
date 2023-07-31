@@ -26,6 +26,33 @@
   align-items: center;
 }
 
+.document_container_selected {
+  border: 1px dashed rgb(210, 227, 244);
+  position: relative;
+  height: fit-content;
+  padding: 1rem;
+  margin: 1rem;
+}
+
+.document_container_selected:hover {
+  cursor: pointer;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.document_name_container {
+}
+
+.document_name_paragraph {
+  font-size: 1rem;
+  font-family: var(--font-family-title);
+  font-style: italic;
+  color: var(--neutral);
+}
+
 .on_hover_actions {
   position: absolute;
   display: flex;

@@ -3,6 +3,7 @@
 import { ItemAnamnesis } from "@/components/ui/dropdown-anamnesis-type";
 import { Item } from "@/components/ui/dropdown-service-type";
 import TextArea from "@/components/ui/textarea";
+import { FileCustom } from "@/hooks/use-file-input";
 import useInput from "@/hooks/use-input";
 import { isNotEmpty } from "@/util/field-validations";
 import { useEffect } from "react";
@@ -12,7 +13,7 @@ type Props = {
   anamnesisTypeDescription: string;
   selectedTypes: Item | Item[] | ItemAnamnesis[] | undefined;
   setTypes: any;
-  anamnesisTypeContent?: string | null;
+  anamnesisTypeContent?: string | null | FileCustom[];
   anamnesisTypeContentIsValid?: boolean | string;
   template?: string;
 };

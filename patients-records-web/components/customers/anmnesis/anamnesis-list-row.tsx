@@ -17,7 +17,15 @@ const AnamnesisListRow = ({ anamnesis }: Props) => {
   return (
     <>
       <article key={anamnesis.anamneseId} className={classes.row}>
-        <div className={classes.cell}>{anamnesis.type[0]}</div>
+        <div className={classes.cell_service_types}>
+          {anamnesis.anamnesisTypeDescriptions &&
+            anamnesis.anamnesisTypeDescriptions.length > 0 &&
+            anamnesis.anamnesisTypeDescriptions.map(
+              (anamnesisTypeDescription) => {
+                return <p>{anamnesisTypeDescription}</p>;
+              }
+            )}
+        </div>
         <div className={classes.cell}>{formatDateTimePTBR(anamnesis.date)}</div>
         <div className={classes.cell}>
           <Button

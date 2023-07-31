@@ -18,6 +18,9 @@ import useInput from "@/hooks/use-input";
 import useDropdown from "@/hooks/use-dropdown";
 import { isDate } from "@/util/field-validations";
 import Pagination from "@/components/ui/pagination";
+import DropdownAnamnesisTypes, {
+  ItemAnamnesis,
+} from "@/components/ui/dropdown-anamnesis-type";
 
 const PAGE_SIZE = 10;
 
@@ -84,14 +87,14 @@ const AnamnesisList = () => {
   });
 
   const {
-    value: type,
-    isValid: typeIsValid,
-    hasError: typeInputHasError,
-    valueChangeHandler: typeChangeHandler,
-    inputBlurHandler: typeBlurHandler,
-    reset: resetType,
-    errorMessage: typeErrorMessage,
-    setItem: setType,
+    value: selectedAnamnesisTypes,
+    isValid: anamnesisTypesIsValid,
+    hasError: anamnesisTypesDropdownHasError,
+    valueChangeHandler: anamnesisTypesDropdownChangeHandler,
+    inputBlurHandler: anamnesisTypesDropdownBlurHandler,
+    reset: resetAnamnesisDropdown,
+    errorMessage: anamnesisDropdownErrorMessage,
+    setItem: setSelectedAnamnesisTypes,
   } = useDropdown({ validateValue: () => true });
 
   const getAnamnesisList = useCallback(async () => {
@@ -109,11 +112,19 @@ const AnamnesisList = () => {
           router.query.customerId as string,
           startDateObject,
           endDateObject,
-          (type as Item)?.description
+          (selectedAnamnesisTypes as ItemAnamnesis[])?.map((type) => type.id)
         );
         if (response.ok) {
           const apiResponseBody = response.body as GetAnamnesisResponse;
           setAnamnesisList(apiResponseBody);
+        } else {
+          const notification = {
+            status: "error",
+            title: "Opsss...",
+            message:
+              "Tivemos um problema passageiro. Aguarde alguns segundos e tente novamente!",
+          };
+          notificationCtx.showNotification(notification);
         }
       } catch (error: any) {
         const notification = {
@@ -132,7 +143,7 @@ const AnamnesisList = () => {
     router.query,
     startDate,
     endDate,
-    type,
+    selectedAnamnesisTypes,
     currentPage,
   ]);
 
@@ -190,17 +201,17 @@ const AnamnesisList = () => {
               />
             </div>
             <div>
-              <Dropdown
-                label={"Tipo"}
-                list={anamnesisTypesList}
-                id={"anamnesis-type-create"}
-                idPropertyName={"id"}
-                descriptionPropertyName={"description"}
-                value={type}
-                onBlurHandler={typeBlurHandler}
-                onChangeHandler={typeChangeHandler}
-                hasError={typeInputHasError}
+              <DropdownAnamnesisTypes
+                label={"Tipo(s) da Anamnese(s):"}
+                id={"anamnesis-type-dropdown-list"}
+                idPropertyName={"anamnesisTypeId"}
+                descriptionPropertyName={"anamnesisTypeDescription"}
+                selectedValues={selectedAnamnesisTypes}
+                onBlurHandler={anamnesisTypesDropdownBlurHandler}
+                onChangeHandler={anamnesisTypesDropdownChangeHandler}
+                hasError={anamnesisTypesDropdownHasError}
                 errorMessage="O tipo da anamnese deve ser selecionado"
+                onlyFilter={true}
               />
             </div>
             <div className={classes.filter_button_group}>

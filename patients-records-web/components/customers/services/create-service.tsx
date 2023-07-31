@@ -63,7 +63,7 @@ const CreateService = () => {
   } = useInput({ validateValue: () => true });
 
   const {
-    selectedPhotos: selectedBeforePhotos,
+    selectedFile: selectedBeforePhotos,
     isValid: selectedBeforePhotosIsValid,
     hasError: selectedBeforePhotosHasError,
     valueChangeHandler: selectedBeforePhotosChangeHandler,
@@ -83,7 +83,7 @@ const CreateService = () => {
   } = useInput({ validateValue: () => true });
 
   const {
-    selectedPhotos: selectedAfterPhotos,
+    selectedFile: selectedAfterPhotos,
     isValid: selectedAfterPhotosIsValid,
     hasError: selectedAfterPhotosHasError,
     valueChangeHandler: selectedAfterPhotosChangeHandler,
@@ -231,7 +231,7 @@ const CreateService = () => {
           label={"Fotos do Antes:"}
           hasError={selectedBeforePhotosHasError}
           errorMessage={selectedBeforePhotosErrorMessage}
-          selectedPhotos={selectedBeforePhotos}
+          selectedFile={selectedBeforePhotos}
           onChangeHandler={selectedBeforePhotosChangeHandler}
           onBlurHandler={selectedBeforePhotosBlurHandler}
         />
@@ -261,7 +261,7 @@ const CreateService = () => {
           label={"Fotos do Depois:"}
           hasError={selectedAfterPhotosHasError}
           errorMessage={selectedAfterPhotosErrorMessage}
-          selectedPhotos={selectedAfterPhotos}
+          selectedFile={selectedAfterPhotos}
           onChangeHandler={selectedAfterPhotosChangeHandler}
           onBlurHandler={selectedAfterPhotosBlurHandler}
         />

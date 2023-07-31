@@ -66,14 +66,14 @@ const EditService = () => {
   } = useInput({ validateValue: () => true });
 
   const {
-    selectedPhotos: selectedBeforePhotos,
+    selectedFile: selectedBeforePhotos,
     isValid: selectedBeforePhotosIsValid,
     hasError: selectedBeforePhotosHasError,
     valueChangeHandler: selectedBeforePhotosChangeHandler,
     inputBlurHandler: selectedBeforePhotosBlurHandler,
     reset: resetSelectedBeforePhotos,
     errorMessage: selectedBeforePhotosErrorMessage,
-    setSelectedPhotos: setBeforePhotos,
+    setSelectedFile: setBeforePhotos,
   } = useFileInput({ validateValue: () => true });
 
   const {
@@ -87,14 +87,14 @@ const EditService = () => {
   } = useInput({ validateValue: () => true });
 
   const {
-    selectedPhotos: selectedAfterPhotos,
+    selectedFile: selectedAfterPhotos,
     isValid: selectedAfterPhotosIsValid,
     hasError: selectedAfterPhotosHasError,
     valueChangeHandler: selectedAfterPhotosChangeHandler,
     inputBlurHandler: selectedAfterPhotosBlurHandler,
     reset: resetSelectedAfterPhotos,
     errorMessage: selectedAfterPhotosErrorMessage,
-    setSelectedPhotos: setAfterPhotos,
+    setSelectedFile: setAfterPhotos,
   } = useFileInput({ validateValue: () => true });
 
   const getAndSetPhotosAsync = async (
@@ -350,7 +350,7 @@ const EditService = () => {
           label={"Fotos do Antes:"}
           hasError={selectedBeforePhotosHasError}
           errorMessage={selectedBeforePhotosErrorMessage}
-          selectedPhotos={selectedBeforePhotos}
+          selectedFiles={selectedBeforePhotos}
           onChangeHandler={selectedBeforePhotosChangeHandler}
           onBlurHandler={selectedBeforePhotosBlurHandler}
         />
@@ -380,7 +380,7 @@ const EditService = () => {
           label={"Fotos do Depois:"}
           hasError={selectedAfterPhotosHasError}
           errorMessage={selectedAfterPhotosErrorMessage}
-          selectedPhotos={selectedAfterPhotos}
+          selectedFiles={selectedAfterPhotos}
           onChangeHandler={selectedAfterPhotosChangeHandler}
           onBlurHandler={selectedAfterPhotosBlurHandler}
         />
