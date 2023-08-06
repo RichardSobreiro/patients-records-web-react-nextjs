@@ -2,7 +2,7 @@
 
 .form {
   display: grid;
-  grid-template-columns: 90% 10%;
+  grid-template-columns: 85% 15%;
   align-items: center;
   justify-content: center;
   gap: 1rem;
@@ -75,11 +75,23 @@
 }
 
 .extra_filters_modal_actions {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1rem;
 
-  margin-top: 1rem;
+  margin-top: 1.5rem;
 }
 
 .actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.modal_inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.modal_input_wrapper {
 }

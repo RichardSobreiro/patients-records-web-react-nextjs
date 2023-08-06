@@ -112,9 +112,10 @@
 }
 
 .existing_service_types_modal_list {
-  font-size: 1rem;
+  font-size: 2rem;
   font-family: var(--font-family-text);
   line-height: 150%;
+  font-weight: bold;
   text-align: center;
   display: flex;
   flex-direction: column;
@@ -127,6 +128,7 @@
 .existing_service_types_modal_actions {
   display: flex;
   flex-direction: row;
+  justify-content: space-between;
   flex-wrap: nowrap;
   gap: 1rem;
 }

@@ -1,6 +1,7 @@
 /** @format */
 
 import {
+  CSSProperties,
   useCallback,
   useContext,
   useEffect,
@@ -12,7 +13,7 @@ import Image from "next/image";
 
 import classes from "./dropdown-service-type.module.css";
 import { useOutsideAlerter } from "@/hooks/use-outside-alerter";
-import Modal from "./modal";
+import Modal, { ModalTheme } from "./modal";
 import Button, { ButtonStyle } from "./button";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
@@ -44,6 +45,8 @@ type Props = {
   onBlurHandler?: () => void;
   hasError?: boolean;
   errorMessage?: string;
+  inputStyle?: CSSProperties;
+  allowAddNewType?: boolean;
 };
 
 const DropdownServiceTypes = ({
@@ -56,6 +59,8 @@ const DropdownServiceTypes = ({
   selectedValues,
   onChangeHandler,
   onBlurHandler,
+  inputStyle,
+  allowAddNewType,
 }: Props) => {
   const [ignored, forceUpdate] = useReducer((x) => x + 1, 0);
 
@@ -169,7 +174,10 @@ const DropdownServiceTypes = ({
     const selectedItems = itemsList?.filter((item) => item.selected);
     if (selectedItems != undefined && selectedItems.length > 0) {
       return (
-        <div className={classes.selected_placeholder_container}>
+        <div
+          style={inputStyle}
+          className={classes.selected_placeholder_container}
+        >
           {selectedItems.map(
             (item, index) =>
               index < 2 && (
@@ -188,7 +196,10 @@ const DropdownServiceTypes = ({
       );
     } else {
       return (
-        <div className={classes.selected_placeholder_container}>
+        <div
+          style={inputStyle}
+          className={classes.selected_placeholder_container}
+        >
           <p className={classes.selected_placeholder_no_items}>Procurar...</p>
         </div>
       );
@@ -372,6 +383,7 @@ const DropdownServiceTypes = ({
           onClose={() => setShowCreateNewServiceTypeModal(false)}
           title="Existem tipos de atendimentos semelhantes:"
           titleStyle={{ fontSize: "1.5rem" }}
+          theme={ModalTheme.SMALL}
         >
           <p className={classes.existing_service_types_modal_subtitle}>
             Os seguintes tipos podem atender a sua solicitação:
@@ -402,7 +414,7 @@ const DropdownServiceTypes = ({
               Prosseguir com a criação
             </Button>
             <Button
-              style={ButtonStyle.SUCCESS_BORDERED}
+              style={ButtonStyle.SUCCESS}
               onClickHandler={useExistingServiceTypes}
             >
               Usar o(s) tipo(s) selecionado(s)
@@ -415,6 +427,7 @@ const DropdownServiceTypes = ({
           onClose={() => setShowConfirmationModal(false)}
           title="Tudo certo?"
           titleStyle={{ fontSize: "1.5rem" }}
+          theme={ModalTheme.SMALL}
         >
           <p className={classes.existing_service_types_modal_subtitle}>
             Confirma a criação do tipo de atendimento:
@@ -432,7 +445,7 @@ const DropdownServiceTypes = ({
               Cancelar
             </Button>
             <Button
-              style={ButtonStyle.SUCCESS_BORDERED}
+              style={ButtonStyle.SUCCESS}
               onClickHandler={createNewServiceType}
             >
               Criar
@@ -472,23 +485,26 @@ const DropdownServiceTypes = ({
         </button>
         {showDropdown && (
           <div className={classes.list}>
-            <button className={classes.chevron_button}>
-              <input
-                className={classes.input}
-                placeholder={"Cadastre um novo tipo..."}
-                onBlur={onNewServiceInputBlurHandler}
-                onChange={onNewServiceInputChangeHandler}
-                value={newServiceDescription}
-              />
-              <Image
-                src={`/images/plus-filled.svg`}
-                alt="Criar novo tipo"
-                width={25}
-                height={25}
-                onClick={onClickCreateNewServiceType}
-                className={classes.plus_button}
-              />
-            </button>
+            {allowAddNewType && (
+              <button className={classes.chevron_button}>
+                <input
+                  style={inputStyle}
+                  className={classes.input}
+                  placeholder={"Cadastre um novo tipo..."}
+                  onBlur={onNewServiceInputBlurHandler}
+                  onChange={onNewServiceInputChangeHandler}
+                  value={newServiceDescription}
+                />
+                <Image
+                  src={`/images/plus-filled.svg`}
+                  alt="Criar novo tipo"
+                  width={25}
+                  height={25}
+                  onClick={onClickCreateNewServiceType}
+                  className={classes.plus_button}
+                />
+              </button>
+            )}
             {itemsList?.map((item) => (
               <div key={item.id}>
                 {item.show && (

@@ -210,7 +210,7 @@ const PersonalInfo = ({ customerId }: Props) => {
             <Input
               type={InputType.DATE}
               label={"Data de Aniversário"}
-              id={"anamnesis-birthdate-create"}
+              id={"customer-birthdate-create"}
               hasError={birthdateInputHasError}
               errorMessage={"A data de aniversário é inválida"}
               value={birthdate}

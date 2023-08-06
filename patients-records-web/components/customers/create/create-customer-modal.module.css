@@ -1,16 +1,15 @@
 /** @format */
 
 .action_group {
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
-  gap: 1rem;
-  margin-bottom: 0.3rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-bottom: 1rem;
 }
 
 .actions {
   display: flex;
   justify-content: flex-end;
-  width: 50%;
+  width: 100%;
   padding-top: 1.4rem;
 }

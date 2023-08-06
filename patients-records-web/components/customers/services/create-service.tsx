@@ -192,6 +192,7 @@ const CreateService = () => {
               onChangeHandler={typeChangeHandler}
               hasError={typeInputHasError}
               errorMessage="O tipo do atendimento deve ser selecionado"
+              allowAddNewType={true}
             />
           </div>
         </div>
@@ -231,7 +232,7 @@ const CreateService = () => {
           label={"Fotos do Antes:"}
           hasError={selectedBeforePhotosHasError}
           errorMessage={selectedBeforePhotosErrorMessage}
-          selectedFile={selectedBeforePhotos}
+          selectedFiles={selectedBeforePhotos}
           onChangeHandler={selectedBeforePhotosChangeHandler}
           onBlurHandler={selectedBeforePhotosBlurHandler}
         />
@@ -261,7 +262,7 @@ const CreateService = () => {
           label={"Fotos do Depois:"}
           hasError={selectedAfterPhotosHasError}
           errorMessage={selectedAfterPhotosErrorMessage}
-          selectedFile={selectedAfterPhotos}
+          selectedFiles={selectedAfterPhotos}
           onChangeHandler={selectedAfterPhotosChangeHandler}
           onBlurHandler={selectedAfterPhotosBlurHandler}
         />

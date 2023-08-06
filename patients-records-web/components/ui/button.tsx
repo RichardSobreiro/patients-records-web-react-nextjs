@@ -1,6 +1,6 @@
 /** @format */
 
-import { MouseEventHandler } from "react";
+import { CSSProperties, MouseEventHandler } from "react";
 import classes from "./button.module.css";
 
 export enum ButtonStyle {
@@ -24,9 +24,17 @@ type Props = {
   onClickHandler?: MouseEventHandler<HTMLButtonElement>;
   type?: "button" | "submit" | "reset";
   disabled?: boolean;
+  cssStyleButton?: CSSProperties;
 };
 
-const Button = ({ children, style, onClickHandler, type, disabled }: Props) => {
+const Button = ({
+  children,
+  style,
+  onClickHandler,
+  type,
+  disabled,
+  cssStyleButton,
+}: Props) => {
   let ButtonStyleClass = "";
   let buttonSizeClass = "";
   switch (style) {
@@ -70,6 +78,7 @@ const Button = ({ children, style, onClickHandler, type, disabled }: Props) => {
 
   return (
     <button
+      style={cssStyleButton}
       type={type ? type : "button"}
       className={
         buttonSizeClass === ""

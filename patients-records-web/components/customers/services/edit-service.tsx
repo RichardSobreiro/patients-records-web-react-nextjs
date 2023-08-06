@@ -309,6 +309,7 @@ const EditService = () => {
               onChangeHandler={typeChangeHandler}
               hasError={typeInputHasError}
               errorMessage="O tipo do atendimento deve ser selecionado"
+              allowAddNewType={true}
             />
           </div>
         </div>

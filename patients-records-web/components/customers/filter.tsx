@@ -166,12 +166,12 @@ const Filter = ({ currentPage, getCustomersAsync, setIsLoading }: Props) => {
         </div>
         <div className={classes.actions}>
           <Button
-            style={ButtonStyle.PRIMARY_BODERED}
+            style={ButtonStyle.SUCCESS}
             onClickHandler={() => {
               setCreateCustomerModalIsOpen(true);
             }}
           >
-            + Cliente
+            Novo Cliente
           </Button>
         </div>
       </form>
@@ -208,32 +208,38 @@ const Filter = ({ currentPage, getCustomersAsync, setIsLoading }: Props) => {
         <Modal
           onClose={() => setLastServiceDateModalIsOpen(false)}
           title="Data do último atendimento:"
-          theme={ModalTheme.SECONDARY}
+          theme={ModalTheme.SMALL}
         >
-          <Input
-            type={InputType.DATE}
-            labelStyle={{ color: "#171717" }}
-            label={"Início"}
-            id={"last-service-date-start"}
-            inputStyle={{ background: "#32b44f" }}
-            hasError={enteredLastServiceDateStartInputHasError}
-            errorMessage={"A data início do último atendimento é inválida"}
-            value={enteredLastServiceDateStart}
-            onChangeHandler={enteredLastServiceDateStartChangedHandler}
-            onBlurHandler={enteredLastServiceDateStartBlurHandler}
-          />
-          <Input
-            type={InputType.DATE}
-            labelStyle={{ color: "#171717" }}
-            label={"Fim"}
-            id={"last-service-date-end"}
-            inputStyle={{ background: "#32b44f" }}
-            hasError={enteredLastServiceDateEndInputHasError}
-            errorMessage={"A data fim do último atendimento é inválida"}
-            value={enteredLastServiceDateEnd}
-            onChangeHandler={enteredLastServiceDateEndChangedHandler}
-            onBlurHandler={enteredLastServiceDateEndBlurHandler}
-          />
+          <div className={classes.modal_inputs}>
+            <div className={classes.modal_input_wrapper}>
+              <Input
+                type={InputType.DATE}
+                labelStyle={{ color: "#171717" }}
+                label={"Início"}
+                id={"last-service-date-start"}
+                inputStyle={{ background: "#bebebe" }}
+                hasError={enteredLastServiceDateStartInputHasError}
+                errorMessage={"A data início do último atendimento é inválida"}
+                value={enteredLastServiceDateStart}
+                onChangeHandler={enteredLastServiceDateStartChangedHandler}
+                onBlurHandler={enteredLastServiceDateStartBlurHandler}
+              />
+            </div>
+            <div className={classes.modal_input_wrapper}>
+              <Input
+                type={InputType.DATE}
+                labelStyle={{ color: "#171717" }}
+                label={"Fim"}
+                id={"last-service-date-end"}
+                inputStyle={{ background: "#bebebe" }}
+                hasError={enteredLastServiceDateEndInputHasError}
+                errorMessage={"A data fim do último atendimento é inválida"}
+                value={enteredLastServiceDateEnd}
+                onChangeHandler={enteredLastServiceDateEndChangedHandler}
+                onBlurHandler={enteredLastServiceDateEndBlurHandler}
+              />
+            </div>
+          </div>
           <div className={classes.extra_filters_modal_actions}>
             <Button
               style={ButtonStyle.NEUTRAL_SMALL}
@@ -246,6 +252,7 @@ const Filter = ({ currentPage, getCustomersAsync, setIsLoading }: Props) => {
             >
               Cancelar
             </Button>
+
             <Button
               style={ButtonStyle.PRIMARY_BODERED_SMALL}
               onClickHandler={() => {
@@ -255,6 +262,7 @@ const Filter = ({ currentPage, getCustomersAsync, setIsLoading }: Props) => {
             >
               Limpar
             </Button>
+
             <Button
               style={ButtonStyle.SUCCESS_BORDERED_SMALL}
               onClickHandler={() =>
@@ -274,10 +282,11 @@ const Filter = ({ currentPage, getCustomersAsync, setIsLoading }: Props) => {
         <Modal
           onClose={() => setLastServiceTypeModalIsOpen(false)}
           title="Tipo(s) de Atendimento(s)"
-          theme={ModalTheme.SECONDARY}
+          theme={ModalTheme.SMALL}
         >
           <DropdownServiceTypes
             label={""}
+            inputStyle={{ background: "#bebebe" }}
             id={"service-type-edit"}
             idPropertyName={"serviceTypeId"}
             descriptionPropertyName={"serviceTypeDescription"}
@@ -317,7 +326,7 @@ const Filter = ({ currentPage, getCustomersAsync, setIsLoading }: Props) => {
         <Modal
           onClose={() => setCreateCustomerModalIsOpen(false)}
           title="Novo Cliente"
-          theme={ModalTheme.SECONDARY}
+          theme={ModalTheme.SMALL}
         >
           <CreateCustomerModalContent />
         </Modal>

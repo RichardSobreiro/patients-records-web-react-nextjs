@@ -60,17 +60,34 @@ const CreateCustomerModalContent = () => {
     reset: resetEmailInput,
   } = useInput({ validateValue: ifEnteredMustBeEmail });
 
+  const {
+    value: birthdate,
+    isValid: birthdateIsValid,
+    hasError: birthdateInputHasError,
+    valueChangeHandler: birthdateChangedHandler,
+    inputBlurHandler: birthdateBlurHandler,
+    reset: resetbirthdateInput,
+    setEnteredValue: setBirthdate,
+  } = useInput({ validateValue: isNotEmpty });
+
   const handleSubmit = async () => {
-    if (!enteredNameIsValid || !enteredEmailIsValid || !enteredEmailIsValid) {
+    if (
+      !enteredNameIsValid ||
+      !enteredEmailIsValid ||
+      !enteredEmailIsValid ||
+      !birthdateIsValid
+    ) {
       return;
     }
 
     setIsLoading(true);
 
+    const birthDateObject = new Date(birthdate.replace(/-/g, "/"));
+
     const request = new CreateCustomerRequest(
       enteredName,
       enteredPhoneNumber,
-      undefined,
+      birthDateObject,
       enteredEmail
     );
 
@@ -104,6 +121,7 @@ const CreateCustomerModalContent = () => {
         <div className={classes.action_group}>
           <div>
             <Input
+              inputStyle={{ backgroundColor: " #bebebe" }}
               type={InputType.TEXT}
               label={"Nome"}
               id={"customer-name"}
@@ -117,6 +135,7 @@ const CreateCustomerModalContent = () => {
           </div>
           <div>
             <Input
+              inputStyle={{ backgroundColor: " #bebebe" }}
               type={InputType.TEXT}
               label={"Telefone"}
               id={"customer-phone-number"}
@@ -132,23 +151,38 @@ const CreateCustomerModalContent = () => {
         <div className={classes.action_group}>
           <div>
             <Input
+              inputStyle={{ backgroundColor: " #bebebe" }}
+              inputTheme={InputTheme.SECONDARY}
               type={InputType.EMAIL}
               label={"E-mail (opcional)"}
               id={"customer-email"}
-              hasError={phoneNumberInputHasError}
+              hasError={emailInputHasError}
               errorMessage={"O e-mail do cliente é inválido"}
               value={enteredEmail}
               onChangeHandler={emailChangedHandler}
               onBlurHandler={emailBlurHandler}
-              inputTheme={InputTheme.SECONDARY}
             />
           </div>
-          <div className={classes.actions}>
-            <div>
-              <Button style={ButtonStyle.SUCCESS} onClickHandler={handleSubmit}>
-                Criar
-              </Button>
-            </div>
+          <div>
+            <Input
+              inputStyle={{ backgroundColor: " #bebebe" }}
+              inputTheme={InputTheme.SECONDARY}
+              type={InputType.DATE}
+              label={"Data de Aniversário"}
+              id={"customer-birthdate-create"}
+              hasError={birthdateInputHasError}
+              errorMessage={"A data de aniversário é inválida"}
+              value={birthdate}
+              onChangeHandler={birthdateChangedHandler}
+              onBlurHandler={birthdateBlurHandler}
+            />
+          </div>
+        </div>
+        <div className={classes.actions}>
+          <div>
+            <Button style={ButtonStyle.SUCCESS} onClickHandler={handleSubmit}>
+              Criar
+            </Button>
           </div>
         </div>
       </article>
