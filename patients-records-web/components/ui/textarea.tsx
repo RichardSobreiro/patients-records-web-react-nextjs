@@ -2,6 +2,19 @@
 
 import classes from "./textarea.module.css";
 
+import dynamic from "next/dynamic";
+import { EditorState, convertToRaw } from "draft-js";
+import draftToHtml from "draftjs-to-html";
+import { convertFromHTML } from "draft-convert";
+
+// import { Editor } from "react-draft-wysiwyg";
+const Editor = dynamic(
+  () => import("react-draft-wysiwyg").then((mod) => mod.Editor),
+  { ssr: false }
+);
+
+import "node_modules/react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
+
 export enum TextAreaTheme {
   STANDARD = 1,
   SECONDARY = 2,
@@ -17,7 +30,7 @@ type Props = {
   rows: number;
   required: boolean;
   placeholder?: string;
-  value?: any;
+  editorState: EditorState;
   onChangeHandler?: any;
   onBlurHandler?: any;
   theme?: TextAreaTheme;
@@ -31,7 +44,7 @@ const TextArea = ({
   rows,
   required,
   placeholder,
-  value,
+  editorState,
   onChangeHandler,
   onBlurHandler,
   theme,
@@ -53,7 +66,13 @@ const TextArea = ({
       <label htmlFor={id} className={labelCssClass}>
         {label}
       </label>
-      <textarea
+      <Editor
+        editorClassName={`${classes.textarea}  ${hasError && classes.invalid}`}
+        editorState={editorState}
+        onBlur={onBlurHandler}
+        onEditorStateChange={onChangeHandler}
+      />
+      {/* <textarea
         className={`${classes.textarea}  ${hasError && classes.invalid}`}
         id={id}
         rows={rows}
@@ -62,7 +81,7 @@ const TextArea = ({
         value={value}
         onChange={onChangeHandler}
         onBlur={onBlurHandler}
-      ></textarea>
+      ></textarea> */}
       {hasError && <p className={classes.error_text}>{errorMessage}</p>}
     </>
   );

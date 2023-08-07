@@ -26,6 +26,11 @@ import { GetServiceTypeResponse } from "@/models/customers/service-types/GetServ
 import { UpdateServiceRequest } from "@/models/customers/services/UpdateServiceRequest";
 import { formatDateTime } from "@/util/date-helpers";
 
+import useTextArea from "@/hooks/use-textarea";
+import { convertFromHTML } from "draft-convert";
+import draftToHtml from "draftjs-to-html";
+import { EditorState, convertToRaw } from "draft-js";
+
 const EditService = () => {
   const { data: session, status, update } = useSession();
   const router = useRouter();
@@ -56,14 +61,14 @@ const EditService = () => {
   } = useDropdown({ validateValue: atLeastOneSelectedArray });
 
   const {
-    value: beforeComments,
+    editorState: beforeComments,
     isValid: beforeCommentsIsValid,
     hasError: beforeCommentsInputHasError,
     valueChangeHandler: beforeCommentsChangedHandler,
     inputBlurHandler: beforeCommentsBlurHandler,
     reset: resetBeforeCommentsInput,
-    setEnteredValue: setBeforeComments,
-  } = useInput({ validateValue: () => true });
+    setEditorState: setBeforeComments,
+  } = useTextArea({ validateValue: () => true });
 
   const {
     selectedFile: selectedBeforePhotos,
@@ -77,14 +82,14 @@ const EditService = () => {
   } = useFileInput({ validateValue: () => true });
 
   const {
-    value: afterComments,
+    editorState: afterComments,
     isValid: afterCommentsIsValid,
     hasError: afterCommentsInputHasError,
     valueChangeHandler: afterCommentsChangedHandler,
     inputBlurHandler: afterCommentsBlurHandler,
     reset: resetAfterCommentsInput,
-    setEnteredValue: setAfterComments,
-  } = useInput({ validateValue: () => true });
+    setEditorState: setAfterComments,
+  } = useTextArea({ validateValue: () => true });
 
   const {
     selectedFile: selectedAfterPhotos,
@@ -159,9 +164,17 @@ const EditService = () => {
           //setDate(new Date(apiResponseBody.date).toISOString().split("T")[0]);
           setDate(formatDateTime(apiResponseBody.date));
           apiResponseBody.afterNotes &&
-            setAfterComments(apiResponseBody.afterNotes);
+            setAfterComments(
+              EditorState.createWithContent(
+                convertFromHTML(apiResponseBody.afterNotes as string)
+              )
+            );
           apiResponseBody.beforeNotes &&
-            setBeforeComments(apiResponseBody.beforeNotes);
+            setBeforeComments(
+              EditorState.createWithContent(
+                convertFromHTML(apiResponseBody.beforeNotes as string)
+              )
+            );
           setType(
             apiResponseBody.serviceTypes.map((type) => {
               return {
@@ -242,9 +255,9 @@ const EditService = () => {
       router.query.serviceId as string,
       dateObject,
       serviceTypesSelected,
-      beforeComments,
+      draftToHtml(convertToRaw(beforeComments.getCurrentContent())),
       selectedBeforePhotos,
-      afterComments,
+      draftToHtml(convertToRaw(afterComments.getCurrentContent())),
       selectedAfterPhotos
     );
 
@@ -342,7 +355,7 @@ const EditService = () => {
             }
             rows={5}
             required={false}
-            value={beforeComments}
+            editorState={beforeComments}
             onChangeHandler={beforeCommentsChangedHandler}
             onBlurHandler={beforeCommentsBlurHandler}
           />
@@ -371,7 +384,7 @@ const EditService = () => {
             }
             rows={5}
             required={false}
-            value={afterComments}
+            editorState={afterComments}
             onChangeHandler={afterCommentsChangedHandler}
             onBlurHandler={afterCommentsBlurHandler}
           />

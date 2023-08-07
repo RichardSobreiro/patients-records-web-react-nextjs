@@ -23,6 +23,11 @@ import { CreateServiceRequest } from "@/models/customers/services/CreateServiceR
 import { GetServiceTypeResponse } from "@/models/customers/service-types/GetServiceTypesResponse";
 import { createService } from "@/api/customers/servicesApi";
 
+import useTextArea from "@/hooks/use-textarea";
+import { convertFromHTML } from "draft-convert";
+import draftToHtml from "draftjs-to-html";
+import { EditorState, convertToRaw } from "draft-js";
+
 const CreateService = () => {
   const { data: session, status, update } = useSession();
   const router = useRouter();
@@ -53,14 +58,14 @@ const CreateService = () => {
   } = useDropdown({ validateValue: atLeastOneSelectedArray });
 
   const {
-    value: beforeComments,
+    editorState: beforeComments,
     isValid: beforeCommentsIsValid,
     hasError: beforeCommentsInputHasError,
     valueChangeHandler: beforeCommentsChangedHandler,
     inputBlurHandler: beforeCommentsBlurHandler,
     reset: resetBeforeCommentsInput,
-    setEnteredValue: setBeforeComments,
-  } = useInput({ validateValue: () => true });
+    setEditorState: setBeforeComments,
+  } = useTextArea({ validateValue: () => true });
 
   const {
     selectedFile: selectedBeforePhotos,
@@ -73,14 +78,14 @@ const CreateService = () => {
   } = useFileInput({ validateValue: () => true });
 
   const {
-    value: afterComments,
+    editorState: afterComments,
     isValid: afterCommentsIsValid,
     hasError: afterCommentsInputHasError,
     valueChangeHandler: afterCommentsChangedHandler,
     inputBlurHandler: afterCommentsBlurHandler,
     reset: resetAfterCommentsInput,
-    setEnteredValue: setAfterComments,
-  } = useInput({ validateValue: () => true });
+    setEditorState: setAfterComments,
+  } = useTextArea({ validateValue: () => true });
 
   const {
     selectedFile: selectedAfterPhotos,
@@ -123,9 +128,9 @@ const CreateService = () => {
     const request = new CreateServiceRequest(
       dateObject,
       serviceTypesSelected,
-      beforeComments,
+      draftToHtml(convertToRaw(beforeComments.getCurrentContent())),
       selectedBeforePhotos,
-      afterComments,
+      draftToHtml(convertToRaw(afterComments.getCurrentContent())),
       selectedAfterPhotos
     );
 
@@ -223,7 +228,7 @@ const CreateService = () => {
             }
             rows={5}
             required={false}
-            value={beforeComments}
+            editorState={beforeComments}
             onChangeHandler={beforeCommentsChangedHandler}
             onBlurHandler={beforeCommentsBlurHandler}
           />
@@ -252,7 +257,7 @@ const CreateService = () => {
             }
             rows={5}
             required={false}
-            value={afterComments}
+            editorState={afterComments}
             onChangeHandler={afterCommentsChangedHandler}
             onBlurHandler={afterCommentsBlurHandler}
           />

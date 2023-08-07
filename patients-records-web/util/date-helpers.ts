@@ -1,7 +1,12 @@
 /** @format */
 
 export const formatDateTime = (dateTime: Date): string => {
-  let m = new Date(dateTime);
+  let m = new Date();
+  if (dateTime && typeof dateTime === "string") {
+    m = new Date((dateTime as unknown as string).slice(0, -1));
+  } else {
+    m = new Date(dateTime as unknown as string);
+  }
   let dateString =
     m.getFullYear() +
     "-" +
@@ -16,7 +21,12 @@ export const formatDateTime = (dateTime: Date): string => {
 };
 
 export const formatDateTimePTBR = (dateTime: Date): string => {
-  let m = new Date(dateTime);
+  let m = new Date();
+  if (dateTime && typeof dateTime === "string") {
+    m = new Date((dateTime as unknown as string).slice(0, -1));
+  } else {
+    m = new Date(dateTime as unknown as string);
+  }
   let dateString =
     (m.getDate() < 10 ? "0" + m.getDate() : m.getDate()) +
     "/" +

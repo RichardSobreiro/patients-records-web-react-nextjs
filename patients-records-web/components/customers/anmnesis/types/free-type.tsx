@@ -4,9 +4,12 @@ import { ItemAnamnesis } from "@/components/ui/dropdown-anamnesis-type";
 import { Item } from "@/components/ui/dropdown-service-type";
 import TextArea from "@/components/ui/textarea";
 import { FileCustom } from "@/hooks/use-file-input";
-import useInput from "@/hooks/use-input";
+import useTextArea from "@/hooks/use-textarea";
 import { isNotEmpty } from "@/util/field-validations";
 import { useEffect } from "react";
+import { convertFromHTML } from "draft-convert";
+import draftToHtml from "draftjs-to-html";
+import { EditorState, convertToRaw } from "draft-js";
 
 type Props = {
   anamnesisTypeId: string;
@@ -28,17 +31,18 @@ const AnamnesisFreeTypeForm = ({
   anamnesisTypeContentIsValid,
 }: Props) => {
   const {
-    value: anamnesisFreeTypeText,
+    editorState: anamnesisFreeTypeText,
     isValid: anamnesisFreeTypeTextIsValid,
     hasError: anamnesisFreeTypeTextInputHasError,
     valueChangeHandler: anamnesisFreeTypeTextChangedHandler,
     inputBlurHandler: anamnesisFreeTypeTextBlurHandler,
     reset: resetAnamnesisFreeTypeTextInput,
-    setEnteredValue: setTemplate,
-  } = useInput({ validateValue: isNotEmpty });
+    setEditorState: setTemplate,
+  } = useTextArea({ validateValue: () => true });
 
   useEffect(() => {
-    template && setTemplate(template);
+    template &&
+      setTemplate(EditorState.createWithContent(convertFromHTML(template)));
   }, [template]);
 
   useEffect(() => {
@@ -50,7 +54,9 @@ const AnamnesisFreeTypeForm = ({
       if (targetType && targetType.length === 1) {
         targetType[0].anamnesisTypeContentIsValid =
           anamnesisFreeTypeTextIsValid;
-        targetType[0].anamnesisTypeContent = anamnesisFreeTypeText;
+        targetType[0].anamnesisTypeContent = draftToHtml(
+          convertToRaw(anamnesisFreeTypeText.getCurrentContent())
+        );
         setTypes(newSelectedTypes);
       }
     }
@@ -67,7 +73,7 @@ const AnamnesisFreeTypeForm = ({
         errorMessage={"O conteúdo da anamnese é inválido"}
         rows={20}
         required={false}
-        value={anamnesisFreeTypeText}
+        editorState={anamnesisFreeTypeText}
         onChangeHandler={anamnesisFreeTypeTextChangedHandler}
         onBlurHandler={anamnesisFreeTypeTextBlurHandler}
       />

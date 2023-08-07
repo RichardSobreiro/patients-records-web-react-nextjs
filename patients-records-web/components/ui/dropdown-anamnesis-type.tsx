@@ -36,6 +36,10 @@ import { ApiResponse } from "@/models/Api/ApiResponse";
 import { UpdateAnamnesisTypeRequest } from "@/models/customers/anamnesis-types/UpdateAnamnesisTypeRequest";
 import { UpdateAnamnesisTypeResponse } from "@/models/customers/anamnesis-types/UpdateAnamnesisTypeResponse";
 import { FileCustom } from "@/hooks/use-file-input";
+import useTextArea from "@/hooks/use-textarea";
+import { convertFromHTML } from "draft-convert";
+import draftToHtml from "draftjs-to-html";
+import { EditorState, convertToRaw } from "draft-js";
 
 export type ItemAnamnesis = {
   id: string;
@@ -103,14 +107,14 @@ const DropdownAnamnesisTypes = ({
   } = useInput({ validateValue: isNotEmpty });
 
   const {
-    value: enteredAnamnesisTypeTemplate,
+    editorState: enteredAnamnesisTypeTemplate,
     isValid: enteredAnamnesisTypeTemplateIsValid,
     hasError: enteredAnamnesisTypeTemplateInputHasError,
     valueChangeHandler: enteredAnamnesisTypeTemplateChangedHandler,
     inputBlurHandler: enteredAnamnesisTypeTemplateBlurHandler,
     reset: resetEnteredAnamnesisTypeTemplateInput,
-    setEnteredValue: setEnteredAnamnesisTypeTemplate,
-  } = useInput({ validateValue: isNotEmpty });
+    setEditorState: setEnteredAnamnesisTypeTemplate,
+  } = useTextArea({ validateValue: () => true });
 
   const [anamnesisTypeBeingEditedId, setAnamnesisTypeBeingEditedId] = useState<
     string | undefined
@@ -330,7 +334,11 @@ const DropdownAnamnesisTypes = ({
     setShowDropdown(false);
 
     setEnteredAnamnesisTypeDescription(item.description);
-    setEnteredAnamnesisTypeTemplate(item.value.template);
+    setEnteredAnamnesisTypeTemplate(
+      EditorState.createWithContent(
+        convertFromHTML(item.value.template as string)
+      )
+    );
     setAnamnesisTypeBeingEditedId(item.id);
 
     setShowCreateEditAnamnesisTypeModal(true);
@@ -355,7 +363,9 @@ const DropdownAnamnesisTypes = ({
       const editAnamnesisTypeRequest = new UpdateAnamnesisTypeRequest(
         anamnesisTypeBeingEditedId,
         enteredAnamnesisTypeDescription!,
-        enteredAnamnesisTypeTemplate!
+        draftToHtml(
+          convertToRaw(enteredAnamnesisTypeTemplate!.getCurrentContent())
+        )
       );
 
       apiResponse = await updateAnamnesisType(
@@ -365,7 +375,9 @@ const DropdownAnamnesisTypes = ({
     } else {
       const createAnamnesisTypeRequest = new CreateAnamnesisTypeRequest(
         enteredAnamnesisTypeDescription!,
-        enteredAnamnesisTypeTemplate!
+        draftToHtml(
+          convertToRaw(enteredAnamnesisTypeTemplate!.getCurrentContent())
+        )
       );
 
       apiResponse = await createAnamnesisType(
@@ -469,7 +481,7 @@ const DropdownAnamnesisTypes = ({
                 id={"new-anamnesis-type-template-create"}
                 hasError={enteredAnamnesisTypeTemplateInputHasError}
                 errorMessage={"O template do tipo da anamnese é inválido"}
-                value={enteredAnamnesisTypeTemplate}
+                editorState={enteredAnamnesisTypeTemplate}
                 onChangeHandler={enteredAnamnesisTypeTemplateChangedHandler}
                 onBlurHandler={enteredAnamnesisTypeTemplateBlurHandler}
                 required

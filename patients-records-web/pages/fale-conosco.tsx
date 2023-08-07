@@ -13,6 +13,10 @@ import Head from "next/head";
 import Image from "next/image";
 import { useContext, useEffect, useState } from "react";
 
+import useTextArea from "@/hooks/use-textarea";
+import draftToHtml from "draftjs-to-html";
+import { convertToRaw } from "draft-js";
+
 const sendContactData = async (
   name: string,
   email: string,
@@ -58,13 +62,13 @@ const FaleConosco = () => {
   } = useInput({ validateValue: isEmail });
 
   const {
-    value: enteredMessage,
+    editorState: enteredMessage,
     isValid: enteredMessageIsValid,
     hasError: enteredMessageInputHasError,
     valueChangeHandler: enteredMessageChangedHandler,
     inputBlurHandler: enteredMessageBlurHandler,
     reset: resetEnteredMessageInput,
-  } = useInput({ validateValue: isNotEmpty });
+  } = useTextArea({ validateValue: () => true });
 
   const sendMessageHandler = async (event: any) => {
     event.preventDefault();
@@ -76,7 +80,6 @@ const FaleConosco = () => {
     )
       return;
 
-    //setRequestStatus("pending");
     setIsSendingMessage(true);
     notificationCtx.showNotification({
       status: "pending",
@@ -85,8 +88,11 @@ const FaleConosco = () => {
     });
 
     try {
-      await sendContactData(enteredName!, enteredEmail!, enteredMessage!);
-      //setRequestStatus("success");
+      await sendContactData(
+        enteredName!,
+        enteredEmail!,
+        draftToHtml(convertToRaw(enteredMessage.getCurrentContent()))
+      );
       notificationCtx.showNotification({
         status: "success",
         title: "Sucesso!",
@@ -96,7 +102,6 @@ const FaleConosco = () => {
       resetEmailInput();
       resetEnteredNameInput();
     } catch (error: any) {
-      //setRequestStatus("error");
       notificationCtx.showNotification({
         status: "error",
         title: "Erro!",
@@ -166,7 +171,7 @@ const FaleConosco = () => {
                 rows={5}
                 required={true}
                 placeholder={"Digite sua mensagem aqui..."}
-                value={enteredMessage}
+                editorState={enteredMessage}
                 onChangeHandler={enteredMessageChangedHandler}
                 onBlurHandler={enteredMessageBlurHandler}
               />
